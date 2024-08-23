@@ -1,0 +1,99 @@
+{% load static %}
+{% block content %}
+{% include 'header.html' %}
+
+<head>
+    <style>
+        /* Center alignment for form elements */
+        .center {
+            text-align: center;
+        }
+
+        /* Input field styling */
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Submit button styling */
+        .submit-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 0px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Form container styling */
+        .forgot-form {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Headline and paragraph styling */
+        .form-heading {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Adjustments for responsiveness */
+        @media (max-width: 768px) {
+            .forgot-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<section class="section" id="contact-us">
+    <div class="container-fluid">
+        <div class="row">
+            <center>
+                <div class="col-lg-6 col-md-6 col-xs-12">
+                    <div class="forgot-form">
+                        <form id="forgot" method="POST" action="{% url 'forgot' %}">
+                            {% csrf_token %}
+                            <h4 class="form-heading">Forgot Password</h4>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input class="form-control" type="text" id="username" name="username" placeholder="Enter your Correct Username*" required>
+                                </div>
+                                <div class="col-md-12 col-sm-12">
+                                    <input class="form-control" type="email" id="email" name="email" placeholder="Enter your Registered Email*" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <button type="submit" class="submit-button">Submit</button>
+                                    <p>The password will be sent to your registered email-Id</p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </center>
+        </div>
+    </div>
+</section>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>  
+{% endblock %}

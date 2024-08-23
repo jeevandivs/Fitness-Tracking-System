@@ -1,0 +1,91 @@
+{% load static %}
+{% block content %}
+{% include 'header.html' %}
+
+    <!-- ***** Header Area End ***** -->
+
+    <!-- ***** Main Banner Area Start ***** -->
+  
+    <!-- ***** Main Banner Area End ***** -->
+
+    <!-- ***** Features Item Start ***** -->
+
+    <!-- ***** Testimonials Ends ***** -->
+    
+    <!-- ***** Contact Us Area Starts ***** -->
+    <section class="section" id="contact-us">
+        <div class="container-fluid">
+            <div class="row">
+                <center>
+<body>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+</body>
+                <div class="col-lg-6 col-md-6 col-xs-12">
+                    <div class="contact-form">
+                        <form id="contact" action="{% url 'register' %}" method="post">
+                        {% csrf_token %}
+                        <h2 style="color:red;">{{status}}</h2>
+                        <br><br>
+                          <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                              <fieldset>
+                                <input name="name" value="{{res.name}}" type="text" id="name" placeholder="Your Name*" required="">
+                              </fieldset>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                              <fieldset>
+                                <input name="email" value="{{res.email}}" type="email" id="email" pattern="[^ @]*@[^ @]*" placeholder="Your Email*" required="">
+                              </fieldset>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                              <fieldset>
+                                <input name="phone" value="{{res.phone}}" type="number" id="phone" pattern="[0-9]{10}" title='Enter 10 digits' placeholder="Your Phone Number*" required="">
+                              </fieldset>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <fieldset>
+                                  <input name="dob" type="date" id="dob" placeholder="Date Of Birth*" required="">
+                                </fieldset>
+                              </div>
+                            <div class="col-md-12 col-sm-12">
+                              <fieldset>
+                                <input name="username" type="text" id="username" placeholder="Username*" required="">
+                              </fieldset>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                              <fieldset>
+                                <input name="password" type="password" id="password" placeholder="Password*" required="">
+                              </fieldset>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                              <fieldset>
+                                <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm Password*" required="">
+                              </fieldset>
+                            </div>
+                            <br><br><br>
+                            <div class="col-lg-12">
+                              <fieldset>
+                                <button type="submit" id="form-submit" name="submit" value="REGISTER" class="main-button">REGISTER</button>
+                            </div>
+                          </div><br>
+                          <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                        </form>
+                    </div>
+                </div>
+                </center>
+            </div>
+        </div>
+    </section>
+    <footer>
+      <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+  </footer>  
+  {% endblock %}
