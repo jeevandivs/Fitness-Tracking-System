@@ -1,5 +1,5 @@
 {% load static %}
-{% include 'header1.html' %}
+{% include 'fm_header.html' %}
 {% block content %}
 <style>
     body {
@@ -86,13 +86,9 @@
             <img src="{% static 'images/profile-placeholder.png' %}" alt="Profile Picture">
 
             <!-- Profile Information -->
-            <h2>{{ client.username }}</h2>
-            <p><strong>Name:</strong> {{ client.name }}</p>
-            <p><strong>Email:</strong> {{ client.email }}</p>
-            <p><strong>Phone:</strong> {{ client.phone }}</p>
-            <p><strong>Date of Birth:</strong> {{ client.dob }}</p>
-            <p><strong>Age:</strong> {{ client.age }}</p>
-            <p><strong>Date Joined:</strong> {{ client.date_joined }}</p>
+            <h2>{{ tbl_fitness_manager.name }}</h2>
+            <p><strong>User Name:</strong> {{ tbl_fitness_manager.username }}</p>
+            <p><strong>Date Joined:</strong> {{ tbl_fitness_manager.date_joined }}</p>
             
             <!-- Edit Button -->
             <a href="#" class="btn" id="edit-btn">Edit Profile</a>

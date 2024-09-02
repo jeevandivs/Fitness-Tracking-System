@@ -1,224 +1,199 @@
 {% load static %}
 {% block content %}
-{% include 'header.html' %}
-        <!-- Content -->
-        <style>
-            body {
-              background-image: url("{% static 'assets/images/gyminside.jpg' %}");
-              background-repeat: no-repeat; 
-              background-size: cover; 
-              background-position: center;
-            }
-            </style>
-         <body></body>
-        <div class="content">
-            <!-- Animated -->
-            <div class="animated fadeIn">
-                <!-- Widgets  -->
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-users"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="manage_clients">MANAGE CLIENTS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6">
+{% include 'fm_header.html' %}
 
-						<div class="card">
+<!-- Content -->
+<style>
+    body {
+        background-image: url("{% static 'assets/images/gyminside.jpg' %}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
 
-							<div class="card-body">
+    .sidebar {
+        width: 250px;
+        position: fixed;
+        top: 79px;
+        left: 0;
+        bottom: 0; /* Extend sidebar to the bottom of the viewport */
+        background-color: #333;
+        padding-top: 20px;
+        padding-left: 10px;
+        overflow-y: auto;
+    }
 
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-users"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="formtrainer">MANAGE WORKOUTS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>       
+    .sidebar .card {
+        margin-bottom: 20px;
+    }
 
-					
-					<div class="col-lg-3 col-md-6">
+    .sidebar .card-body {
+        background-color: #444; /* Card background color */
+        color: #fff; /* Card text color */
+    }
 
-						<div class="card">
-
-							<div class="card-body">
-								 <div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="viewallattendence">MANAGE NUTRITION<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-					</div>
-
-					<div class="col-lg-3 col-md-6">
-						<div class="card">
-
-							<div class="card-body">
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-file"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="formproduct">MANAGE MENTAL FITNESS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    .sidebar .card-body a {
+        color: #fff;
+        text-decoration: none;
+    }
+    footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #f8f5f5;
+        color: #fff;
+        position: relative;
+        width: 100%;
+        bottom: 0;
+        margin-top: 900px;
+    }
+</style>
+<body></body>
+    <div class="sidebar">
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="manage_clients">MANAGE CLIENTS</a></div>
                         </div>
                     </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-image"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="formblog">VIEW GOALS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-								               
-                    <div class="col-lg-3 col-md-6">
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-file"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="formvedio">VIEW PROGRESS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-rupee"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="viwpay">VIEW PAYMENTS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="reports">VIEW PLANS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-								
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="upgymfee">UPDATE SERVICES<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-								
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="adminviewfeedback">FEEDBACK<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-								
-                    </div>
-                <div>
+                </div>
             </div>
-
- 
-
         </div>
-			
-                <!-- /Widgets -->
-             
-            <!-- /#add-category -->
- 
-            <!-- .animated -->
-        <!-- /.content -->
-        <div class="clearfix"></div>
-<BR><BR><BR>
-{% include 'admin_footer.html' %}
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="formtrainer">MANAGE WORKOUTS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-table"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="viewallattendence">MANAGE NUTRITION</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-file"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="formproduct">MANAGE MENTAL FITNESS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-image"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="formblog">VIEW GOALS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-file"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="formvedio">VIEW PROGRESS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-rupee"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="viwpay">VIEW PAYMENTS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-table"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="reports">VIEW PLANS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-table"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="upgymfee">UPDATE SERVICES</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-table"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="adminviewfeedback">FEEDBACK</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+    </footer>  
 {% endblock %}

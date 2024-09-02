@@ -1,0 +1,56 @@
+
+
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
+
+    <title>FITSCULPT</title>
+	<script type="text/javascript">
+        function preventBack() {
+            window.history.forward(); 
+        }
+          
+        setTimeout("preventBack()", 0);
+          
+        window.onunload = function () { null };
+    </script>
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'assets/css/templatemo-training-studio.css' %}">
+
+    </head>
+    
+    <body>
+        <header class="header-area header-sticky">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav" style="background-color:black;">
+                        <a href="" class="logo">FIT<em> SCULPT</em></a>
+                        <ul class="nav">
+                           <li class="scroll-to-section"><a href="{% url 'fm_home' %}" class="">HOME</a></li>
+						   <li class="scroll-to-section"><a href="{% url 'fm_profile' %}" class="">PROFILE</a></li>
+						   <li class="main-button"><a href="{% url 'fm_logout' %}">Logout</a></li>
+                           
+                        </ul>        
+                       
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+	{% endblock %}

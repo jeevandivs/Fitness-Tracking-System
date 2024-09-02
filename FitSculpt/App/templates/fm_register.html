@@ -2,12 +2,6 @@
 {% block content %}
 {% include 'header.html' %}
 
-<!-- ***** Header Area End ***** -->
-<!-- ***** Main Banner Area Start ***** -->
-<!-- ***** Main Banner Area End ***** -->
-<!-- ***** Features Item Start ***** -->
-<!-- ***** Testimonials Ends ***** -->
-<!-- ***** Contact Us Area Starts ***** -->
 <section class="section" id="contact-us">
     <div class="container-fluid">
         <div class="row">
@@ -20,12 +14,12 @@
                                 {{ message }}
                             </li>
                         {% endfor %}
-                    </ul> 
+                    </ul>
                 {% endif %}
                 </body>
                 <div class="col-lg-6 col-md-6 col-xs-12">
                     <div class="contact-form">
-                        <form id="registration-form" action="{% url 'register' %}" method="post">
+                        <form id="fitness-manager-form" action="{% url 'fm_register' %}" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <h2 style="color:red;">{{status}}</h2>
                             <br><br>
@@ -49,113 +43,125 @@
                                     </fieldset>
                                 </div>
                                 <div class="col-md-12 col-sm-12">
-                                    <fieldset>
-                                        <input name="dob" type="date" id="dob" placeholder="Date Of Birth*" required>
-                                        <span class="error-message" id="dob-error"></span>
+                                    <fieldset class="dropdown-fieldset">
+                                        <select name="qualification" id="qualification" required>
+                                            <option value="">Select Qualification*</option>
+                                            <option value="Certified Fitness Trainer">Certified Fitness Trainer</option>
+                                            <option value="Certified Personal Trainer">Certified Personal Trainer</option>
+                                            <option value="Certified Nutritionist or Dietitian">Certified Nutritionist or Dietitian</option>
+                                            <option value="Certified Mental Health Professional">Certified Mental Health Professional</option>
+                                            <option value="Certified Bodybuilding Coach">Certified Bodybuilding Coach</option>
+                                        </select>
+                                        <span class="error-message" id="qualification-error"></span>
                                     </fieldset>
                                 </div>
                                 <div class="col-md-12 col-sm-12">
-                                    <fieldset>
-                                        <input name="username" type="text" id="username" placeholder="Username*" required>
-                                        <span class="error-message" id="username-error"></span>
+                                    <fieldset class="dropdown-fieldset">
+                                        <select name="designation" id="designation" required>
+                                            <option value="">Select Designation*</option>
+                                            <option value="General Fitness Manager">General Fitness Manager</option>
+                                            <option value="Personal Trainer">Personal Trainer</option>
+                                            <option value="Specialized Diet Recommender">Specialized Diet Recommender</option>
+                                            <option value="Mental Fitness Manager">Mental Fitness Manager</option>
+                                            <option value="Body Builder Specialist">Body Builder Specialist</option>
+                                        </select>
+                                        <span class="error-message" id="designation-error"></span>
                                     </fieldset>
-                                </div>
-                                <div class="col-md-12 col-sm-12">
                                     <fieldset>
-                                        <input name="password" type="password" id="password" placeholder="Password*" required>
-                                        <span class="error-message" id="password-error"></span>
-                                    </fieldset>
-                                </div>
-                                <div class="col-md-12 col-sm-12">
-                                    <fieldset>
-                                        <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm Password*" required>
-                                        <span class="error-message" id="confirm-password-error"></span>
-                                    </fieldset>
-                                </div>
-                                <br><br><br><br><br>
+                                        <p>Upload Your Course completion Certificate</p>
+                                        <input name="certificate_proof" type="file" id="certificate_proof" placeholder="Upload Your Course completion Certificate" accept=".pdf,.jpg,.jpeg,.png" required>
+                                        <span class="error-message" id="certificate-proof-error"></span>
+                                    </fieldset><br><br><br>
                                 <div class="col-lg-12">
                                     <fieldset>
-                                        <button type="submit" id="form-submit" name="submit" value="REGISTER" class="main-button">REGISTER</button>
+                                        <button type="submit" id="form-submit" name="submit" value="REGISTER" class="main-button">REGISTER FOR JOB</button>
                                     </fieldset>
                                 </div>
                             </div><br>
-                            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                            <p>Already have an account? <a href="{% url 'fm_login' %}">Login here</a></p>
                         </form>
                     </div>
                 </div>
             </center>
         </div>
     </div>
+
+
 </section>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
 </footer>  
 
+<style>
+  .dropdown-fieldset {
+      position: relative;
+      margin-bottom: 1em;
+  }
+
+  select {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      font-size: 1em;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  select:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+  }
+
+  .error-message {
+      color: #dc3545;
+      font-size: 0.875em;
+  }
+
+
+  
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      const form = document.getElementById('registration-form');
-      const dobField = document.getElementById('dob');
-      const passwordField = document.getElementById('password');
-      const confirmPasswordField = document.getElementById('confirm_password');
+      const form = document.getElementById('fitness-manager-form');
 
       const nameField = document.getElementById('name');
       const emailField = document.getElementById('email');
       const phoneField = document.getElementById('phone');
-      const usernameField = document.getElementById('username');
+      const qualificationField = document.getElementById('qualification');
+      const designationField = document.getElementById('designation');
 
       const nameError = document.getElementById('name-error');
       const emailError = document.getElementById('email-error');
       const phoneError = document.getElementById('phone-error');
-      const dobError = document.getElementById('dob-error');
-      const usernameError = document.getElementById('username-error');
-      const passwordError = document.getElementById('password-error');
-      const confirmPasswordError = document.getElementById('confirm-password-error');
+      const qualificationError = document.getElementById('qualification-error');
+      const designationError = document.getElementById('designation-error');
 
-      // Function to display error messages
       function showError(element, message) {
           element.textContent = message;
           element.style.color = 'red';
       }
 
-      // Function to clear error messages
       function clearErrors() {
           nameError.textContent = '';
           emailError.textContent = '';
           phoneError.textContent = '';
-          dobError.textContent = '';
-          usernameError.textContent = '';
-          passwordError.textContent = '';
-          confirmPasswordError.textContent = '';
+          qualificationError.textContent = '';
+          designationError.textContent = '';
       }
 
       nameField.addEventListener('input', function () {
-          const namePattern = /^[A-Za-z\s]+$/;
+          const namePattern = /^[A-Za-z\s\-]+$/;
           if (!namePattern.test(nameField.value)) {
-              showError(nameError, 'Name can only contain letters and spaces.');
+              showError(nameError, 'Name can only contain letters & spaces.');
           } else if (nameField.value.trim() === '') {
               showError(nameError, 'Name is required.');
           } else {
               nameError.textContent = '';
-          }
-      });
-
-      dobField.addEventListener('change', function () {
-          const dob = new Date(dobField.value);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-
-          if (dob > today) {
-              showError(dobError, 'Date of birth cannot be in the future.');
-          } else {
-              dobError.textContent = '';
-          }
-      });
-
-      form.addEventListener('input', function () {
-          if (passwordField.value !== confirmPasswordField.value) {
-              showError(confirmPasswordError, 'Passwords do not match.');
-          } else {
-              confirmPasswordError.textContent = '';
           }
       });
 
@@ -177,19 +183,17 @@
           }
       });
 
-      usernameField.addEventListener('input', function () {
-          if (['fm001', 'admin001'].includes(usernameField.value)) {
-              showError(usernameError, 'This username cannot be taken.');
-          } else {
-              usernameError.textContent = '';
+      form.addEventListener('submit', function (event) {
+          clearErrors();
+          // Validate dropdowns
+          if (qualificationField.value === '') {
+              showError(qualificationError, 'Qualification is required.');
+              event.preventDefault();
           }
-      });
 
-      passwordField.addEventListener('input', function () {
-          if (passwordField.value.length < 8) {
-              showError(passwordError, 'Password must be at least 8 characters long.');
-          } else {
-              passwordError.textContent = '';
+          if (designationField.value === '') {
+              showError(designationError, 'Designation is required.');
+              event.preventDefault();
           }
       });
   });

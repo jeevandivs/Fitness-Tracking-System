@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-sy3fl#=*y&8&yeyqn(n=t@ed(l=ov=e4m0@v3fv@2!1y!49e4a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['yourdomain.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -152,7 +152,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'jeevandominic2025@mca.ajce.in'
-EMAIL_HOST_PASSWORD = 'Jeevan123@'
+EMAIL_HOST_PASSWORD = 'appichan123@'
 DEFAULT_FROM_EMAIL = 'jeevandominic2025@mca.ajce.in'
 
 #google signin
@@ -166,3 +166,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1200
+
+#for storing images
+MEDIA_URL = '/media/'
+MEDIA_ROOT=os.path.join(BASE_DIR,'media')
