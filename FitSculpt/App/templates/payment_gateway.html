@@ -1,0 +1,207 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #d6c2bc;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 50px;
+    background-color: white;
+    border: 2px solid #1B1B1B;
+    box-shadow: 6px 6px 0px #1B1B1B;
+    border-radius: 8px;
+    width: 48vw;
+    max-width: 600px;
+}
+
+.heading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#exit {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+input {
+    margin-top: 10px;
+    padding: 16px 24px;
+    width: 100%;
+    background: #FFFFFF;
+    border: 2px solid #1B1B1B;
+    border-radius: 16px;
+    transition: 0.2s;
+}
+
+input:focus {
+    outline: none;
+    background: #F9E450;
+    border: 3px solid #1B1B1B;
+}
+
+.exp-cvc {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.expiration, .security {
+    flex: 1;
+}
+
+span {
+    padding-left: 5px;
+    cursor: pointer;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn {
+    background-color: #b35138;
+    border: 2px solid #1B1B1B;
+    border-radius: 16px;
+    padding: 16px 32px;
+    text-align: center;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.16s ease-out;
+}
+
+.btn:hover {
+    border: 4px solid #1B1B1B;
+    box-shadow: 0px 0px 0px 4px #C1BFFA;
+}
+
+.error {
+    color: red;
+    font-size: 0.75rem;
+    margin-top: 5px;
+}
+
+</style>
+<div class="main">
+    <div class="container">
+        <div class="heading">
+            <h1>Payment details for {{ plan.plan_name }}</h1>
+            <p>Amount: ${{ plan.amount }}</p>  <!-- Dynamically display plan amount -->
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    ````{% endif %}
+        <form id="payment-form" action="{% url 'payment_gateway' plan.plan_id %}" method="post">
+            {% csrf_token %}
+            <label for="name">Card Holder Name</label>
+            <input type="text" id="name" name="name" placeholder="Name" required />
+            <div id="name-error" class="error"></div>
+
+            <label for="card">Card Number</label>
+            <input type="text" id="card" name="card" placeholder="0000 0000 0000 0000" required minlength="16" maxlength="16" />
+            <div id="card-error" class="error"></div>
+
+            <div class="exp-cvc">
+                <div class="expiration">
+                    <label for="expiry">Expiry Date</label>
+                    <input name="expiry" id="expiry" type="text" required placeholder="MM/YY" required minlength="5" maxlength="5" />
+                    <div id="expiry-error" class="error"></div>
+                </div>
+
+                <div class="security">
+                    <label for="cvc">CVV</label>
+                    <input type="password" id="cvc" name="cvc" placeholder="XXX" required minlength="3" maxlength="3" />
+                    <div id="cvc-error" class="error"></div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" id="form-submit" name="submit" class="btn">MAKE PAYMENT</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameField = document.getElementById('name');
+        const cardField = document.getElementById('card');
+        const expiryField = document.getElementById('expiry');
+        const cvcField = document.getElementById('cvc');
+
+        const nameError = document.getElementById('name-error');
+        const cardError = document.getElementById('card-error');
+        const expiryError = document.getElementById('expiry-error');
+        const cvcError = document.getElementById('cvc-error');
+
+        // Function to display error messages
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.color = 'red';
+        }
+
+        nameField.addEventListener('input', function () {
+            const namePattern = /^[a-zA-Z\s]+$/; // Only characters and spaces
+            if (!namePattern.test(nameField.value)) {
+                showError(nameError, 'Please enter a valid name (letters and spaces only).');
+            } else if (nameField.value.trim() === '') {
+                showError(nameError, 'Name is required.');
+            } else {
+                nameError.textContent = '';
+            }
+        });
+
+        cardField.addEventListener('input', function () {
+    const cardPattern = /^\d{16}$/; // 16 digits only
+    const cleanedValue = cardField.value.replace(/\s/g, ''); // Remove spaces
+    if (!cardPattern.test(cleanedValue)) {
+        showError(cardError, 'Card number must be exactly 16 digits and contain only numbers.');
+    } else {
+        cardError.textContent = '';
+    }
+});
+
+        expiryField.addEventListener('input', function () {
+            const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
+            if (!expiryPattern.test(expiryField.value)) {
+                showError(expiryError, 'Expiry date must be in MM/YY format.');
+            } else {
+                expiryError.textContent = '';
+            }
+        });
+
+        cvcField.addEventListener('input', function () {
+            const cvcPattern = /^\d{3}$/; // 3 digits
+            if (!cvcPattern.test(cvcField.value)) {
+                showError(cvcError, 'CVV must be 3 digits.');
+            } else {
+                cvcError.textContent = '';
+            }
+        });
+    });
+</script>

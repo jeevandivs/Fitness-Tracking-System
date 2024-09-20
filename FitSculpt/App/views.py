@@ -187,9 +187,39 @@ def reset_password_view(request, uidb64, token):
     else:
         messages.error(request, 'The password reset link is invalid or has expired.')
         return redirect('forgot')
+
+
 @fm_custom_login_required
 def fm_home_view(request):
     return render(request, 'fm_home.html')
+
+@fm_custom_login_required
+def fm_users(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT user_id, name, email, phone,dob, username,gender,age,height,weight,date_joined
+            FROM client""")
+        clients = cursor.fetchall()
+        clients = [
+            {
+                'user_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'dob': row[4],
+                'username': row[5],
+                'gender': row[6],
+                'age': row[7],
+                'height': row[8],
+                'weight': row[9],
+                'date_joined': row[10],
+            } 
+            for row in clients
+        ]
+        context = {
+        'clients': clients,
+    }
+    return render(request, 'fm_users.html',context)
 
 @fm_custom_login_required
 def fm_profile_view(request):
@@ -404,23 +434,140 @@ def logout_view(request):
     request.session.flush()
     return redirect('login')
 
+
+from datetime import datetime
+from django.shortcuts import render
+from django.db import connection
+
+@custom_login_required
+def plans_view(request):
+    # Fetch user's age from the client table
+    user_id = request.session.get('user_id')  # Assuming user_id is stored in session
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT dob FROM client WHERE user_id = %s", [user_id])
+        user_data = cursor.fetchone()
+    
+    if user_data:
+        date_of_birth = user_data[0]
+        current_year = datetime.now().year
+        user_age = current_year - date_of_birth.year
+    else:
+        user_age = None  
+
+    # Fetch plans
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM tbl_plans")
+        plans = cursor.fetchall()
+    
+    plans_data = [
+        {
+            'plan_id': row[0],
+            'plan_name': row[1],
+            'amount': row[2],
+            'description': row[3],
+            'service_id': row[4],
+        } 
+        for row in plans
+    ]
+    
+    return render(request, 'plans.html', {'plans': plans_data, 'user_age': user_age})
+
+
+@custom_login_required
+def select_plan_view(request, plan_id):
+    if request.method == 'POST':
+        request.session['selected_plan'] = plan_id
+        if plan_id == 4:  
+            return redirect('payment_gateway',plan_id=plan_id) 
+        else:
+            return redirect('payment_gateway',plan_id=plan_id)  
+        
+    return redirect('user_home') 
+ 
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseBadRequest
+from .models import Plan, Payment
+from datetime import datetime
+
+@custom_login_required
+def payment_gateway_view(request, plan_id):
+    plan = get_object_or_404(Plan, plan_id=plan_id)
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        card_number = request.POST.get('card')
+        expiry = request.POST.get('expiry')
+        cvc = request.POST.get('cvc')
+
+        if not all([name, card_number, expiry, cvc]):
+            return HttpResponseBadRequest("Missing required fields")
+        payment = Payment.objects.create(
+            plan_id=plan.plan_id,  
+            payment_date=timezone.now(),
+            mode='online',  
+            status='success'  
+        )
+        payment.save()
+        messages.success(request, "Payment successful!")
+        return redirect('user_home')
+
+    return render(request, 'payment_gateway.html', {'plan': plan})
+
+
+
 def admin_login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username == 'admin001' and password == 'admin001':
-            return render(request, 'admin_home.html')
+            request.session['admin_username'] =username
+            request.session['admin_password'] =password  
+            return redirect('admin_home')
     return render(request, 'admin_login.html')
 
+@admin_custom_login_required
+def admin_logout(request):
+    request.session.flush()
+    return redirect('admin_login')
+
+
+@admin_custom_login_required
 def admin_home_view(request):
     return render(request, 'admin_home.html')
+@admin_custom_login_required
 def admin_users_view(request):
-    return render(request, 'admin_users.html')
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT user_id, name, email, phone, username, date_joined
+            FROM client""")
+        clients = cursor.fetchall()
+        clients = [
+            {
+                'user_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'username': row[4],
+                'date_joined': row[5],
+            } 
+            for row in clients
+        ]
+        context = {
+        'clients': clients,
+    }
+    return render(request, 'admin_users.html',context)
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 
+from django.conf import settings
+from django.shortcuts import render
+from django.db import connection
+
+@admin_custom_login_required
 def admin_fm_view(request):
     with connection.cursor() as cursor:
+        # Fetch fitness managers without a username and password
         cursor.execute("""
             SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof 
             FROM tbl_fitness_manager 
@@ -439,10 +586,44 @@ def admin_fm_view(request):
             } 
             for row in applicants
         ]
-    
-    return render(request, 'admin_fm.html', {'applicants': applicants, 'MEDIA_URL': settings.MEDIA_URL})
+        
+        # Fetch fitness managers with a username and password
+        cursor.execute("""
+            SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof, username, password
+            FROM tbl_fitness_manager 
+            WHERE username != '' AND password != ''
+        """)
+        complete_fms = cursor.fetchall()
+        complete_fms = [
+            {
+                'user_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'qualification_id': row[4],
+                'designation_id': row[5],
+                'certificate_proof': row[6],
+                'username': row[7],
+                'password': row[8],
+            }
+            for row in complete_fms
+        ]
 
-    
+    context = {
+        'applicants': applicants,
+        'complete_fms': complete_fms,
+        'MEDIA_URL': settings.MEDIA_URL,
+    }
+    return render(request, 'admin_fm.html', context)
+
+def delete_fm(request, user_id):
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM tbl_fitness_manager WHERE user_id = %s", [user_id])
+    return redirect('admin_fm')
+def delete_client(request, user_id):
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM client WHERE user_id = %s", [user_id])
+    return redirect('admin_users')
 
 def accept_fm_view(request, user_id):
     with connection.cursor() as cursor:

@@ -1,33 +1,142 @@
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Qualification</th>
-            <th>Designation</th>
-            <th>Certificate</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for fm in applicants %}
-        <tr>
-            <td>{{ fm.name }}</td>
-            <td>{{ fm.email }}</td>
-            <td>{{ fm.phone }}</td>
-            <td>{{ fm.qualification_id }}</td>
-            <td>{{ fm.designation_id }}</td>
-            <td>
-                <a href="{% url 'view_certificate' fm.user_id %}">View Certificate</a>
-            </td>
-            <td>
-                <form action="{% url 'accept_fm' fm.user_id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Accept</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% load static %}
+{% block content %}
+{% include 'admin_header.html' %}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #343a40;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #c82333;
+    }
+
+    form {
+        display: inline;
+    }
+
+    .section-title {
+        margin: 20px 0;
+        font-size: 24px;
+        color: #343a40;
+    }
+
+    .container {
+        padding: 20px;
+    }
+</style>
+
+<div class="container">
+    <div class="section-title">Registrations To Be Considered</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Qualification</th>
+                <th>Designation</th>
+                <th>Certificate</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fm in applicants %}
+            <tr>
+                <td>{{ fm.name }}</td>
+                <td>{{ fm.email }}</td>
+                <td>{{ fm.phone }}</td>
+                <td>{{ fm.qualification_id }}</td>
+                <td>{{ fm.designation_id }}</td>
+                <td>
+                    <a href="{% url 'view_certificate' fm.user_id %}">View Certificate</a>
+                </td>
+                <td>
+                    <form action="{% url 'accept_fm' fm.user_id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Accept</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Registered Fitness Managers (With Complete Details)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Qualification</th>
+                <th>Designation</th>
+                <th>Certificate</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fm in complete_fms %}
+            <tr>
+                <td>{{ fm.name }}</td>
+                <td>{{ fm.email }}</td>
+                <td>{{ fm.phone }}</td>
+                <td>{{ fm.qualification_id }}</td>
+                <td>{{ fm.designation_id }}</td>
+                <td>
+                    <a href="{% url 'view_certificate' fm.user_id %}">View Certificate</a>
+                </td>
+                <td>
+                    <form action="{% url 'delete_fm' fm.user_id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

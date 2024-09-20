@@ -27,7 +27,39 @@ class Client(models.Model):
         today = datetime.today().date()
         age = today.year - self.dob.year - ((today.month, today.day) < (self.dob.month, self.dob.day))
         return age
+
+from django.db import models
+
+class Plan(models.Model):
+    plan_id = models.AutoField(primary_key=True)  # Auto-incrementing primary key
+    plan_name = models.CharField(max_length=100)  # Name of the plan
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Amount for the plan
+    description = models.TextField()  # Description of the plan
+    service_id = models.IntegerField()  # Assuming service_id relates to some service in your application
     
+    class Meta:
+        managed = False
+        db_table = 'tbl_plans'
+    def __str__(self):
+        return self.plan_name
+
+from django.db import models
+from django.utils import timezone
+
+
+class Payment(models.Model):
+    payment_id = models.AutoField(primary_key=True)
+    plan_id = models.IntegerField() 
+    payment_date = models.DateTimeField(default=timezone.now)  # Use DateTimeField to store both date and time
+    mode = models.CharField(max_length=50) 
+    status = models.CharField(max_length=50)  
+    class Meta:
+        managed = False
+        db_table = 'tbl_payment'
+    def __str__(self):
+        return f"Payment {self.payment_id} - {self.status}"
+
+
 class FitnessManager(models.Model):
     user_id = models.AutoField(primary_key=True) 
     name = models.CharField(max_length=50)

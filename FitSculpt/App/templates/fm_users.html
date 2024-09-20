@@ -1,6 +1,6 @@
 {% load static %}
 {% block content %}
-{% include 'admin_header.html' %}
+{% include 'fm_header.html' %}
 
 <style>
     body {
@@ -72,27 +72,34 @@
       <table>
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Date Of Birth</th>
                 <th>Username</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Height</th>
+                <th>Weight</th>
                 <th>Joined Date</th>
             </tr>
         </thead>
         <tbody>
             {% for client in clients %}
             <tr>
+                <td>{{ client.user_id }}</td>
                 <td>{{ client.name }}</td>
                 <td>{{ client.email }}</td>
                 <td>{{ client.phone }}</td>
+                <td>{{ client.dob }}</td>
                 <td>{{ client.username }}</td>
+                <td>{{ client.gender }}</td>
+                <td>{{ client.age }}</td>
+                <td>{{ client.height }}</td>
+                <td>{{ client.weight }}</td>
                 <td>{{ client.date_joined }}</td>
-                <td>
-                    <form action="{% url 'delete_client' client.user_id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
+                
             </tr>
             {% endfor %}
         </tbody>

@@ -11,6 +11,10 @@ urlpatterns = [
     path('register/', views.register_view, name='register'), 
     path('user_home/', views.user_home_view, name='user_home'),
     path('forgot/', views.forgot_view, name='forgot'),
+    path('plans/', views.plans_view, name='plans'),
+    path('select_plan/<int:plan_id>/', views.select_plan_view, name='select_plan'),
+    path('payment_gateway/<int:plan_id>/', views.payment_gateway_view, name='payment_gateway'),
+
 
     path('fm_home/', views.fm_home_view, name='fm_home'),
     path('fm_register/', views.fm_register_view, name='fm_register'),
@@ -19,13 +23,18 @@ urlpatterns = [
     path('fm_login/', views.fm_login_view, name='fm_login'),
     path('fm_profile/', views.fm_profile_view, name='fm_profile'),
     path('fm_logout/', views.fm_logout_view, name='fm_logout'),
+    path('fm_users/', views.fm_users, name='fm_users'),
+
 
 
     path('admin_home/', views.admin_home_view, name='admin_home'),
     path('admin_login/', views.admin_login_view, name='admin_login'),
+    path('admin_logout/', views.admin_logout, name='admin_logout'),
     path('admin_users/', views.admin_users_view, name='admin_users'),
     path('admin_fm/', views.admin_fm_view, name='admin_fm'),
     path('accept_fm/<int:user_id>/', views.accept_fm_view, name='accept_fm'),
+    path('delete_fm/<int:user_id>/', views.delete_fm, name='delete_fm'),
+    path('delete_client/<int:user_id>/', views.delete_client, name='delete_client'),
     path('view_certificate/<int:user_id>/', views.view_certificate, name='view_certificate'),
 
 
