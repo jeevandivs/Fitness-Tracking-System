@@ -435,14 +435,14 @@ def logout_view(request):
     return redirect('login')
 
 
-from datetime import datetime
-from django.shortcuts import render
-from django.db import connection
+from django.utils import timezone
 
 @custom_login_required
 def plans_view(request):
-    # Fetch user's age from the client table
     user_id = request.session.get('user_id')  # Assuming user_id is stored in session
+    if not user_id:
+        return redirect('login')
+    
     with connection.cursor() as cursor:
         cursor.execute("SELECT dob FROM client WHERE user_id = %s", [user_id])
         user_data = cursor.fetchone()
@@ -453,6 +453,21 @@ def plans_view(request):
         user_age = current_year - date_of_birth.year
     else:
         user_age = None  
+
+    # Check payment status
+    payment_due = False
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT payment_date FROM tbl_payment WHERE user_id = %s ORDER BY payment_date DESC LIMIT 1", [user_id])
+        last_payment = cursor.fetchone()
+
+    if last_payment:
+        last_payment_date = last_payment[0]
+        if isinstance(last_payment_date, datetime):  # Ensure it's a datetime object
+            # Check if payment is older than 30 days
+            if last_payment_date < timezone.now() - timedelta(days=30):
+                payment_due = True
+        else:
+            payment_due = True  # No valid payment found, mark as due
 
     # Fetch plans
     with connection.cursor() as cursor:
@@ -470,28 +485,36 @@ def plans_view(request):
         for row in plans
     ]
     
-    return render(request, 'plans.html', {'plans': plans_data, 'user_age': user_age})
+    return render(request, 'plans.html', {'plans': plans_data, 'user_age': user_age, 'payment_due': payment_due})
+
+
 
 
 @custom_login_required
 def select_plan_view(request, plan_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
     if request.method == 'POST':
+        # Allow plan change by updating the selected plan
         request.session['selected_plan'] = plan_id
-        if plan_id == 4:  
-            return redirect('payment_gateway',plan_id=plan_id) 
-        else:
-            return redirect('payment_gateway',plan_id=plan_id)  
-        
-    return redirect('user_home') 
+        return redirect('payment_gateway', plan_id=plan_id)  # Ensure it redirects properly
+
+    return redirect('user_home')
+
  
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseBadRequest
 from .models import Plan, Payment
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @custom_login_required
 def payment_gateway_view(request, plan_id):
+    user_id = request.session.get('user_id')  
+    if not user_id:
+        return redirect('login')
     plan = get_object_or_404(Plan, plan_id=plan_id)
 
     if request.method == 'POST':
@@ -504,6 +527,7 @@ def payment_gateway_view(request, plan_id):
             return HttpResponseBadRequest("Missing required fields")
         payment = Payment.objects.create(
             plan_id=plan.plan_id,  
+            user_id=user_id,
             payment_date=timezone.now(),
             mode='online',  
             status='success'  
@@ -659,4 +683,5 @@ def view_certificate(request, user_id):
     print(certificate_url)
     
     return render(request, 'media.html', {'certificate_url': certificate_url})
+
 

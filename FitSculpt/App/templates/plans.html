@@ -68,7 +68,15 @@
             margin-bottom: 20px;
             font-weight: bold;
         }
-        #change-plan-btn{
+
+        .payment-alert {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        #change-plan-btn {
             background-color: #b35138;
             color: white;
             border: none;
@@ -77,66 +85,83 @@
             border-radius: 5px;
             transition: background-color 0.3s;
         }
+
+        .content-wrapper {
+            padding-top: 80px;
+        }
     </style>
 </head>
 <body>
-    <h1>Activated Plans</h1>
+    <div class="content-wrapper">
+        <h1>Activated Plans</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Plan Name</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for plan in plans %}
-            <tr>
-                <td>{{ plan.plan_name }}</td>
-                <td>${{ plan.amount }}</td>
-                <td>{{ plan.description }}</td>
-                <td>
-                    <form action="{% url 'select_plan' plan.plan_id %}" method="post">
-                        {% csrf_token %}
-                        {% if plan.plan_id == 4 and user_age is not none and user_age >= 12 %}
-                            <button type="button" class="disabled" disabled>Not eligible</button>
-                        {% else %}
-                            <button type="submit" class="select-btn">Select</button>
-                        {% endif %}
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% if payment_due %}
+            <p class="payment-alert">Your payment is Upto Date. Please make a payment after 30 days to access the services.</p>
+        {% else %}
+            <p>You have access to the following plans:</p>
+        {% endif %}
+        
+        {% if plans %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plan Name</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plan in plans %}
+                    <tr>
+                        <td>{{ plan.plan_name }}</td>
+                        <td>${{ plan.amount }}</td>
+                        <td>{{ plan.description }}</td>
+                        <td>
+                            <form action="{% url 'select_plan' plan.plan_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="select-btn">Select</button>
+                            </form>
+                        </td>
+                        
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No plans available at the moment.</p>
+        {% endif %}
 
-    {% if request.session.selected_plan %}
-    <p class="alert">You have already selected the plan: {{ request.session.selected_plan }}</p>
-    {% endif %}
-    <div class="btn-container" style="text-align: center; margin-top: 20px;">
-        <button id="change-plan-btn" class="btn">Add My Plan</button>
-    </div>
+        {% if request.session.selected_plan %}
+            <p class="alert">You have already selected the plan: {{ request.session.selected_plan }}</p>
+        {% endif %}
+        
+        <div class="btn-container" style="text-align: center; margin-top: 20px;">
+            <button id="change-plan-btn" class="btn">Add My Plan</button>
+        </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const selectButtons = document.querySelectorAll('.select-btn');
-
-            const planSelected = {{ request.session.selected_plan|default:"null" }};
-            if (planSelected !== null) {
-                selectButtons.forEach(button => {
-                    button.disabled = true; 
-                });
-            }
-
-            document.getElementById('change-plan-btn').addEventListener('click', function () {
-                selectButtons.forEach(button => {
-                    button.disabled = false; 
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const selectButtons = document.querySelectorAll('.select-btn');
+            
+                const planSelected = {{ request.session.selected_plan|default:"null" }};
+                if (planSelected !== null) {
+                    selectButtons.forEach(button => {
+                        button.disabled = false;  // Allow selection if a plan is already selected
+                    });
+                }
+            
+                document.getElementById('change-plan-btn').addEventListener('click', function () {
+                    selectButtons.forEach(button => {
+                        button.disabled = false;  // Enable all buttons for changing plans
+                    });
                 });
             });
-        });
-    </script>
+            </script>            
+            
+    </div>
 </body>
 </html>
+
 {% endblock %}

@@ -50,6 +50,7 @@ from django.utils import timezone
 class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
     plan_id = models.IntegerField() 
+    user_id=models.IntegerField()
     payment_date = models.DateTimeField(default=timezone.now)  # Use DateTimeField to store both date and time
     mode = models.CharField(max_length=50) 
     status = models.CharField(max_length=50)  
