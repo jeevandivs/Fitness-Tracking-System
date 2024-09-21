@@ -130,9 +130,38 @@
                 <td>
                     <form action="{% url 'delete_fm' fm.user_id %}" method="post">
                         {% csrf_token %}
-                        <button type="submit">Delete</button>
+                        <button type="submit">Remove</button>
                     </form>
                 </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Past Fitness Managers</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Qualification</th>
+                <th>Designation</th>
+                <th>Certificate</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fm in removed_fms %}
+            <tr>
+                <td>{{ fm.name }}</td>
+                <td>{{ fm.email }}</td>
+                <td>{{ fm.phone }}</td>
+                <td>{{ fm.qualification_id }}</td>
+                <td>{{ fm.designation_id }}</td>
+                <td>
+                    <a href="{% url 'view_certificate' fm.user_id %}">View Certificate</a>
+                </td>
+                
             </tr>
             {% endfor %}
         </tbody>

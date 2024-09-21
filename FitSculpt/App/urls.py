@@ -26,6 +26,8 @@ urlpatterns = [
     path('fm_profile/', views.fm_profile_view, name='fm_profile'),
     path('fm_logout/', views.fm_logout_view, name='fm_logout'),
     path('fm_users/', views.fm_users, name='fm_users'),
+    path('fm_payment/', views.fm_payment, name='fm_payment'),
+
 
 
 

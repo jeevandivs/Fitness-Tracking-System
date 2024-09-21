@@ -1,6 +1,91 @@
+{% load static %}
+{% include 'header1.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #010306;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            background-color: #b35138;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #a04030;
+        }
+
+        .disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            color: green;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .payment-alert {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        #change-plan-btn {
+            background-color: #b35138;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .content-wrapper {
+            padding-top: 80px;
+        }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plans</title>
@@ -46,3 +131,4 @@
     </div>
 </body>
 </html>
+{% endblock %}

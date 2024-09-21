@@ -18,15 +18,17 @@ from .models import *
 from .tokens import custom_token_generator
 from .decorators import *
 from django.utils.html import strip_tags
+from datetime import datetime
+
 
 def index_view(request):
     return render(request, 'index.html')
 
 def calculate_age(dob):
-    today = datetime.today().date()
+    today = datetime.datetime.today().date()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
     return age
-
+import datetime
 def register_view(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -72,10 +74,12 @@ def register_view(request):
             return render(request, 'register.html')
 
         try:
-            dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
-            if dob_date > datetime.today().date():
+            dob_date = datetime.datetime.strptime(dob, "%Y-%m-%d").date()
+            if dob_date > datetime.datetime.today().date():
+
                 messages.error(request, 'Date of birth cannot be in the future.')
                 return render(request, 'register.html')
+            print(dob_date)
             age = calculate_age(dob_date)
         except ValueError:
             messages.error(request, 'Invalid date format. Use YYYY-MM-DD.')
@@ -220,6 +224,28 @@ def fm_users(request):
         'clients': clients,
     }
     return render(request, 'fm_users.html',context)
+
+@fm_custom_login_required
+def fm_payment(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT * from tbl_payment""")
+        payments = cursor.fetchall()
+        payments = [
+            {
+                'payment_id': row[0],
+                'plan_id': row[1],
+                'user_id': row[2],
+                'payment_date': row[3],
+                'mode': row[4],
+                'status': row[5],
+            } 
+            for row in payments
+        ]
+        context = {
+        'payments': payments,
+    }
+    return render(request, 'fm_payment.html',context)
 
 @fm_custom_login_required
 def fm_profile_view(request):
@@ -530,8 +556,25 @@ def admin_users_view(request):
             } 
             for row in clients
         ]
+
+        cursor.execute("""
+            SELECT user_id, name, email, phone, username, date_joined
+            FROM client where status=0 """)
+        rm_clients = cursor.fetchall()
+        rm_clients = [
+            {
+                'user_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'username': row[4],
+                'date_joined': row[5],
+            } 
+            for row in rm_clients
+        ]
         context = {
         'clients': clients,
+        'rm_clients': rm_clients,
     }
     return render(request, 'admin_users.html',context)
 from django.core.mail import send_mail
@@ -585,21 +628,43 @@ def admin_fm_view(request):
             }
             for row in complete_fms
         ]
+        
+        cursor.execute("""
+            SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof, username, password
+            FROM tbl_fitness_manager 
+            WHERE status=0
+        """)
+        removed_fms = cursor.fetchall()
+        removed_fms = [
+            {
+                'user_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'qualification_id': row[4],
+                'designation_id': row[5],
+                'certificate_proof': row[6],
+                'username': row[7],
+                'password': row[8],
+            }
+            for row in removed_fms
+        ]
 
     context = {
         'applicants': applicants,
         'complete_fms': complete_fms,
+        'removed_fms' : removed_fms,
         'MEDIA_URL': settings.MEDIA_URL,
     }
     return render(request, 'admin_fm.html', context)
 
 def delete_fm(request, user_id):
     with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM tbl_fitness_manager WHERE user_id = %s", [user_id])
+        cursor.execute("UPDATE tbl_fitness_manager SET status=0 WHERE user_id = %s", [user_id])
     return redirect('admin_fm')
 def delete_client(request, user_id):
     with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM client WHERE user_id = %s", [user_id])
+        cursor.execute("UPDATE client SET status=0 WHERE user_id = %s", [user_id])
     return redirect('admin_users')
 
 def accept_fm_view(request, user_id):

@@ -90,9 +90,35 @@
                 <td>
                     <form action="{% url 'delete_client' client.user_id %}" method="post">
                         {% csrf_token %}
-                        <button type="submit">Delete</button>
+                        <button type="submit">Remove</button>
                     </form>
                 </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <div class="section-title">Past Users</div>
+      <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Username</th>
+                <th>Joined Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in rm_clients %}
+            <tr>
+                <td>{{ client.name }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.phone }}</td>
+                <td>{{ client.username }}</td>
+                <td>{{ client.date_joined }}</td>
+                
             </tr>
             {% endfor %}
         </tbody>
