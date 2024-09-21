@@ -435,110 +435,63 @@ def logout_view(request):
     return redirect('login')
 
 
-from django.utils import timezone
+from django.shortcuts import render
+from .models import Plan, Client  
 
 @custom_login_required
 def plans_view(request):
-    user_id = request.session.get('user_id')  # Assuming user_id is stored in session
-    if not user_id:
-        return redirect('login')
-    
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT dob FROM client WHERE user_id = %s", [user_id])
-        user_data = cursor.fetchone()
-    
-    if user_data:
-        date_of_birth = user_data[0]
-        current_year = datetime.now().year
-        user_age = current_year - date_of_birth.year
-    else:
-        user_age = None  
+    plans = Plan.objects.all()  
+    user_id = request.session.get('user_id') 
 
-    # Check payment status
-    payment_due = False
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT payment_date FROM tbl_payment WHERE user_id = %s ORDER BY payment_date DESC LIMIT 1", [user_id])
-        last_payment = cursor.fetchone()
+    user_age = None
+    if user_id:
+        try:
+            client = Client.objects.get(user_id=user_id)
+            user_age = client.age 
+        except Client.DoesNotExist:
+            user_age = None
 
-    if last_payment:
-        last_payment_date = last_payment[0]
-        if isinstance(last_payment_date, datetime):  # Ensure it's a datetime object
-            # Check if payment is older than 30 days
-            if last_payment_date < timezone.now() - timedelta(days=30):
-                payment_due = True
-        else:
-            payment_due = True  # No valid payment found, mark as due
+    is_child_plan_enabled = user_age is not None and user_age < 12
 
-    # Fetch plans
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM tbl_plans")
-        plans = cursor.fetchall()
-    
-    plans_data = [
-        {
-            'plan_id': row[0],
-            'plan_name': row[1],
-            'amount': row[2],
-            'description': row[3],
-            'service_id': row[4],
-        } 
-        for row in plans
-    ]
-    
-    return render(request, 'plans.html', {'plans': plans_data, 'user_age': user_age, 'payment_due': payment_due})
+    return render(request, 'plans.html', {'plans': plans, 'is_child_plan_enabled': is_child_plan_enabled})
 
-
-
-
-@custom_login_required
-def select_plan_view(request, plan_id):
-    user_id = request.session.get('user_id')
-    if not user_id:
-        return redirect('login')
-
-    if request.method == 'POST':
-        # Allow plan change by updating the selected plan
-        request.session['selected_plan'] = plan_id
-        return redirect('payment_gateway', plan_id=plan_id)  # Ensure it redirects properly
-
-    return redirect('user_home')
-
- 
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseBadRequest
-from .models import Plan, Payment
-from datetime import datetime, timedelta
-
+from django.shortcuts import render, redirect
+from .models import Plan, Payment 
+from django.utils import timezone  
 @custom_login_required
 def payment_gateway_view(request, plan_id):
-    user_id = request.session.get('user_id')  
-    if not user_id:
-        return redirect('login')
-    plan = get_object_or_404(Plan, plan_id=plan_id)
+    user_id = request.session.get('user_id')
+    
+    try:
+        plan = Plan.objects.get(plan_id=plan_id)
+    except Plan.DoesNotExist:
+        messages.error(request, "Plan not found.")
+        return redirect('plans')
 
     if request.method == 'POST':
-        name = request.POST.get('name')
-        card_number = request.POST.get('card')
-        expiry = request.POST.get('expiry')
-        cvc = request.POST.get('cvc')
-
-        if not all([name, card_number, expiry, cvc]):
-            return HttpResponseBadRequest("Missing required fields")
-        payment = Payment.objects.create(
-            plan_id=plan.plan_id,  
+        # Process payment here
+        payment = Payment(
+            plan_id=plan_id,
             user_id=user_id,
             payment_date=timezone.now(),
-            mode='online',  
-            status='success'  
+            mode='online',
+            status='success'
         )
-        payment.save()
-        messages.success(request, "Payment successful!")
-        return redirect('user_home')
+        payment.save()  
+        return render(request, 'user_home.html')
 
+    # If it's a GET request, just render the payment gateway form
     return render(request, 'payment_gateway.html', {'plan': plan})
 
-
+from django.shortcuts import redirect
+@custom_login_required
+def select_plan_view(request):
+    if request.method == 'POST':
+        plan_id = request.POST.get('plan_id')
+        user_id=request.session.get('user_id')
+        # You can add any additional logic here if needed
+        return redirect('payment_gateway', plan_id=plan_id)
+    return redirect('plans')
 
 def admin_login_view(request):
     if request.method == 'POST':
