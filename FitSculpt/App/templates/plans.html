@@ -16,6 +16,10 @@
             text-align: center;
             color: #333;
         }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
 
         table {
             width: 100%;
@@ -53,11 +57,6 @@
             background-color: #a04030;
         }
 
-        .disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
         .alert {
             color: green;
             text-align: center;
@@ -70,20 +69,10 @@
             text-align: center;
             margin-bottom: 20px;
             font-weight: bold;
+            
         }
-
-        #change-plan-btn {
-            background-color: #b35138;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .content-wrapper {
-            padding-top: 80px;
+        .container {
+            margin-top: 80px;  /* Add margin to separate from the header */
         }
     </style>
     <meta charset="UTF-8">
@@ -93,6 +82,19 @@
 <body>
     <div class="container">
         <h1>Available Plans</h1>
+        <h2>Please Select a valid Plan</h2>
+
+        {% if user_has_plan %}            
+            <div class="alert">
+                <p>Your Current Plan is: {{ current_plan_name }}</p>
+                You have an active plan. 
+                <form action="{% url 'delete_plan' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete Current Plan</button>
+                </form>
+            </div>
+        {% endif %}
+
         <table>
             <thead>
                 <tr>
@@ -116,12 +118,11 @@
                         {% if plan.plan_id == 4 and not is_child_plan_enabled %}
                             <button disabled>Not Eligible</button>
                         {% else %}
-                        <form action="{% url 'select_plan' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="plan_id" value="{{ plan.plan_id }}">
-                            <button type="submit">Select</button>
-                        </form>
-                        
+                            <form action="{% url 'select_plan' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ plan.plan_id }}">
+                                <button type="submit">Select</button>
+                            </form>
                         {% endif %}
                     </td>
                 </tr>

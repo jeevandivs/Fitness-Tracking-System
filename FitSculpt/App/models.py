@@ -35,7 +35,7 @@ class Plan(models.Model):
     plan_name = models.CharField(max_length=100)  # Name of the plan
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # Amount for the plan
     description = models.TextField()  # Description of the plan
-    service_id = models.IntegerField()  # Assuming service_id relates to some service in your application
+    service_no = models.IntegerField()  # Assuming service_id relates to some service in your application
     
     class Meta:
         managed = False
@@ -51,7 +51,7 @@ class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
     plan_id = models.IntegerField() 
     user_id=models.IntegerField()
-    payment_date = models.DateTimeField(default=timezone.now)  # Use DateTimeField to store both date and time
+    payment_date = models.DateTimeField(default=timezone.now)  
     mode = models.CharField(max_length=50) 
     status = models.CharField(max_length=50)  
     class Meta:
@@ -95,3 +95,34 @@ class Designations(models.Model):
         managed = False
         db_table = 'tbl_designations'
     
+
+class Service(models.Model):
+    service_id = models.AutoField(primary_key=True)
+    service_no=models.IntegerField()
+    service_type = models.CharField(max_length=100)
+    workout_id = models.IntegerField()
+    nutrition_id = models.IntegerField()
+    description = models.TextField()
+    category = models.CharField(max_length=100)
+    day=models.IntegerField()
+    class Meta:
+        managed = False
+        db_table = 'tbl_services'
+
+    def __str__(self):
+        return self.description
+
+class Workout(models.Model):
+    workout_id = models.AutoField(primary_key=True)
+    workout_name = models.CharField(max_length=100)
+    description = models.TextField()
+    body_part = models.CharField(max_length=100)
+    duration = models.IntegerField()  
+    workout_image = models.FileField(upload_to='workout_img/', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tbl_workouts'
+
+    def __str__(self):
+        return self.workout_name

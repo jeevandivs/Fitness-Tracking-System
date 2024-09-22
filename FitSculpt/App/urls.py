@@ -13,7 +13,13 @@ urlpatterns = [
     path('forgot/', views.forgot_view, name='forgot'),
     path('plans/',views.plans_view,name='plans'),
     path('select_plan/', views.select_plan_view, name='select_plan'),
+    path('delete_plan/', views.delete_plan, name='delete_plan'),
     path('payment_gateway/<int:plan_id>/', views.payment_gateway_view, name='payment_gateway'),
+    path('workouts/', views.workouts_view, name='workouts'),
+    path('workouts/day/<int:day>/', views.workouts_by_day_view, name='workouts_by_day'),
+    path('view_workout_img/<int:workout_id>/', views.view_workout_img, name='view_workout_img'),
+
+
 
 
 
@@ -27,6 +33,11 @@ urlpatterns = [
     path('fm_logout/', views.fm_logout_view, name='fm_logout'),
     path('fm_users/', views.fm_users, name='fm_users'),
     path('fm_payment/', views.fm_payment, name='fm_payment'),
+    path('fm_workouts/', fm_workouts_view, name='fm_workouts'),
+    path('see_all_workouts/', see_all_workouts, name='see_all_workouts'),
+    path('add_workout/', add_workout, name='add_workout'),
+    path('update_workout/<int:workout_id>/', update_workout, name='update_workout'),
+    path('delete_workout/<int:workout_id>/', delete_workout, name='delete_workout'),
 
 
 

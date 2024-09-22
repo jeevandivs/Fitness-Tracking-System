@@ -318,7 +318,7 @@ def fm_register_view(request):
                 designation_id = designation_id[0]
 
                 # Insert into tbl_fitness_manager
-                date_joined = datetime.datetime.now()
+                date_joined = datetime.now()
                 cursor.execute("""
                     INSERT INTO tbl_fitness_manager (name, email, phone, qualification_id, designation_id,certificate_proof, date_joined)
                     VALUES (%s, %s, %s, %s, %s, %s,%s)
@@ -467,8 +467,9 @@ from .models import Plan, Client
 @custom_login_required
 def plans_view(request):
     plans = Plan.objects.all()  
+    plan_id = request.POST.get('plan_id')
     user_id = request.session.get('user_id') 
-
+    print(user_id,plan_id)
     user_age = None
     if user_id:
         try:
@@ -478,8 +479,23 @@ def plans_view(request):
             user_age = None
 
     is_child_plan_enabled = user_age is not None and user_age < 12
+    user_has_plan = Payment.objects.filter(user_id=user_id).exists()
 
-    return render(request, 'plans.html', {'plans': plans, 'is_child_plan_enabled': is_child_plan_enabled})
+    current_plan = None
+    if user_id:
+        payment_record = Payment.objects.filter(user_id=user_id).first()
+        if payment_record:
+            current_plan = payment_record.plan_id
+    print(current_plan)
+
+    current_plan_name = None
+    if current_plan:
+        plan_record = Plan.objects.filter(plan_id=current_plan).first()
+        if plan_record:
+            current_plan_name = plan_record.plan_name
+    print(current_plan_name)
+    
+    return render(request, 'plans.html', {'plans': plans, 'is_child_plan_enabled': is_child_plan_enabled,'user_has_plan': user_has_plan,'current_plan':current_plan, 'current_plan_name':current_plan_name})
 
 from django.shortcuts import render, redirect
 from .models import Plan, Payment 
@@ -508,6 +524,30 @@ def payment_gateway_view(request, plan_id):
 
     # If it's a GET request, just render the payment gateway form
     return render(request, 'payment_gateway.html', {'plan': plan})
+
+from datetime import datetime
+from django.utils import timezone
+from django.shortcuts import redirect, get_object_or_404
+from .models import Payment  # Adjust according to your models
+
+@custom_login_required
+def delete_plan(request):
+    if request.method == 'POST':
+        # Fetch the user ID from the session
+        plan_id = request.POST.get('plan_id')
+        user_id = request.session.get('user_id')
+        print(user_id,plan_id)
+
+
+        # Fetch the payment record associated with the user
+        payment_record = get_object_or_404(Payment, user_id=user_id)
+        
+        # Delete the payment record
+        payment_record.delete()
+        
+        # Redirect to the plans page
+        return redirect('plans')  # Adjust the redirect as needed
+    return redirect('plans')
 
 from django.shortcuts import redirect
 @custom_login_required
@@ -702,4 +742,139 @@ def view_certificate(request, user_id):
     
     return render(request, 'media.html', {'certificate_url': certificate_url})
 
+def view_workout_img(request, workout_id):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT workout_image FROM tbl_workouts WHERE workout_id = %s", [workout_id])
+        workout_image = cursor.fetchone()[0]
+    
+    workout_url = settings.MEDIA_URL + workout_image
+    print(workout_url)
+    
+    return render(request, 'workout_media.html', {'workout_url': workout_url})
 
+from django.shortcuts import render, redirect
+from .models import Workout
+from django.core.files.storage import FileSystemStorage
+
+def fm_workouts_view(request):
+    return render(request, 'fm_workouts.html')
+
+def see_all_workouts(request):
+    workouts = Workout.objects.all()
+    return render(request, 'fm_workouts.html', {'workouts': workouts})
+
+def add_workout(request):
+    if request.method == 'POST':
+        workout_name = request.POST['workout_name']
+        description = request.POST['description']
+        body_part = request.POST['body_part']
+        duration = request.POST['duration']
+        workout_image = request.FILES['workout_image']
+
+        workout = Workout(
+            workout_name=workout_name,
+            description=description,
+            body_part=body_part,
+            duration=duration,
+            workout_image=workout_image
+        )
+        workout.save()
+        return redirect('see_all_workouts')  # Redirect to see all workouts after adding
+
+    return render(request, 'add_workout.html')  # Render form for adding workout
+
+def update_workout(request, workout_id):
+    workout = Workout.objects.get(workout_id=workout_id)
+    if request.method == 'POST':
+        workout.workout_name = request.POST['workout_name']
+        workout.description = request.POST['description']
+        workout.body_part = request.POST['body_part']
+        workout.duration = request.POST['duration']
+        if 'workout_image' in request.FILES:
+            workout.workout_image = request.FILES['workout_image']
+        workout.save()
+        return redirect('see_all_workouts')
+
+    return render(request, 'update_workout.html', {'workout': workout})  # Render form with workout details
+
+def delete_workout(request, workout_id):
+    workout = Workout.objects.get(workout_id=workout_id)
+    if request.method == 'POST':
+        workout.delete()
+        return redirect('see_all_workouts')
+
+    return render(request, 'delete_workout.html', {'workout': workout})  # Confirm delete
+
+
+
+from django.shortcuts import render
+from .models import Plan, Service, Workout
+from django.db import connection
+
+@custom_login_required
+def workouts_view(request, day=None):
+    user_id = request.session.get('user_id')
+
+    # Fetch plan_id from tbl_payment
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND status = 'success'", [user_id])
+        result = cursor.fetchone()
+        plan_id = result[0] if result else None
+
+    plan = None
+    workouts = []
+
+    if plan_id:
+        plan = Plan.objects.get(plan_id=plan_id)
+
+        if day:
+            services = Service.objects.filter(service_no=plan.service_no, day=day)
+
+            for service in services:
+                workout = Workout.objects.get(workout_id=service.workout_id)
+                workouts.append(workout)
+
+    context = {
+        'plan': plan,
+        'workouts': workouts,
+        'error': 'No workouts found for this day.' if not workouts and day else ''
+    }
+    return render(request, 'workouts.html', context)
+
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Plan, Service, Workout
+from django.db import connection
+
+@custom_login_required
+def workouts_by_day_view(request, day):
+    user_id = request.session.get('user_id')
+
+    # Fetch plan_id from tbl_payment
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND status = 'success'", [user_id])
+        result = cursor.fetchone()
+        plan_id = result[0] if result else None
+
+    if plan_id:
+        # Fetch the plan details
+        plan = Plan.objects.get(plan_id=plan_id)
+
+        # Fetch services associated with the plan for the selected day
+        services = Service.objects.filter(service_no=plan.service_no, day=day)
+
+        # Get the corresponding workouts
+        workouts = []
+        for service in services:
+            workout = Workout.objects.get(workout_id=service.workout_id)
+            workouts.append(workout)
+
+        # Render the template with the workouts
+        context = {
+            'plan': plan,
+            'workouts': workouts,
+        }
+        return render(request, 'workouts.html', context)
+    else:
+        return render(request, 'workouts.html', {'error': 'No active plan found.'})
