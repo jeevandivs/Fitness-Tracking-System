@@ -32,11 +32,17 @@ urlpatterns = [
     path('fm_logout/', views.fm_logout_view, name='fm_logout'),
     path('fm_users/', views.fm_users, name='fm_users'),
     path('fm_payment/', views.fm_payment, name='fm_payment'),
-    path('fm_workouts/', fm_workouts_view, name='fm_workouts'),
-    path('see_all_workouts/', see_all_workouts, name='see_all_workouts'),
-    path('add_workout/', add_workout, name='add_workout'),
-    path('update_workout/<int:workout_id>/', update_workout, name='update_workout'),
-    path('delete_workout/<int:workout_id>/', delete_workout, name='delete_workout'),
+    path('fm_workouts/', views.fm_workouts_view, name='fm_workouts'),
+    path('see_all_workouts/', views.see_all_workouts, name='see_all_workouts'),
+    path('add_workout/', views.add_workout, name='add_workout'),
+    path('update_workout/<int:workout_id>/', views.update_workout, name='update_workout'),
+    path('delete_workout/<int:workout_id>/', views.delete_workout, name='delete_workout'),
+    path('fm_nutritions/', views.fm_nutritions_view, name='fm_nutritions'),
+    path('see_all_food/', views.see_all_food, name='see_all_food'),
+    path('add_food/', views.add_food, name='add_food'),
+    path('update_food/<int:food_id>/', views.update_food, name='update_food'),
+    path('delete_food/<int:food_id>/', views.delete_food, name='delete_food'),
+
 
 
 

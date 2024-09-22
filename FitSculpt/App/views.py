@@ -746,7 +746,7 @@ def view_certificate(request, user_id):
     print(certificate_url)
     
     return render(request, 'media.html', {'certificate_url': certificate_url})
-@fm_custom_login_required
+@custom_login_required
 def view_workout_img(request, workout_id):
     with connection.cursor() as cursor:
         cursor.execute("SELECT workout_image FROM tbl_workouts WHERE workout_id = %s", [workout_id])
@@ -810,6 +810,63 @@ def delete_workout(request, workout_id):
 
     return render(request, 'delete_workout.html', {'workout': workout})  # Confirm delete
 
+
+
+from django.shortcuts import render, redirect
+from .models import Workout
+from django.core.files.storage import FileSystemStorage
+@fm_custom_login_required
+def fm_nutritions_view(request):
+    return render(request, 'fm_nutritions.html')
+@fm_custom_login_required
+def see_all_food(request):
+    foods = FoodDatabase.objects.all()
+    return render(request, 'fm_nutritions.html', {'foods': foods})
+@fm_custom_login_required
+def add_food(request):
+    if request.method == 'POST':
+        food_name = request.POST['food_name']
+        food_type = request.POST['food_type']
+        calories = request.POST['calories']
+        proteins = request.POST['proteins']
+        carbs = request.POST['carbs']
+        fats = request.POST['fats']
+
+
+        food = FoodDatabase(
+            food_name=food_name,
+            food_type=food_type,
+            calories=calories,
+            proteins=proteins,
+            carbs=carbs,
+            fats=fats
+        )
+        food.save()
+        return redirect('see_all_food')  # Redirect to see all workouts after adding
+
+    return render(request, 'add_food.html')  # Render form for adding workout
+@fm_custom_login_required
+def update_food(request, food_id):
+    food = FoodDatabase.objects.get(food_id=food_id)
+    if request.method == 'POST':
+        food.food_name = request.POST['food_name']
+        food.food_type = request.POST['food_type']
+        food.calories = request.POST['calories']
+        food.proteins = request.POST['proteins']
+        food.carbs = request.POST['carbs']
+        food.fats = request.POST['fats']
+        food.save()
+        return redirect('see_all_food')
+
+    return render(request, 'update_food.html', {'food': food})  # Render form with workout details
+@fm_custom_login_required
+def delete_food(request, food_id):
+    food = FoodDatabase.objects.get(food_id=food_id)
+    if request.method == 'POST':
+        food.delete()
+        return redirect('see_all_food')
+
+    return render(request, 'delete_food.html', {'food': food})  # Confirm delete
 
 
 from django.shortcuts import render
@@ -946,4 +1003,6 @@ def nutrition_view(request):
     return redirect('login')
 
 
-
+@fm_custom_login_required
+def fm_nutritions_view(request):
+    return render(request, 'fm_nutritions.html')
