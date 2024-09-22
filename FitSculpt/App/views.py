@@ -452,7 +452,12 @@ def user_profile_view(request):
         else:
             form = ClientUpdateForm(instance=client)
         
-        return render(request, 'user_profile.html', {'form': form, 'client': client})
+        bmi = None
+        if client.height and client.weight:  
+            height_in_meters = client.height / 100  
+            bmi = client.weight / (height_in_meters ** 2)
+
+        return render(request, 'user_profile.html', {'form': form, 'client': client, 'bmi': bmi})
     return redirect('login')
 
 @custom_login_required
@@ -731,7 +736,7 @@ def accept_fm_view(request, user_id):
         )
 
     return redirect('admin_fm')  
-
+@admin_custom_login_required
 def view_certificate(request, user_id):
     with connection.cursor() as cursor:
         cursor.execute("SELECT certificate_proof FROM tbl_fitness_manager WHERE user_id = %s", [user_id])
@@ -741,7 +746,7 @@ def view_certificate(request, user_id):
     print(certificate_url)
     
     return render(request, 'media.html', {'certificate_url': certificate_url})
-
+@fm_custom_login_required
 def view_workout_img(request, workout_id):
     with connection.cursor() as cursor:
         cursor.execute("SELECT workout_image FROM tbl_workouts WHERE workout_id = %s", [workout_id])
@@ -755,14 +760,14 @@ def view_workout_img(request, workout_id):
 from django.shortcuts import render, redirect
 from .models import Workout
 from django.core.files.storage import FileSystemStorage
-
+@fm_custom_login_required
 def fm_workouts_view(request):
     return render(request, 'fm_workouts.html')
-
+@fm_custom_login_required
 def see_all_workouts(request):
     workouts = Workout.objects.all()
     return render(request, 'fm_workouts.html', {'workouts': workouts})
-
+@fm_custom_login_required
 def add_workout(request):
     if request.method == 'POST':
         workout_name = request.POST['workout_name']
@@ -782,7 +787,7 @@ def add_workout(request):
         return redirect('see_all_workouts')  # Redirect to see all workouts after adding
 
     return render(request, 'add_workout.html')  # Render form for adding workout
-
+@fm_custom_login_required
 def update_workout(request, workout_id):
     workout = Workout.objects.get(workout_id=workout_id)
     if request.method == 'POST':
@@ -796,7 +801,7 @@ def update_workout(request, workout_id):
         return redirect('see_all_workouts')
 
     return render(request, 'update_workout.html', {'workout': workout})  # Render form with workout details
-
+@fm_custom_login_required
 def delete_workout(request, workout_id):
     workout = Workout.objects.get(workout_id=workout_id)
     if request.method == 'POST':
@@ -878,3 +883,67 @@ def workouts_by_day_view(request, day):
         return render(request, 'workouts.html', context)
     else:
         return render(request, 'workouts.html', {'error': 'No active plan found.'})
+
+from django.shortcuts import render, redirect
+from .models import Client, Nutrition, FoodDatabase
+from django.db.models import Q
+
+@custom_login_required
+def nutrition_view(request):
+    user_id = request.session.get('user_id')
+
+    if user_id:
+        client = Client.objects.get(user_id=user_id)
+        height_in_meters = client.height / 100 if client.height else None
+        bmi = client.weight / (height_in_meters ** 2) if client.weight and client.height else None
+
+        if bmi:
+            if bmi < 18.5:
+                nutrition_category = 'Underweight'
+            elif 18.5 <= bmi < 24.9:
+                nutrition_category = 'Normal'
+            elif 25 <= bmi < 29.9:
+                nutrition_category = 'Overweight'
+            else:
+                nutrition_category = 'Obesity'
+        else:
+            return render(request, 'nutritions.html', {'error': 'Please update your height and weight to get nutrition suggestions.'})
+
+        food_type = 'Vegetarian' if client.food_type == 'veg' else 'Non Vegetarian'
+
+        if nutrition_category == 'Underweight':
+            nutrition = Nutrition.objects.filter(Q(nutrition_no__in=[1, 4]) if food_type == 'Vegetarian' else Q(nutrition_no__in=[5, 8]))
+        elif nutrition_category == 'Normal':
+            nutrition = Nutrition.objects.filter(Q(nutrition_no=4) if food_type == 'Vegetarian' else Q(nutrition_no=8))
+        elif nutrition_category == 'Overweight':
+            nutrition = Nutrition.objects.filter(Q(nutrition_no__in=[3, 4]) if food_type == 'Vegetarian' else Q(nutrition_no__in=[7, 8]))
+        else:
+            nutrition = Nutrition.objects.filter(Q(nutrition_no=3) if food_type == 'Vegetarian' else Q(nutrition_no=7))
+
+        # Now, fetch all food items associated with the nutrition_no
+        food_details = []
+        for item in nutrition:
+            foods = FoodDatabase.objects.filter(food_id=item.food_id).all()  # Assuming food_id relates to the Nutrition
+            for food in foods:
+                food_details.append({
+                    'nutrition_id': item.nutrition_id,
+                    'nutrition_description': item.description,
+                    'food_name': food.food_name,
+                    'calories': food.calories,
+                    'proteins': food.proteins,
+                    'carbs': food.carbs,
+                    'fats': food.fats,
+                })
+
+        return render(request, 'nutritions.html', {
+            'nutrition': nutrition,
+            'food_details': food_details,
+            'bmi': bmi,
+            'client': client,
+            'nutrition_category': nutrition_category
+        })
+    
+    return redirect('login')
+
+
+

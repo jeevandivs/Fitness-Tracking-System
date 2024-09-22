@@ -101,7 +101,7 @@ class Service(models.Model):
     service_no=models.IntegerField()
     service_type = models.CharField(max_length=100)
     workout_id = models.IntegerField()
-    nutrition_id = models.IntegerField()
+    nutrition_no = models.IntegerField()
     description = models.TextField()
     category = models.CharField(max_length=100)
     day=models.IntegerField()
@@ -126,3 +126,32 @@ class Workout(models.Model):
 
     def __str__(self):
         return self.workout_name
+    
+class Nutrition(models.Model):
+    nutrition_id = models.AutoField(primary_key=True)
+    nutrition_no = models.IntegerField()
+    food_id = models.IntegerField()
+    description = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'tbl_nutritions'
+
+    def __str__(self):
+        return self.nutrition_no
+    
+class FoodDatabase(models.Model):
+    food_id = models.AutoField(primary_key=True)
+    food_name = models.CharField(max_length=100)
+    calories = models.FloatField()
+    proteins = models.FloatField()
+    carbs = models.FloatField()
+    fats = models.FloatField()
+    food_type = models.CharField(max_length=50)  
+
+    class Meta:
+        managed = False
+        db_table = 'tbl_food_database'
+
+    def __str__(self):
+        return self.food_name

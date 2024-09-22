@@ -18,8 +18,7 @@ urlpatterns = [
     path('workouts/', views.workouts_view, name='workouts'),
     path('workouts/day/<int:day>/', views.workouts_by_day_view, name='workouts_by_day'),
     path('view_workout_img/<int:workout_id>/', views.view_workout_img, name='view_workout_img'),
-
-
+    path('nutrition/', views.nutrition_view, name='nutrition'),
 
 
 

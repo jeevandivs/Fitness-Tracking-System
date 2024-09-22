@@ -86,23 +86,39 @@
             <img src="{% static 'images/profile-placeholder.png' %}" alt="Profile Picture">
 
             <!-- Profile Information -->
-            <h2>{{ client.username }}</h2>
-            <p><strong>Name:</strong> {{ client.name }}</p>
+            <h2>{{ client.name }}</h2>
+            <p><strong>User Name:</strong> {{ client.username }}</p>
             <p><strong>Email:</strong> {{ client.email }}</p>
             <p><strong>Phone:</strong> {{ client.phone }}</p>
             <p><strong>Date of Birth:</strong> {{ client.dob }}</p>
             <p><strong>Age:</strong> {{ client.age }}</p>
             <p><strong>Date Joined:</strong> {{ client.date_joined }}</p>
-            
-            <!-- Edit Button -->
             <a href="#" class="btn" id="edit-btn">Edit Profile</a>
 
-            <!-- Edit Form -->
+            <div class="bmi-box"></div>
+                {% if bmi %}
+                    <p><strong>BMI:</strong> {{ bmi|floatformat:2 }}</p>
+                    {% if bmi < 18.5 %}
+                        <p>You are underweight.</p>
+                    {% elif bmi >= 18.5 and bmi < 24.9 %}
+                        <p>Your BMI is normal.</p>
+                    {% elif bmi >= 25 and bmi < 29.9 %}
+                        <p>You are overweight.</p>
+                    {% else %}
+                        <p>You are obese.</p>
+                    {% endif %}
+                {% else %}
+                    <p>Update your height and weight to calculate BMI.</p>
+                {% endif %}
+            </div>
+            
+            
+
             <div class="edit-form" id="edit-form">
                 <form method="post">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit">Update Profile</button>
+                    <center><button type="submit">Update Profile</button></center>
                 </form>
             </div>
         </div>
