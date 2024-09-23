@@ -90,7 +90,8 @@
         }
 
         small {
-            color: #6c757d; /* Lighter color for the note */
+            color: #6c757d; 
+            margin: auto;/* Lighter color for the note */
         }
     </style>
 </head>
@@ -112,7 +113,21 @@
 
         <label for="workout_image">Workout Image:</label>
         <input type="file" id="workout_image" name="workout_image" accept="image/*">
-        <small>Leave blank to keep current image.</small>
+        <small>Leave blank to keep current image.</small><br><br>
+
+        {% csrf_token %}
+    <label for="plans">Select Plans:</label>
+    <select id="plans" name="plans" multiple>
+        {% for plan in all_plans %}
+            <option value="{{ plan.plan_id }}" 
+                {% if plan in associated_plans %} selected {% endif %}>
+                {{ plan.plan_name }}
+            </option>
+            
+
+        {% endfor %}
+    </select>
+    <small>Already selected plans highlighted here.</small>
 
         <button type="submit">Update Workout</button>
     </form>

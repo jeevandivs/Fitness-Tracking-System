@@ -95,53 +95,27 @@
 </head>
 <body>
     <h1>Nutritions</h1>
-    <div class="button-container">
-        <a href="{% url 'see_all_food' %}"><button>See the Food Database</button></a>
-        <a href="{% url 'add_food' %}"><button>Add Food</button></a>
-        <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
 
-    </div>
-    <h2>Food Database</h2>
+    <h2>Nutrition Structure</h2>
     <table>
         <thead>
             <tr>
-                <th>Food Name</th>
-                <th>Actions</th>
+                <th>Nutrition Number</th>
+                <th>Food_ID</th>
+                <th>Description</th>
+
             </tr>
         </thead>
         <tbody>
-            {% for food in foods %}
+            {% for nutrition in nutritions %}
             <tr>
-                <td>{{ food.food_name }}</td>
-                <td>
-                    <a href="{% url 'update_food' food.food_id %}">
-                        <button>Update Food</button>
-                    </a>
-                    <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-                    </form>
-                </td>
+                <td>{{ nutrition.nutrition_no }}</td>
+                <td>{{ nutrition.food_id }}</td>
+                <td>{{ nutrition.description }}</td>
             </tr>
             {% endfor %}
         </tbody>
 
-        <tbody>
-            {% for food in foods %}
-            <tr>
-                <td>{{ food.food_name }}</td>
-                <td>
-                    <a href="{% url 'update_food' food.food_id %}">
-                        <button>Update Food</button>
-                    </a>
-                    <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
     </table>
 </body>
 <footer>

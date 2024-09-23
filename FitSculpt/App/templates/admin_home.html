@@ -1,183 +1,215 @@
 {% load static %}
 {% block content %}
 {% include 'admin_header.html' %}
-        <!-- Content -->
-        <style>
-            body {
-                background-color: rgb(234, 234, 164);
+    <style>
+        /* General Styling */
+        body {
+            background-color: rgb(138, 175, 145);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-widget-five {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            color: #28a745;
+        }
+
+        .stat-text a {
+            font-size: 1.2rem;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .stat-text a:hover {
+            color: #28a745;
+            text-decoration: underline;
+        }
+
+        /* Responsive Grid */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .col-lg-3, .col-md-6 {
+            flex: 1 1 calc(25% - 40px); /* Takes up 25% width minus gap */
+            max-width: 250px;
+        }
+
+        @media (max-width: 992px) {
+            .col-lg-3 {
+                flex: 1 1 calc(50% - 40px); /* Takes up 50% width on medium screens */
             }
-            </style>
-         <body></body>
-        <div class="content">
-            <!-- Animated -->
-            <div class="animated fadeIn">
-                <!-- Widgets  -->
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-users"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="manage_system">MANAGE SYSTEM<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6">
+        }
 
-						<div class="card">
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 1 1 calc(100% - 40px); /* Takes up 100% width on smaller screens */
+            }
+        }
 
-							<div class="card-body">
+        /* Footer Spacing */
+        .clearfix {
+            margin-top: 20px;
+        }
 
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-users"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="{% url 'admin_users' %}">MANAGE USERS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
+    </style>
+
+    <!-- Content Section -->
+    <div class="content">
+        <div class="row">
+            <!-- Card Widgets -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-image"></i>
                             </div>
-                        </div>
-                    </div>      
-
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-image"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="{% url 'admin_fm' %}">MANAGE TRAINERS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="stat-text">
+                                <a href="{% url 'admin_fm' %}">MANAGE TRAINERS</a>
                             </div>
                         </div>
                     </div>
-								               
-                    <div class="col-lg-3 col-md-6">
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-file"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="formvedio">MANAGE DATABASE<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-rupee"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="viwpay">VIEW PAYMENTS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="reports">REPORTS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-								
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="upgymfee">UPDATE PLANS<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-								
-                    </div>
-					<div class="col-lg-3 col-md-6">
-
-						<div class="card">
-
-							<div class="card-body">
-
-								<div class="stat-widget-five">
-                                    <div class="stat-icon dib flat-color-1">
-                                        <i class="fa fa-table"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="text-left dib">
-                                            <div class="stat-text"><a href="adminviewfeedback">UPDATE SERVICES<a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-								
-                    </div>
-                <div>
+                </div>
             </div>
 
- 
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="{% url 'admin_users' %}">MANAGE USERS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-rupee"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="{% url 'admin_payment' %}">VIEW PAYMENTS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="manage_system">MANAGE SYSTEM</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-file"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="formvedio">MANAGE DATABASE</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="reports">REPORTS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="{% url 'admin_plans' %}">MANAGE PLANS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-text">
+                                <a href="adminviewfeedback">UPDATE SERVICES</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-			
-                <!-- /Widgets -->
-             
-            <!-- /#add-category -->
- 
-            <!-- .animated -->
-        <!-- /.content -->
-        <div class="clearfix"></div>
-<BR><BR><BR>
+    </div>
+
+    <div class="clearfix"></div>
 {% endblock %}

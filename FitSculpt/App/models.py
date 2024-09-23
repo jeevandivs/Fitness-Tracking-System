@@ -1,6 +1,5 @@
 from datetime import date, datetime
 from django.db import models
-
 class Client(models.Model):
     user_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)  
@@ -15,11 +14,10 @@ class Client(models.Model):
     weight=models.FloatField()
     food_type=models.CharField(max_length=20)
     date_joined=models.DateField(auto_now_add=True) 
-
+    status=models.IntegerField()
     class Meta:
         managed = False
         db_table = 'client'
-
     def __str__(self):
         return self.username
     @property
@@ -72,6 +70,8 @@ class FitnessManager(models.Model):
     password = models.CharField(max_length=20)
     certificate_proof = models.FileField(upload_to='certificates/', blank=True, null=True)
     date_joined=models.DateField(auto_now_add=True) 
+    status=models.IntegerField()
+
 
     class Meta:
         managed = False

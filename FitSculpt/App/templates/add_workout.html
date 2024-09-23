@@ -107,7 +107,14 @@
         <input type="number" id="duration" name="duration" required>
 
         <label for="workout_image">Workout Image:</label>
-        <input type="file" id="workout_image" name="workout_image" accept="image/*">
+        <input type="file" id="workout_image" name="workout_image" accept="image/*"><br><br>
+
+        <label for="plans">Select Plans (Ctrl+Click to select multiple):</label>
+        <select id="plans" name="plans" multiple>
+            {% for plan in plans %}
+                <option value="{{ plan.plan_id }}">{{ plan.plan_name }}</option>
+            {% endfor %}
+        </select>
 
         <button type="submit">Add Workout</button>
     </form>

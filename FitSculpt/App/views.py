@@ -18,17 +18,16 @@ from .models import *
 from .tokens import custom_token_generator
 from .decorators import *
 from django.utils.html import strip_tags
-from datetime import datetime
+from datetime import datetime,date
 
 
 def index_view(request):
     return render(request, 'index.html')
 
 def calculate_age(dob):
-    today = datetime.datetime.today().date()
+    today = datetime.today().date()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
     return age
-import datetime
 def register_view(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -38,33 +37,27 @@ def register_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
-
         try:
             validate_email(email)
         except ValidationError:
             messages.error(request, 'Invalid email address')
             return render(request, 'register.html')
-
         if password != confirm_password:
             messages.error(request, 'Passwords do not match')
             return render(request, 'register.html')
-
         if username in ['fm001', 'admin001']:
             messages.error(request, 'This username cannot be taken.')
             return render(request, 'register.html')
-
         try:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT COUNT(*) FROM client WHERE username = %s", [username])
                 if cursor.fetchone()[0] > 0:
                     messages.error(request, 'Username already exists')
                     return render(request, 'register.html')
-
                 cursor.execute("SELECT COUNT(*) FROM client WHERE email = %s", [email])
                 if cursor.fetchone()[0] > 0:
                     messages.error(request, 'Email already registered')
                     return render(request, 'register.html')
-
                 cursor.execute("SELECT COUNT(*) FROM client WHERE phone = %s", [phone])
                 if cursor.fetchone()[0] > 0:
                     messages.error(request, 'Phone number already registered')
@@ -72,19 +65,15 @@ def register_view(request):
         except Exception as e:
             messages.error(request, f'Error checking username, email, or phone: {e}')
             return render(request, 'register.html')
-
         try:
-            dob_date = datetime.datetime.strptime(dob, "%Y-%m-%d").date()
-            if dob_date > datetime.datetime.today().date():
-
+            dob_date = datetime.strptime(dob, '%Y-%m-%d').date()
+            if dob_date > datetime.today().date():
                 messages.error(request, 'Date of birth cannot be in the future.')
                 return render(request, 'register.html')
-            print(dob_date)
             age = calculate_age(dob_date)
         except ValueError:
             messages.error(request, 'Invalid date format. Use YYYY-MM-DD.')
             return render(request, 'register.html')
-
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -98,24 +87,23 @@ def register_view(request):
             messages.error(request, f'Error occurred: {e}')
             return render(request, 'register.html')
     return render(request, 'register.html')
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
         try:
             user = Client.objects.get(username=username)
-            if user.password == password:  
-                request.session['user_id'] = user.user_id 
-                request.session['username'] = user.username  
-                return redirect('user_home')  
-            else:
-                messages.error(request, 'Invalid username or password.')
+            if user.status == 1:
+                if user.password == password:  
+                    request.session['user_id'] = user.user_id 
+                    request.session['username'] = user.username  
+                    return redirect('user_home')  
+                else:
+                    messages.error(request, 'Invalid username or password.')
         except Client.DoesNotExist:
             messages.error(request, 'Invalid username or password.')
-
     return render(request, 'login.html')
+
 
 
 def google_login_view(request):
@@ -246,6 +234,29 @@ def fm_payment(request):
         'payments': payments,
     }
     return render(request, 'fm_payment.html',context)
+
+
+@admin_custom_login_required
+def admin_payment(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT * from tbl_payment""")
+        payments = cursor.fetchall()
+        payments = [
+            {
+                'payment_id': row[0],
+                'plan_id': row[1],
+                'user_id': row[2],
+                'payment_date': row[3],
+                'mode': row[4],
+                'status': row[5],
+            } 
+            for row in payments
+        ]
+        context = {
+        'payments': payments,
+    }
+    return render(request, 'admin_payment.html',context)
 
 @fm_custom_login_required
 def fm_profile_view(request):
@@ -421,13 +432,14 @@ def fm_login_view(request):
         password = request.POST.get('password')
         try:
             user = FitnessManager.objects.get(username=username)
-            if user.password == password:  
-                request.session['fm_user_id'] = user.user_id 
-                request.session['username'] = user.username  
-                return redirect('fm_home')  
+            if user.status == 1: 
+                if user.password == password:  
+                    request.session['fm_user_id'] = user.user_id 
+                    request.session['username'] = user.username  
+                    return redirect('fm_home')  
                 
-            else:
-                messages.error(request, 'Invalid username or password.')
+                else:
+                    messages.error(request, 'Invalid username or password.')
         except FitnessManager.DoesNotExist:
             messages.error(request, 'Invalid username or password.')
 
@@ -588,7 +600,7 @@ def admin_users_view(request):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT user_id, name, email, phone, username, date_joined
-            FROM client""")
+            FROM client where status=1 """)
         clients = cursor.fetchall()
         clients = [
             {
@@ -656,7 +668,7 @@ def admin_fm_view(request):
         cursor.execute("""
             SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof, username, password
             FROM tbl_fitness_manager 
-            WHERE username != '' AND password != ''
+            WHERE username != '' AND password != '' && status=1
         """)
         complete_fms = cursor.fetchall()
         complete_fms = [
@@ -767,15 +779,23 @@ def fm_workouts_view(request):
 def see_all_workouts(request):
     workouts = Workout.objects.all()
     return render(request, 'fm_workouts.html', {'workouts': workouts})
+
+
+from django.shortcuts import render, redirect
+from .models import Workout, Plan, Service
+from django.core.files.storage import FileSystemStorage
+
 @fm_custom_login_required
 def add_workout(request):
     if request.method == 'POST':
+        # Get form data
         workout_name = request.POST['workout_name']
         description = request.POST['description']
         body_part = request.POST['body_part']
         duration = request.POST['duration']
         workout_image = request.FILES['workout_image']
-
+        
+        # Save the workout details and get the workout_id
         workout = Workout(
             workout_name=workout_name,
             description=description,
@@ -783,24 +803,152 @@ def add_workout(request):
             duration=duration,
             workout_image=workout_image
         )
-        workout.save()
-        return redirect('see_all_workouts')  # Redirect to see all workouts after adding
+        workout.save()  # This saves the workout and assigns the workout_id
+        workout_id = workout.workout_id  # Get the auto-incremented workout_id
 
-    return render(request, 'add_workout.html')  # Render form for adding workout
+        # Get the selected plans from the form
+        selected_plans = request.POST.getlist('plans')
+        
+        for plan_id in selected_plans:
+            plan = Plan.objects.get(plan_id=plan_id)
+            
+            # Create Service for each selected plan
+            if plan.plan_name == 'Basic Plan':
+                service_no = 1
+                service_type = 'Basic'
+                service_description = 'Basic plan including 5 workouts for each body part'
+                category = 'plan 1'
+            elif plan.plan_name == 'Standard Plan':
+                service_no = 2
+                service_type = 'Standard'
+                service_description = 'Standard plan including 7 workouts for each body part'
+                category = 'plan 2'
+            elif plan.plan_name == 'Premium Plan':
+                service_no = 3
+                service_type = 'Premium'
+                service_description = 'Premium plan including 9 workouts for each body part'
+                category = 'plan 3'
+            elif plan.plan_name == 'Child Plan':
+                service_no = 4
+                service_type = 'Child'
+                service_description = 'Child plan including 4 workouts for each body part'
+                category = 'plan 4'
+            
+            service = Service(
+                service_no=service_no,
+                service_type=service_type,
+                workout_id=workout_id,  # Use workout_id here
+                nutrition_no=5,  # Example value, you can modify this
+                description=service_description,
+                category=category,
+                day=1 if body_part.strip().lower() == 'chest' else   # Day 1 for chest
+        2 if body_part.strip().lower() == 'back' else    # Day 2 for back
+        3 if body_part.strip().lower() == 'biceps' else  # Day 3 for biceps
+        4 if body_part.strip().lower() == 'triceps' else # Day 4 for triceps
+        5 if body_part.strip().lower() == 'shoulder' else# Day 5 for shoulder
+        6 if body_part.strip().lower() == 'leg' else 0     # Day 6 for leg
+            )
+            service.save()
+        
+        # Redirect to workout list page after submission
+        return redirect('see_all_workouts')
+    
+    # Fetch available plans from the database
+    plans = Plan.objects.all()
+    return render(request, 'add_workout.html', {'plans': plans})
+
+from django.shortcuts import render, redirect
+from .models import Workout, Plan, Service
+
 @fm_custom_login_required
 def update_workout(request, workout_id):
+    # Fetch the workout object
     workout = Workout.objects.get(workout_id=workout_id)
-    if request.method == 'POST':
-        workout.workout_name = request.POST['workout_name']
-        workout.description = request.POST['description']
-        workout.body_part = request.POST['body_part']
-        workout.duration = request.POST['duration']
-        if 'workout_image' in request.FILES:
-            workout.workout_image = request.FILES['workout_image']
-        workout.save()
-        return redirect('see_all_workouts')
 
-    return render(request, 'update_workout.html', {'workout': workout})  # Render form with workout details
+    # Fetch associated services for this workout
+    associated_services = Service.objects.filter(workout_id=workout_id)
+
+    # Get the service_no(s) from associated services
+    associated_service_nos = [service.service_no for service in associated_services]
+
+    # Fetch plans from tbl_plans
+    all_plans = Plan.objects.all()
+
+    # Get associated plans (pre-select these in the dropdown)
+    associated_plans = Plan.objects.filter(service_no__in=associated_service_nos)
+
+    if request.method == 'POST':
+        # Handle form submission for updating the plans
+        selected_plan_ids = request.POST.getlist('plans')  # Get selected plan IDs from the form
+        
+        # Clear existing services for this workout
+        Service.objects.filter(workout_id=workout_id).delete()
+
+        # Add the newly selected plans
+        for plan_id in selected_plan_ids:
+            plan = Plan.objects.get(plan_id=plan_id)
+
+            # Initialize variables for service creation
+            service_no = 0
+            service_type = ''
+            service_description = ''
+            category = ''
+
+            if plan.plan_name == 'Basic Plan':
+                service_no = 1
+                service_type = 'Basic'
+                service_description = 'Basic plan including 5 workouts for each body part'
+                category = 'plan 1'
+            elif plan.plan_name == 'Standard Plan':
+                service_no = 2
+                service_type = 'Standard'
+                service_description = 'Standard plan including 7 workouts for each body part'
+                category = 'plan 2'
+            elif plan.plan_name == 'Premium Plan':
+                service_no = 3
+                service_type = 'Premium'
+                service_description = 'Premium plan including 9 workouts for each body part'
+                category = 'plan 3'
+            elif plan.plan_name == 'Child Plan':
+                service_no = 4
+                service_type = 'Child'
+                service_description = 'Child plan including 4 workouts for each body part'
+                category = 'plan 4'
+
+            # Determine the day based on the workout body part
+            day = {
+                'chest': 1,
+                'back': 2,
+                'biceps': 3,
+                'triceps': 4,
+                'shoulder': 5,
+                'leg': 6
+            }.get(workout.body_part.strip().lower(), 0)  # Default to 0 if not found
+
+            # Create and save the service
+            service = Service(
+                service_no=service_no,
+                service_type=service_type,
+                workout_id=workout_id,
+                nutrition_no=5,  # You can set this dynamically if needed
+                description=service_description,
+                category=category,
+                day=day
+            )
+            service.save()
+
+        return redirect('see_all_workouts')  # Redirect to workout list after update
+
+    context = {
+        'workout': workout,
+        'all_plans': all_plans,  # All available plans
+        'associated_plans': associated_plans,  # Plans already linked to the workout
+    }
+
+    return render(request, 'update_workout.html', context)
+
+
+
 @fm_custom_login_required
 def delete_workout(request, workout_id):
     workout = Workout.objects.get(workout_id=workout_id)
@@ -822,8 +970,14 @@ def fm_nutritions_view(request):
 def see_all_food(request):
     foods = FoodDatabase.objects.all()
     return render(request, 'fm_nutritions.html', {'foods': foods})
+
 @fm_custom_login_required
 def add_food(request):
+    # Fetch unique nutrition_no and their descriptions
+    nutrition_options = Nutrition.objects.values('nutrition_no').annotate(
+        first_description=models.F('description')
+    ).distinct()
+
     if request.method == 'POST':
         food_name = request.POST['food_name']
         food_type = request.POST['food_type']
@@ -832,7 +986,7 @@ def add_food(request):
         carbs = request.POST['carbs']
         fats = request.POST['fats']
 
-
+        # Create the food entry
         food = FoodDatabase(
             food_name=food_name,
             food_type=food_type,
@@ -841,10 +995,39 @@ def add_food(request):
             carbs=carbs,
             fats=fats
         )
-        food.save()
-        return redirect('see_all_food')  # Redirect to see all workouts after adding
+        food.save()  # Save the food entry
 
-    return render(request, 'add_food.html')  # Render form for adding workout
+        food_id = food.food_id  # Get the newly created food_id
+        print(food_id)
+
+        selected_nutrition_nos = request.POST.getlist('nutritional_descriptions')  # Get selected nutrition_nos
+
+        # Insert entries for each selected nutrition_no
+        for nutrition_no in selected_nutrition_nos:
+            # Use filter() to get a queryset
+            nutrition_entries = Nutrition.objects.filter(nutrition_no=nutrition_no)
+            if nutrition_entries.exists():
+                nutrition_entry = nutrition_entries.first()  # Get the first matching entry
+
+                # Create a new Nutrition entry for each selected nutrition_no
+                Nutrition.objects.create(
+                    nutrition_no=nutrition_entry.nutrition_no,  # Store the nutrition_no
+                    food_id=food_id,                             # Associate with the new food_id
+                    description=nutrition_entry.description      # Fetch the description
+                )
+
+        return redirect('see_all_food')  # Redirect to see all food after adding
+
+    context = {
+        'nutrition_options': nutrition_options,
+    }
+
+    return render(request, 'add_food.html', context)
+
+
+
+
+
 @fm_custom_login_required
 def update_food(request, food_id):
     food = FoodDatabase.objects.get(food_id=food_id)
@@ -1006,3 +1189,17 @@ def nutrition_view(request):
 @fm_custom_login_required
 def fm_nutritions_view(request):
     return render(request, 'fm_nutritions.html')
+
+@fm_custom_login_required
+def fm_plans(request):
+    plans = Plan.objects.all()
+    return render(request, 'fm_plans.html', {'plans': plans})
+
+@fm_custom_login_required
+def fm_nutritions2(request):
+    nutritions = Nutrition.objects.all()
+    return render(request, 'fm_nutritions2.html', {'nutritions': nutritions})
+
+@admin_custom_login_required
+def admin_plans(request):
+    return render(request, 'admin_plans.html')

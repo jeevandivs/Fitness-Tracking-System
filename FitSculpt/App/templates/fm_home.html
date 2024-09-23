@@ -5,7 +5,7 @@
 <!-- Content -->
 <style>
     body {
-        background-image: url("{% static 'assets/images/gyminside.jpg' %}");
+        background-image: url("{% static 'assets/images/onemore.jpeg' %}");
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
@@ -98,6 +98,20 @@
             <div class="card-body">
                 <div class="stat-widget-five">
                     <div class="stat-icon dib flat-color-1">
+                        <i class="fa fa-rupee"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="text-left dib">
+                            <div class="stat-text"><a href="{% url 'fm_payment' %}">VIEW PAYMENTS</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="stat-widget-five">
+                    <div class="stat-icon dib flat-color-1">
                         <i class="fa fa-file"></i>
                     </div>
                     <div class="stat-content">
@@ -136,20 +150,7 @@
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-rupee"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'fm_payment' %}">VIEW PAYMENTS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+       
         <div class="card">
             <div class="card-body">
                 <div class="stat-widget-five">
@@ -158,7 +159,7 @@
                     </div>
                     <div class="stat-content">
                         <div class="text-left dib">
-                            <div class="stat-text"><a href="reports">VIEW PLANS</a></div>
+                            <div class="stat-text"><a href="{% url 'fm_plans' %}">VIEW PLANS</a></div>
                         </div>
                     </div>
                 </div>

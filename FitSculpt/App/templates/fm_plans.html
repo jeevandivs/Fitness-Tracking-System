@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Manager Nutritions</title>
+    <title>Fitness Manager Plans</title>
     <style>
         body {
             background-color: #f8f9fa;
@@ -94,50 +94,23 @@
     </style>
 </head>
 <body>
-    <h1>Nutritions</h1>
-    <div class="button-container">
-        <a href="{% url 'see_all_food' %}"><button>See the Food Database</button></a>
-        <a href="{% url 'add_food' %}"><button>Add Food</button></a>
-        <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
-
-    </div>
-    <h2>Food Database</h2>
+    <h1>Different Plans</h1>
     <table>
         <thead>
             <tr>
-                <th>Food Name</th>
-                <th>Actions</th>
+                <th>Plan Name</th>
+                <th>Amount</th>
+                <th>Description</th>
+
             </tr>
         </thead>
         <tbody>
-            {% for food in foods %}
+            {% for plan in plans %}
             <tr>
-                <td>{{ food.food_name }}</td>
-                <td>
-                    <a href="{% url 'update_food' food.food_id %}">
-                        <button>Update Food</button>
-                    </a>
-                    <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+                <td>{{ plan.plan_name }}</td>
+                <td>{{ plan.amount }}</td>
+                <td>{{ plan.description }}</td>
 
-        <tbody>
-            {% for food in foods %}
-            <tr>
-                <td>{{ food.food_name }}</td>
-                <td>
-                    <a href="{% url 'update_food' food.food_id %}">
-                        <button>Update Food</button>
-                    </a>
-                    <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-                    </form>
                 </td>
             </tr>
             {% endfor %}

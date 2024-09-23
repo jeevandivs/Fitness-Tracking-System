@@ -38,10 +38,13 @@ urlpatterns = [
     path('update_workout/<int:workout_id>/', views.update_workout, name='update_workout'),
     path('delete_workout/<int:workout_id>/', views.delete_workout, name='delete_workout'),
     path('fm_nutritions/', views.fm_nutritions_view, name='fm_nutritions'),
+    path('fm_nutritions2/', views.fm_nutritions2, name='fm_nutritions2'),
     path('see_all_food/', views.see_all_food, name='see_all_food'),
     path('add_food/', views.add_food, name='add_food'),
     path('update_food/<int:food_id>/', views.update_food, name='update_food'),
     path('delete_food/<int:food_id>/', views.delete_food, name='delete_food'),
+    path('fm_plans/', views.fm_plans, name='fm_plans'),
+
 
 
 
@@ -56,6 +59,10 @@ urlpatterns = [
     path('delete_fm/<int:user_id>/', views.delete_fm, name='delete_fm'),
     path('delete_client/<int:user_id>/', views.delete_client, name='delete_client'),
     path('view_certificate/<int:user_id>/', views.view_certificate, name='view_certificate'),
+    path('admin_payment/', views.admin_payment, name='admin_payment'),
+    path('admin_plans/', views.admin_plans, name='admin_plans'),
+
+
 
 
 

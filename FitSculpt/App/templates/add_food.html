@@ -98,19 +98,27 @@
         <input type="text" id="food_name" name="food_name" required>
 
         <label for="food_type">Type:</label>
-        <input type="text" id="food_type" name="food_type" required>
+        <input type="text" id="food_type" name="food_type" placeholder="(Enter Vegetarian for vegetarian & Enter Non-Vegetarian for non vegetarian)" required>
 
         <label for="calories"> Calories:</label>
-        <input type="number" id="calories" name="calories" required>
+        <input type="number" id="calories" name="calories" placeholder="In 100 grams" required>
 
         <label for="proteins">Proteins:</label>
-        <input type="number" id="proteins" name="proteins" required>
+        <input type="number" id="proteins" name="proteins" placeholder="In 100 grams" required>
 
         <label for="carbs">Carbs:</label>
-        <input type="number" id="carbs" name="carbs" required>
+        <input type="number" id="carbs" name="carbs" placeholder="In 100 grams" required>
 
         <label for="fats">Fats:</label>
-        <input type="number" id="fats" name="fats" required>
+        <input type="number" id="fats" name="fats" placeholder="In 100 grams" required>
+
+        <label for="nutritional_descriptions">Select Nutritional Descriptions:</label>
+<select id="nutritional_descriptions" name="nutritional_descriptions" multiple>
+    {% for nutrition in nutrition_options %}
+        <option value="{{ nutrition.nutrition_no }}">{{ nutrition.first_description }}</option>
+    {% endfor %}
+</select>
+
 
 
         <button type="submit">Add Food</button>
