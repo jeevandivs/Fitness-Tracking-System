@@ -112,7 +112,7 @@
     <td>{{ plan.description }}</td>
     <td>
         {% if user_has_plan %}
-            <button disabled>Selection Disabled</button>
+            <button disabled>Selection Disabled</button><br><p>You have already selected a plan</p>
         {% elif plan.plan_id == 4 and not is_child_plan_enabled %}
             <button disabled>Not Eligible</button>
         {% elif previous_plan_amount and plan.amount < previous_plan_amount %}

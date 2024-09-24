@@ -128,18 +128,7 @@ class Workout(models.Model):
     def __str__(self):
         return self.workout_name
     
-class Nutrition(models.Model):
-    nutrition_id = models.AutoField(primary_key=True)
-    nutrition_no = models.IntegerField()
-    food_id = models.IntegerField()
-    description = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'tbl_nutritions'
-
-    def __str__(self):
-        return self.nutrition_no
+from django.db import models
     
 class FoodDatabase(models.Model):
     food_id = models.AutoField(primary_key=True)
@@ -156,3 +145,16 @@ class FoodDatabase(models.Model):
 
     def __str__(self):
         return self.food_name
+
+class Nutrition(models.Model):
+    nutrition_id = models.AutoField(primary_key=True)
+    nutrition_no = models.IntegerField()
+    food = models.ForeignKey(FoodDatabase, on_delete=models.CASCADE, related_name='nutritions')
+    description = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'tbl_nutritions'
+
+    def __str__(self):
+        return self.nutrition_no

@@ -69,6 +69,7 @@
 
 <div class="container">
     <div class="section-title">Users</div>
+    <center><h1>Active Clients</h1></center>
       <table>
         <thead>
             <tr>
@@ -86,7 +87,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for client in clients %}
+            {% for client in clients %} 
             <tr>
                 <td>{{ client.user_id }}</td>
                 <td>{{ client.name }}</td>

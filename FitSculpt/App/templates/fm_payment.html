@@ -69,15 +69,20 @@
 
 <div class="container">
     <div class="section-title">Users</div>
+    <center><h1>Active Plans</h1></center>
       <table>
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Plan_ID</th>
+                <th>Plan Name</th>
+                <th>Paid Amount</th>
                 <th>User_ID</th>
+                <th>User Name</th>
                 <th>Payment Date</th>
                 <th>Mode</th>
                 <th>Status</th>
+
             </tr>
         </thead>
         <tbody>
@@ -85,7 +90,10 @@
             <tr>
                 <td>{{ payment.payment_id }}</td>
                 <td>{{ payment.plan_id }}</td>
+                <td>{{ payment.plan_name }}</td>
+                <td>{{ payment.amount }}</td>
                 <td>{{ payment.user_id }}</td>
+                <td>{{ payment.name }}</td>
                 <td>{{ payment.payment_date }}</td>
                 <td>{{ payment.mode }}</td>
                 <td>{{ payment.status }}</td>

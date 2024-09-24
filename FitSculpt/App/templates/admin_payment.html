@@ -67,14 +67,51 @@
     }
 </style>
 
-<div class="container">
-    <div class="section-title">Users</div>
+<div class="container"></div>
+    <div class="section-title">Active User Payments</div>
       <table>
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Plan_ID</th>
+                <th>Plan Name</th>
+                <th>Paid Amount</th>
                 <th>User_ID</th>
+                <th>User Name</th>
+                <th>Payment Date</th>
+                <th>Mode</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for active_payment in active_payments %}
+            <tr>
+                <td>{{ active_payment.payment_id }}</td>
+                <td>{{ active_payment.plan_id }}</td>
+                <td>{{ active_payment.plan_name }}</td>
+                <td>{{ active_payment.amount }}</td>
+                <td>{{ active_payment.user_id }}</td>
+                <td>{{ active_payment.name }}</td>
+                <td>{{ active_payment.payment_date }}</td>
+                <td>{{ active_payment.mode }}</td>
+                <td>{{ active_payment.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <div class="section-title">User Inactive Payments</div>
+      <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Plan_ID</th>
+                <th>Plan Name</th>
+                <th>Paid Amount</th>
+                <th>User_ID</th>
+                <th>User Name</th>
                 <th>Payment Date</th>
                 <th>Mode</th>
                 <th>Status</th>
@@ -85,7 +122,10 @@
             <tr>
                 <td>{{ payment.payment_id }}</td>
                 <td>{{ payment.plan_id }}</td>
+                <td>{{ payment.plan_name }}</td>
+                <td>{{ payment.amount }}</td>
                 <td>{{ payment.user_id }}</td>
+                <td>{{ payment.name }}</td>
                 <td>{{ payment.payment_date }}</td>
                 <td>{{ payment.mode }}</td>
                 <td>{{ payment.status }}</td>
@@ -94,5 +134,7 @@
         </tbody>
     </table>
 </div>
+
+
 
 {% endblock %}

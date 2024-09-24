@@ -1,4 +1,8 @@
+{% load static %}
+{% include 'header1.html' %}
+{% block content %}
 <style>
+
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 body {
@@ -112,12 +116,12 @@ span {
             <p>Amount: ${{ plan.amount }}</p>  
         </div>
         {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
-    ````{% endif %}
-    <form id="payment-form" action="{% url 'payment_gateway' plan.plan_id %}" method="post">
-        {% csrf_token %}
+            {% for message in messages %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form id="payment-form" action="{% url 'payment_gateway' plan.plan_id %}" method="post">
+            {% csrf_token %}
             <label for="name">Card Holder Name</label>
             <input type="text" id="name" name="name" placeholder="Name" required />
             <div id="name-error" class="error"></div>
@@ -129,7 +133,7 @@ span {
             <div class="exp-cvc">
                 <div class="expiration">
                     <label for="expiry">Expiry Date</label>
-                    <input name="expiry" id="expiry" type="text" required placeholder="MM/YY" required minlength="5" maxlength="5" />
+                    <input name="expiry" id="expiry" type="text" required placeholder="MM/YY" minlength="5" maxlength="5" />
                     <div id="expiry-error" class="error"></div>
                 </div>
 
@@ -148,60 +152,85 @@ span {
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const nameField = document.getElementById('name');
-        const cardField = document.getElementById('card');
-        const expiryField = document.getElementById('expiry');
-        const cvcField = document.getElementById('cvc');
-
+    // Real-time validation function
+    function validateName() {
+        const nameInput = document.getElementById('name');
         const nameError = document.getElementById('name-error');
-        const cardError = document.getElementById('card-error');
-        const expiryError = document.getElementById('expiry-error');
-        const cvcError = document.getElementById('cvc-error');
+        const namePattern = /^[A-Za-z\s]+$/;
 
-        // Function to display error messages
-        function showError(element, message) {
-            element.textContent = message;
-            element.style.color = 'red';
+        if (!namePattern.test(nameInput.value)) {
+            nameError.textContent = 'Name must contain only letters and spaces.';
+        } else {
+            nameError.textContent = '';
+        }
+    }
+
+    function validateCardNumber() {
+        const cardInput = document.getElementById('card');
+        const cardError = document.getElementById('card-error');
+        const cardPattern = /^\d{16}$/; // Must be 16 digits
+
+        if (!cardPattern.test(cardInput.value)) {
+            cardError.textContent = 'Card number must be exactly 16 digits.';
+        } else {
+            cardError.textContent = '';
+        }
+    }
+
+    function validateExpiry() {
+        const expiryInput = document.getElementById('expiry');
+        const expiryError = document.getElementById('expiry-error');
+        const currentYear = new Date().getFullYear() % 100; // Get last two digits of current year
+        const expiryParts = expiryInput.value.split('/');
+
+        if (expiryParts.length !== 2 || isNaN(expiryParts[0]) || isNaN(expiryParts[1])) {
+            expiryError.textContent = 'Expiry date must be in MM/YY format.';
+            return;
         }
 
-        nameField.addEventListener('input', function () {
-            const namePattern = /^[a-zA-Z\s]+$/; // Only characters and spaces
-            if (!namePattern.test(nameField.value)) {
-                showError(nameError, 'Please enter a valid name (letters and spaces only).');
-            } else if (nameField.value.trim() === '') {
-                showError(nameError, 'Name is required.');
-            } else {
-                nameError.textContent = '';
-            }
-        });
+        const month = parseInt(expiryParts[0]);
+        const year = parseInt(expiryParts[1]);
 
-        cardField.addEventListener('input', function () {
-    const cardPattern = /^\d{16}$/; // 16 digits only
-    const cleanedValue = cardField.value.replace(/\s/g, ''); // Remove spaces
-    if (!cardPattern.test(cleanedValue)) {
-        showError(cardError, 'Card number must be exactly 16 digits and contain only numbers.');
-    } else {
-        cardError.textContent = '';
+        if (month < 1 || month > 12) {
+            expiryError.textContent = 'Month must be between 01 and 12.';
+        } else if (year < currentYear || year > (currentYear + 10)) {
+            expiryError.textContent = 'Year must be between this year and 10 years from now.';
+        } else {
+            expiryError.textContent = '';
+        }
     }
-});
 
-        expiryField.addEventListener('input', function () {
-            const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
-            if (!expiryPattern.test(expiryField.value)) {
-                showError(expiryError, 'Expiry date must be in MM/YY format.');
-            } else {
-                expiryError.textContent = '';
-            }
-        });
+    function validateCVC() {
+        const cvcInput = document.getElementById('cvc');
+        const cvcError = document.getElementById('cvc-error');
+        const cvcPattern = /^\d{3}$/; // Must be 3 digits
 
-        cvcField.addEventListener('input', function () {
-            const cvcPattern = /^\d{3}$/; // 3 digits
-            if (!cvcPattern.test(cvcField.value)) {
-                showError(cvcError, 'CVV must be 3 digits.');
-            } else {
-                cvcError.textContent = '';
-            }
-        });
+        if (!cvcPattern.test(cvcInput.value)) {
+            cvcError.textContent = 'CVC must be exactly 3 digits.';
+        } else {
+            cvcError.textContent = '';
+        }
+    }
+
+    // Add event listeners for real-time validation
+    document.getElementById('name').addEventListener('input', validateName);
+    document.getElementById('card').addEventListener('input', validateCardNumber);
+    document.getElementById('expiry').addEventListener('input', validateExpiry);
+    document.getElementById('cvc').addEventListener('input', validateCVC);
+
+    // Form submission validation
+    document.getElementById('payment-form').addEventListener('submit', function(event) {
+        validateName();
+        validateCardNumber();
+        validateExpiry();
+        validateCVC();
+
+        // Check if there are any errors before submission
+        if (document.querySelector('.error').textContent) {
+            event.preventDefault(); // Prevent form submission
+            alert('Please fix the errors before submitting.');
+        }
     });
 </script>
+
+{% endblock %}

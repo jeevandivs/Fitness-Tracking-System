@@ -82,19 +82,30 @@
 <section class="section" id="profile">
     <div class="container">
         <div class="profile-card">
-            <!-- Example profile image -->
             <img src="{% static 'images/profile-placeholder.png' %}" alt="Profile Picture">
 
-            <!-- Profile Information -->
             <h2>{{ tbl_fitness_manager.name }}</h2>
             <p><strong>User Name:</strong> {{ tbl_fitness_manager.username }}</p>
             <p><strong>Date Joined:</strong> {{ tbl_fitness_manager.date_joined }}</p>
             
-            <!-- Edit Button -->
             <a href="#" class="btn" id="edit-btn">Edit Profile</a>
 
-            <!-- Edit Form -->
             <div class="edit-form" id="edit-form">
+                {% if form.errors %}
+                    <div class="error-message">
+                        <strong>Please correct the following errors:</strong>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
                 <form method="post">
                     {% csrf_token %}
                     {{ form.as_p }}
@@ -117,5 +128,12 @@
             this.textContent = 'Cancel';
         }
     });
+
+    // If there are any errors, keep the form open
+    const errorMessages = document.querySelectorAll('.error-message');
+    if (errorMessages.length > 0) {
+        document.getElementById('edit-form').classList.add('active');
+        document.getElementById('edit-btn').textContent = 'Cancel';
+    }
 </script>
 {% endblock %}

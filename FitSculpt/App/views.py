@@ -205,7 +205,7 @@ def fm_users(request):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT user_id, name, email, phone,dob, username,gender,age,height,weight,date_joined
-            FROM client""")
+            FROM client where status=1 """)
         clients = cursor.fetchall()
         clients = [
             {
@@ -223,53 +223,102 @@ def fm_users(request):
             } 
             for row in clients
         ]
+
+        
         context = {
         'clients': clients,
     }
     return render(request, 'fm_users.html',context)
 
+from django.shortcuts import render
+from django.db import connection
+
 @fm_custom_login_required
 def fm_payment(request):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT * from tbl_payment""")
+            SELECT p.payment_id, p.plan_id, pl.plan_name,pl.amount,p.user_id,c.name, p.payment_date, p.mode, p.status 
+            FROM tbl_payment p
+            JOIN client c ON p.user_id = c.user_id
+            JOIN tbl_plans pl ON p.plan_id = pl.plan_id
+            where active=1
+        """)
         payments = cursor.fetchall()
         payments = [
             {
                 'payment_id': row[0],
                 'plan_id': row[1],
-                'user_id': row[2],
-                'payment_date': row[3],
-                'mode': row[4],
-                'status': row[5],
+                'plan_name': row[2],
+                'amount': row[3],
+                'user_id': row[4],
+                'name': row[5],
+                'payment_date': row[6],
+                'mode': row[7],
+                'status': row[8],
+                  
+                
             } 
             for row in payments
         ]
-        context = {
+
+    context = {
         'payments': payments,
     }
-    return render(request, 'fm_payment.html',context)
+    return render(request, 'fm_payment.html', context)
+
 
 
 @admin_custom_login_required
 def admin_payment(request):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT * from tbl_payment""")
+            SELECT p.payment_id, p.plan_id, pl.plan_name,pl.amount,p.user_id,c.name, p.payment_date, p.mode, p.status 
+            FROM tbl_payment p
+            JOIN client c ON p.user_id = c.user_id
+            JOIN tbl_plans pl ON p.plan_id = pl.plan_id
+        """)
         payments = cursor.fetchall()
         payments = [
             {
                 'payment_id': row[0],
                 'plan_id': row[1],
-                'user_id': row[2],
-                'payment_date': row[3],
-                'mode': row[4],
-                'status': row[5],
+                'plan_name': row[2],
+                'amount': row[3],
+                'user_id': row[4],
+                'name': row[5],
+                'payment_date': row[6],
+                'mode': row[7],
+                'status': row[8],
+                  
+                
             } 
             for row in payments
         ]
+
+        cursor.execute("""
+            SELECT p.payment_id, p.plan_id, pl.plan_name,pl.amount,p.user_id,c.name, p.payment_date, p.mode, p.status 
+            FROM tbl_payment p
+            JOIN client c ON p.user_id = c.user_id
+            JOIN tbl_plans pl ON p.plan_id = pl.plan_id
+            WHERE p.active = 1 """)
+        active_payments = cursor.fetchall()
+        active_payments = [
+            {
+                'payment_id': row[0],
+                'plan_id': row[1],
+                'plan_name': row[2],
+                'amount': row[3],
+                'user_id': row[4],
+                'name': row[5],
+                'payment_date': row[6],
+                'mode': row[7],
+                'status': row[8],
+            } 
+            for row in active_payments
+        ]
         context = {
         'payments': payments,
+        'active_payments': active_payments
     }
     return render(request, 'admin_payment.html',context)
 
@@ -283,7 +332,7 @@ def fm_profile_view(request):
             form = FmUpdateForm(request.POST, instance=tbl_fitness_manager)
             if form.is_valid():
                 form.save()
-                return redirect('fm_home')
+                return redirect('fm_profile')
         else:
             form = FmUpdateForm(instance=tbl_fitness_manager)
         
@@ -849,6 +898,12 @@ def add_workout(request):
         body_part = request.POST['body_part']
         duration = request.POST['duration']
         workout_image = request.FILES['workout_image']
+
+        if Workout.objects.filter(workout_name=workout_name).exists():
+            # Workout already exists, add an error message
+            error_message = f"The workout '{workout_name}' already exists."
+            plans = Plan.objects.all()  # Fetch available plans again
+            return render(request, 'add_workout.html', {'plans': plans, 'error_message': error_message})
         
         # Save the workout details and get the workout_id
         workout = Workout(
@@ -917,33 +972,35 @@ from .models import Workout, Plan, Service
 
 @fm_custom_login_required
 def update_workout(request, workout_id):
-    # Fetch the workout object
     workout = Workout.objects.get(workout_id=workout_id)
 
-    # Fetch associated services for this workout
     associated_services = Service.objects.filter(workout_id=workout_id)
-
-    # Get the service_no(s) from associated services
     associated_service_nos = [service.service_no for service in associated_services]
-
-    # Fetch plans from tbl_plans
     all_plans = Plan.objects.all()
-
-    # Get associated plans (pre-select these in the dropdown)
     associated_plans = Plan.objects.filter(service_no__in=associated_service_nos)
 
     if request.method == 'POST':
-        # Handle form submission for updating the plans
         selected_plan_ids = request.POST.getlist('plans')  # Get selected plan IDs from the form
         
-        # Clear existing services for this workout
+        # Update the workout details
+        workout.workout_name = request.POST.get('workout_name', workout.workout_name)
+        workout.description = request.POST.get('description', workout.description)
+        workout.body_part = request.POST.get('body_part', workout.body_part)
+        workout.duration = request.POST.get('duration', workout.duration)
+
+        # Handle the workout image if provided
+        if 'workout_image' in request.FILES:
+            workout.workout_image = request.FILES['workout_image']
+
+        workout.save()  # Save updated workout details
+
+        # Delete existing services for this workout
         Service.objects.filter(workout_id=workout_id).delete()
 
-        # Add the newly selected plans
+        # Create new services based on selected plans
         for plan_id in selected_plan_ids:
             plan = Plan.objects.get(plan_id=plan_id)
 
-            # Initialize variables for service creation
             service_no = 0
             service_type = ''
             service_description = ''
@@ -970,7 +1027,6 @@ def update_workout(request, workout_id):
                 service_description = 'Child plan including 4 workouts for each body part'
                 category = 'plan 4'
 
-            # Determine the day based on the workout body part
             day = {
                 'chest': 1,
                 'back': 2,
@@ -978,9 +1034,8 @@ def update_workout(request, workout_id):
                 'triceps': 4,
                 'shoulder': 5,
                 'leg': 6
-            }.get(workout.body_part.strip().lower(), 0)  # Default to 0 if not found
+            }.get(workout.body_part.strip().lower(), 0)  
 
-            # Create and save the service
             service = Service(
                 service_no=service_no,
                 service_type=service_type,
@@ -1001,6 +1056,7 @@ def update_workout(request, workout_id):
     }
 
     return render(request, 'update_workout.html', context)
+
 
 
 
@@ -1041,6 +1097,13 @@ def add_food(request):
         carbs = request.POST['carbs']
         fats = request.POST['fats']
 
+        if FoodDatabase.objects.filter(food_name=food_name).exists():
+            error_message = "This food already exists. Please enter a different food name."
+            context = {
+                'nutrition_options': nutrition_options,
+                'error_message': error_message,
+            }
+            return render(request, 'add_food.html', context)
         # Create the food entry
         food = FoodDatabase(
             food_name=food_name,
@@ -1117,7 +1180,7 @@ def workouts_view(request, day=None):
 
     # Fetch plan_id from tbl_payment
     with connection.cursor() as cursor:
-        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND status = 'success'", [user_id])
+        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND active=1 ", [user_id])
         result = cursor.fetchone()
         plan_id = result[0] if result else None
 
@@ -1153,7 +1216,7 @@ def workouts_by_day_view(request, day):
 
     # Fetch plan_id from tbl_payment
     with connection.cursor() as cursor:
-        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND status = 'success'", [user_id])
+        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND active =1 ", [user_id])
         result = cursor.fetchone()
         plan_id = result[0] if result else None
 
@@ -1252,7 +1315,7 @@ def fm_plans(request):
 
 @fm_custom_login_required
 def fm_nutritions2(request):
-    nutritions = Nutrition.objects.all()
+    nutritions = Nutrition.objects.select_related('food').all()
     return render(request, 'fm_nutritions2.html', {'nutritions': nutritions})
 
 @admin_custom_login_required
@@ -1270,7 +1333,21 @@ def add_plan(request):
         plan_name = request.POST['plan_name']
         amount = request.POST['amount']
         description = request.POST['description']
-        service_no = request.POST['service_no']    
+        service_no = request.POST['service_no']
+        
+        # Check if the plan name already exists
+        if Plan.objects.filter(plan_name=plan_name).exists():
+            error_message = f"The plan '{plan_name}' already exists."
+            plans = Plan.objects.all()  # Fetch available plans again
+            return render(request, 'add_plan.html', {'plans': plans, 'error_message': error_message})
+
+        # Check if the service number already exists
+        if Plan.objects.filter(service_no=service_no).exists():
+            error_message = f"The service number '{service_no}' already exists."
+            plans = Plan.objects.all()  # Fetch available plans again
+            return render(request, 'add_plan.html', {'plans': plans, 'error_message': error_message})
+
+        # If no duplicates are found, save the new plan
         plan = Plan(
             plan_name=plan_name,
             amount=amount,
@@ -1285,6 +1362,7 @@ def add_plan(request):
     
     plans = Plan.objects.all()
     return render(request, 'add_plan.html', {'plans': plans})
+
 
 
 

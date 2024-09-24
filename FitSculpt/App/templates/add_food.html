@@ -18,17 +18,17 @@
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px; /* Margin to push it below the header */
+            margin-top: 80px;
             margin-bottom: 20px;
         }
 
         form {
-            max-width: 600px; /* Center the form */
+            max-width: 600px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px; /* Rounded corners */
+            border-radius: 8px;
         }
 
         label {
@@ -40,6 +40,7 @@
 
         input[type="text"],
         input[type="number"],
+        select,
         textarea {
             width: 100%;
             padding: 10px;
@@ -50,7 +51,7 @@
         }
 
         textarea {
-            resize: vertical; /* Allow vertical resizing only */
+            resize: vertical;
         }
 
         button {
@@ -62,7 +63,7 @@
             border-radius: 5px;
             font-size: 16px;
             transition: background-color 0.3s;
-            width: 100%; /* Full width */
+            width: 100%;
         }
 
         button:hover {
@@ -88,19 +89,86 @@
             font-size: 14px;
             color: #666;
         }
+
+        .error {
+            color: #dc3545; /* Red color for error messages */
+            font-size: 0.9em;
+        }
     </style>
+    <script>
+        function validateFoodName() {
+            const foodName = document.getElementById('food_name').value;
+            const foodNameError = document.getElementById('food_name_error');
+            const foodNameRegex = /^[A-Za-z\s]+$/;
+
+            if (!foodNameRegex.test(foodName) && foodName !== "") {
+                foodNameError.textContent = 'Food name must contain only letters and spaces.';
+                return false;
+            } else {
+                foodNameError.textContent = ''; // Clear error message
+                return true;
+            }
+        }
+
+        function validateFoodType() {
+            const foodType = document.getElementById('food_type').value;
+            const foodTypeError = document.getElementById('food_type_error');
+
+            if (foodType !== 'Vegetarian' && foodType !== 'Non-Vegetarian') {
+                foodTypeError.textContent = 'Food type must be either Vegetarian or Non-Vegetarian.';
+                return false;
+            } else {
+                foodTypeError.textContent = ''; // Clear error message
+                return true;
+            }
+        }
+
+        function validateNutritionalDescriptions() {
+            const nutritionalDescriptions = document.getElementById('nutritional_descriptions');
+            const nutritionalDescriptionError = document.getElementById('nutritional_description_error');
+
+            if (nutritionalDescriptions.selectedOptions.length === 0) {
+                nutritionalDescriptionError.textContent = 'At least one nutritional description must be selected.';
+                return false;
+            } else {
+                nutritionalDescriptionError.textContent = ''; // Clear error message
+                return true;
+            }
+        }
+
+        function validateForm() {
+            const isFoodNameValid = validateFoodName();
+            const isFoodTypeValid = validateFoodType();
+            const isNutritionalDescriptionsValid = validateNutritionalDescriptions();
+
+            return isFoodNameValid && isFoodTypeValid && isNutritionalDescriptionsValid;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Real-time validation
+            document.getElementById('food_name').addEventListener('input', validateFoodName);
+            document.getElementById('food_type').addEventListener('change', validateFoodType);
+            document.getElementById('nutritional_descriptions').addEventListener('change', validateNutritionalDescriptions);
+        });
+    </script>
 </head>
 <body>
     <h1>Add Food</h1>
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
         {% csrf_token %}
         <label for="food_name">Food Name:</label>
         <input type="text" id="food_name" name="food_name" required>
+        <div id="food_name_error" class="error"></div>
 
         <label for="food_type">Type:</label>
-        <input type="text" id="food_type" name="food_type" placeholder="(Enter Vegetarian for vegetarian & Enter Non-Vegetarian for non vegetarian)" required>
+        <select id="food_type" name="food_type" required>
+            <option value="">Select Type</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Non-Vegetarian">Non-Vegetarian</option>
+        </select>
+        <div id="food_type_error" class="error"></div>
 
-        <label for="calories"> Calories:</label>
+        <label for="calories">Calories:</label>
         <input type="number" id="calories" name="calories" placeholder="In 100 grams" required>
 
         <label for="proteins">Proteins:</label>
@@ -113,13 +181,15 @@
         <input type="number" id="fats" name="fats" placeholder="In 100 grams" required>
 
         <label for="nutritional_descriptions">Select Nutritional Descriptions:</label>
-<select id="nutritional_descriptions" name="nutritional_descriptions" multiple>
-    {% for nutrition in nutrition_options %}
-        <option value="{{ nutrition.nutrition_no }}">{{ nutrition.first_description }}</option>
-    {% endfor %}
-</select>
-
-
+        <select id="nutritional_descriptions" name="nutritional_descriptions" multiple required>
+            {% for nutrition in nutrition_options %}
+                <option value="{{ nutrition.nutrition_no }}">{{ nutrition.first_description }}</option>
+            {% endfor %}
+        </select>
+        <div id="nutritional_description_error" class="error"></div>
+        {% if error_message %}
+            <div class="error">{{ error_message }}</div>
+        {% endif %}
 
         <button type="submit">Add Food</button>
     </form>

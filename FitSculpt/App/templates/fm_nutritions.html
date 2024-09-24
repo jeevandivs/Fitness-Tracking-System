@@ -50,38 +50,41 @@
             background-color: #0056b3;
         }
 
-        table {
-            width: 100%;
-            margin: 0 auto;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             margin-top: 20px;
         }
 
-        th, td {
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
             padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            width: 250px; /* Fixed width for the card */
+            text-align: center;
         }
-
-        th {
-            background-color: #343a40;
-            color: white;
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card h3 {
+            margin: 10px 0;
             font-size: 1.2em;
+            color: #343a40;
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        a {
+        .card a {
+            display: inline-block;
+            margin-top: 10px;
             color: #007bff;
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        a:hover {
+        .card a:hover {
             color: #0056b3;
         }
 
@@ -99,50 +102,22 @@
         <a href="{% url 'see_all_food' %}"><button>See the Food Database</button></a>
         <a href="{% url 'add_food' %}"><button>Add Food</button></a>
         <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
-
     </div>
     <h2>Food Database</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Food Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for food in foods %}
-            <tr>
-                <td>{{ food.food_name }}</td>
-                <td>
-                    <a href="{% url 'update_food' food.food_id %}">
-                        <button>Update Food</button>
-                    </a>
-                    <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-
-        <tbody>
-            {% for food in foods %}
-            <tr>
-                <td>{{ food.food_name }}</td>
-                <td>
-                    <a href="{% url 'update_food' food.food_id %}">
-                        <button>Update Food</button>
-                    </a>
-                    <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card-container">
+        {% for food in foods %}
+        <div class="card">
+            <h3>{{ food.food_name }}</h3>
+            <a href="{% url 'update_food' food.food_id %}">
+                <button>Update Food</button>
+            </a>
+            <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" style="background-color: #dc3545;">Delete Food</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
 </body>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>

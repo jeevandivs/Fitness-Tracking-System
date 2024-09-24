@@ -40,7 +40,8 @@
 
         input[type="text"],
         input[type="number"],
-        textarea {
+        textarea,
+        select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -69,6 +70,13 @@
             background-color: #0056b3;
         }
 
+        .error {
+            color: #dc3545; /* Bootstrap danger color */
+            margin-top: -10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
         a {
             display: inline-block;
             text-align: center;
@@ -89,25 +97,63 @@
             color: #666;
         }
     </style>
+    <script>
+        function validateWorkoutName() {
+            const workoutName = document.getElementById('workout_name');
+            const error = document.getElementById('workout_name_error');
+            const regex = /^[A-Za-z\s]+$/; // Allows letters and spaces
+            if (!regex.test(workoutName.value)) {
+                error.textContent = "Workout name must contain only letters and spaces.";
+                workoutName.setCustomValidity("Invalid workout name.");
+            } else {
+                error.textContent = "";
+                workoutName.setCustomValidity("");
+            }
+        }
+
+        function validateDescription() {
+            const description = document.getElementById('description');
+            const error = document.getElementById('description_error');
+            const regex = /^[\w\s!@#$%^&*(),.?":{}|<>]*$/; // Allows letters and spaces
+            if (!regex.test(description.value)) {
+                error.textContent = "Description must contain only letters and spaces.";
+                description.setCustomValidity("Invalid description.");
+            } else {
+                error.textContent = "";
+                description.setCustomValidity("");
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Add Workout</h1>
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        
         <label for="workout_name">Workout Name:</label>
-        <input type="text" id="workout_name" name="workout_name" required>
+        <input type="text" id="workout_name" name="workout_name" required oninput="validateWorkoutName()">
+        <div class="error" id="workout_name_error"></div>
 
         <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
+        <textarea id="description" name="description" required oninput="validateDescription()"></textarea>
+        <div class="error" id="description_error"></div>
 
         <label for="body_part">Body Part:</label>
-        <input type="text" id="body_part" name="body_part" required>
+        <select id="body_part" name="body_part" required>
+            <option value="" disabled selected>Select Body Part</option>
+            <option value="Chest">Chest</option>
+            <option value="Back">Back</option>
+            <option value="Biceps">Biceps</option>
+            <option value="Triceps">Triceps</option>
+            <option value="Shoulder">Shoulder</option>
+            <option value="Leg">Leg</option>
+        </select>
 
         <label for="duration">Duration (in minutes):</label>
-        <input type="number" id="duration" name="duration" required>
+        <input type="number" id="duration" name="duration" required min="1">
 
         <label for="workout_image">Workout Image:</label>
-        <input type="file" id="workout_image" name="workout_image" accept="image/*"><br><br>
+        <input type="file" id="workout_image" name="workout_image" accept="image/*" required><br><br>
 
         <label for="plans">Select Plans (Ctrl+Click to select multiple):</label>
         <select id="plans" name="plans" multiple>
@@ -115,7 +161,12 @@
                 <option value="{{ plan.plan_id }}">{{ plan.plan_name }}</option>
             {% endfor %}
         </select>
-
+        {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+        {% endif %}
+        
         <button type="submit">Add Workout</button>
     </form>
     <center><a href="{% url 'fm_workouts' %}">Back to Workouts</a></center>

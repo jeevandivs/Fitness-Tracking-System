@@ -93,20 +93,87 @@
             color: #6c757d; 
             margin: auto;/* Lighter color for the note */
         }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+        }
     </style>
+    <script>
+        function validateField(fieldId, messageId, regex, message) {
+            const field = document.getElementById(fieldId);
+            const messageElement = document.getElementById(messageId);
+            if (!regex.test(field.value.trim())) {
+                messageElement.textContent = message;
+                return false;
+            } else {
+                messageElement.textContent = '';
+                return true;
+            }
+        }
+
+        function validateForm() {
+            const workoutNameValid = validateField(
+                'workout_name', 
+                'workoutNameMessage', 
+                /^[A-Za-z\s]+$/, 
+                'Workout Name must only contain letters and spaces.'
+            );
+            const descriptionValid = validateField(
+                'description', 
+                'descriptionMessage', 
+                /^[\w\s!@#$%^&*(),.?":{}|<>]*$/, 
+                'Description can contain letters, numbers, special characters, and spaces.'
+            );
+            const bodyPartValid = document.getElementById('body_part').value !== '';
+            document.getElementById('bodyPartMessage').textContent = bodyPartValid ? '' : 'Please select a body part.';
+            return workoutNameValid && descriptionValid && bodyPartValid;
+        }
+        
+        // Attach real-time validation listeners
+        window.onload = function() {
+            document.getElementById('workout_name').addEventListener('input', function() {
+                validateField(
+                    'workout_name', 
+                    'workoutNameMessage', 
+                    /^[A-Za-z\s]+$/, 
+                    'Workout Name must only contain letters and spaces.'
+                );
+            });
+            document.getElementById('description').addEventListener('input', function() {
+                validateField(
+                    'description', 
+                    'descriptionMessage', 
+                    /^[\w\s!@#$%^&*(),.?":{}|<>]*$/, 
+                    'Description can contain letters, numbers, special characters, and spaces.'
+                );
+            });
+        };
+    </script>
 </head>
 <body>
     <h1>Update Workout: {{ workout.workout_name }}</h1>
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
         {% csrf_token %}
         <label for="workout_name">Workout Name:</label>
         <input type="text" id="workout_name" name="workout_name" value="{{ workout.workout_name }}" required>
+        <div id="workoutNameMessage" class="error-message"></div> <!-- Validation message -->
 
         <label for="description">Description:</label>
         <textarea id="description" name="description" required>{{ workout.description }}</textarea>
+        <div id="descriptionMessage" class="error-message"></div> <!-- Validation message -->
 
         <label for="body_part">Body Part:</label>
-        <input type="text" id="body_part" name="body_part" value="{{ workout.body_part }}" required>
+        <select id="body_part" name="body_part" required>
+            <option value="" disabled>Select a body part</option>
+            <option value="Chest" {% if workout.body_part == 'Chest' %}selected{% endif %}>Chest</option>
+            <option value="Back" {% if workout.body_part == 'Back' %}selected{% endif %}>Back</option>
+            <option value="Biceps" {% if workout.body_part == 'Biceps' %}selected{% endif %}>Biceps</option>
+            <option value="Triceps" {% if workout.body_part == 'Triceps' %}selected{% endif %}>Triceps</option>
+            <option value="Shoulder" {% if workout.body_part == 'Shoulder' %}selected{% endif %}>Shoulder</option>
+            <option value="Leg" {% if workout.body_part == 'Leg' %}selected{% endif %}>Leg</option>
+        </select>
+        <div id="bodyPartMessage" class="error-message"></div> <!-- Validation message -->
 
         <label for="duration">Duration (in minutes):</label>
         <input type="number" id="duration" name="duration" value="{{ workout.duration }}" required>
@@ -115,19 +182,16 @@
         <input type="file" id="workout_image" name="workout_image" accept="image/*">
         <small>Leave blank to keep current image.</small><br><br>
 
-        {% csrf_token %}
-    <label for="plans">Select Plans:</label>
-    <select id="plans" name="plans" multiple>
-        {% for plan in all_plans %}
-            <option value="{{ plan.plan_id }}" 
-                {% if plan in associated_plans %} selected {% endif %}>
-                {{ plan.plan_name }}
-            </option>
-            
-
-        {% endfor %}
-    </select>
-    <small>Already selected plans highlighted here.</small>
+        <label for="plans">Select Plans:</label>
+        <select id="plans" name="plans" multiple>
+            {% for plan in all_plans %}
+                <option value="{{ plan.plan_id }}" 
+                    {% if plan in associated_plans %} selected {% endif %}>
+                    {{ plan.plan_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <small>Already selected plans highlighted here.</small>
 
         <button type="submit">Update Workout</button>
     </form>

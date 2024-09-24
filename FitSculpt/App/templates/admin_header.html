@@ -1,81 +1,69 @@
 {% load static %}
 {% block content %}
-
-
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>FITSCULPT</title>
     <meta name="description" content="Ela Admin - HTML5 Admin Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<script type="text/javascript">
-        function preventBack() {
-            window.history.forward(); 
-        }
-          
-        setTimeout("preventBack()", 0);
-          
-        window.onunload = function () { null };
-    </script>
+
     <link rel="apple-touch-icon" href="https://i.imgur.com/QRAUqs9.png">
     <link rel="shortcut icon" href="https://i.imgur.com/QRAUqs9.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
     <link rel="stylesheet" href="{% static 'admin/assets/css/cs-skin-elastic.css' %}">
     <link rel="stylesheet" href="{% static 'admin/assets/css/style.css' %}">
-    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
-    <link href="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/weathericons@2.1.0/css/weather-icons.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.9.0/dist/fullcalendar.min.css" rel="stylesheet" />
-
-   <style>
-    #weatherWidget .currentDesc {
-        color: #ffffff!important;
-        border-radius: 10px;
-    }
-        .traffic-chart {
-            min-height: 335px;
-        }
-        #flotPie1  {
-            height: 150px;
-        }
-        #flotPie1 td {
-            padding:3px;
-        }
-        #flotPie1 table {
-            top: 20px!important;
-            right: -10px!important;
-        }
-        .chart-container {
-            display: table;
-            min-width: 270px ;
-            text-align: left;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-        #flotLine5  {
-             height: 105px;
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f9fc; /* Light background for better contrast */
+            color: #333; /* Dark text for readability */
         }
 
-        #flotBarChart {
-            height: 150px;
+        /* Sidebar Styles */
+        #left-panel {
+            background-color: #343a40; /* Dark sidebar background */
         }
-        #cellPaiChart{
-            height: 160px;
+        .nav > li > a {
+            color: #ffffff; /* White text */
+            padding: 15px 20px; /* More padding */
+            border-radius: 5px; /* Rounded corners */
+            transition: background-color 0.3s; /* Transition for hover effect */
+        }
+        .nav > li > a:hover {
+            background-color: #495057; /* Darker shade on hover */
         }
 
+        /* Header Styles */
+        #header {
+    background-color: #ffffff; /* Keep header background white */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+/* Main Content Styles */
+#right-panel {
+    background-color: #d8cfcf; /* Light background for the content area */
+    padding: 20px; /* Add padding to the right panel */
+}
+        .navbar-brand h2 {
+            margin: 0; /* Remove default margin */
+            font-weight: 700; /* Bold font for brand */
+        }
+
+        /* Main Content Styles */
+        .right-panel {
+            padding: 20px; /* Add padding to the right panel */
+        }
+        h1, h2 {
+            margin-bottom: 20px; /* Spacing below headings */
+            color: #343a40; /* Dark color for headings */
+        }
     </style>
 </head>
 
@@ -86,37 +74,38 @@
             <div id="main-menu" class="main-menu collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li class="active">
-                        <a href="{% url 'admin_home' %}"><i class="menu-icon fa fa-laptop"></i>Admin Dashboard   </a>
+                        <a href="{% url 'admin_home' %}"><i class="menu-icon fa fa-laptop"></i>Admin Dashboard</a>
                     </li>
-                
                     <li>
                         <a href="{% url 'admin_logout' %}"> <i class="menu-icon fa fa-lock"></i> Logout </a>
                     </li>
-                   
                 </ul>
-            </div><!-- /.navbar-collapse -->
+            </div>
         </nav>
     </aside>
     <!-- /#left-panel -->
+
     <!-- Right Panel -->
     <div id="right-panel" class="right-panel">
-        <!-- Header-->
         <header id="header" class="header">
             <div class="top-left">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="" style='color:#050100;'><h2><b>FIT</b></h2></a>
-                    <a class="navbar-brand" href="" style='color:#c21300;'><h2><b>SCULPT</b></h2></a>
-
+                    <a class="navbar-brand" href="#" style='color:#f5f1f0;'><h2><b>FIT</b></h2></a>
+                    <a class="navbar-brand" href="#" style='color:#c21300;'><h2><b>SCULPT</b></h2></a>
                     <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
                 </div>
             </div>
             <div class="top-right">
                 <div class="header-menu">
-                  
-
-                   
+                    <!-- Add any additional header menu items here -->
                 </div>
             </div>
         </header>
         <!-- /#header -->
-			{% endblock %}
+        
+        <!-- Your page content here -->
+        {% endblock %}
+    </div>
+    <!-- /#right-panel -->
+</body>
+</html>
