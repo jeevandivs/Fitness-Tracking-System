@@ -97,6 +97,7 @@ def login_view(request):
                 if user.password == password:  
                     request.session['user_id'] = user.user_id 
                     request.session['username'] = user.username  
+                    print(user.age)
                     return redirect('user_home')  
                 else:
                     messages.error(request, 'Invalid username or password.')
@@ -1203,3 +1204,53 @@ def fm_nutritions2(request):
 @admin_custom_login_required
 def admin_plans(request):
     return render(request, 'admin_plans.html')
+
+@admin_custom_login_required
+def see_all_plan(request):
+    plans = Plan.objects.all()
+    return render(request, 'admin_plans.html', {'plans': plans})
+
+@admin_custom_login_required
+def add_plan(request):
+    if request.method == 'POST':
+        plan_name = request.POST['plan_name']
+        amount = request.POST['amount']
+        description = request.POST['description']
+        service_no = request.POST['service_no']    
+        plan = Plan(
+            plan_name=plan_name,
+            amount=amount,
+            description=description,
+            service_no=service_no
+        )
+        plan.save()  
+        plan_id = plan.plan_id  
+        print(plan_id)
+                
+        return redirect('see_all_plan')
+    
+    plans = Plan.objects.all()
+    return render(request, 'add_plan.html', {'plans': plans})
+
+
+
+@admin_custom_login_required
+def update_plan(request, plan_id):
+    plan = Plan.objects.get(plan_id=plan_id)
+    if request.method == 'POST':
+        plan.plan_name = request.POST['plan_name']
+        plan.amount = request.POST['amount']
+        plan.description = request.POST['description']
+        plan.service_no = request.POST['service_no'] 
+        plan.save()
+        return redirect('see_all_plan')
+
+    return render(request, 'update_plan.html', {'plan': plan})  
+@admin_custom_login_required
+def admin_delete_plan(request, plan_id):
+    plan = Plan.objects.get(plan_id=plan_id)
+    if request.method == 'POST':
+        plan.delete()
+        return redirect('see_all_plan')
+
+    return render(request, 'admin_delete_plan.html', {'plan': plan}) 
