@@ -87,6 +87,18 @@ def register_view(request):
             messages.error(request, f'Error occurred: {e}')
             return render(request, 'register.html')
     return render(request, 'register.html')
+
+
+from django.utils import timezone
+from datetime import timedelta
+
+def update_inactive_payments(user_id):
+    now = timezone.now()
+
+    threshold_date = now - timedelta(days=30)
+
+    Payment.objects.filter(user_id=user_id, active=1, payment_date__lt=threshold_date).update(active=0)
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -98,6 +110,8 @@ def login_view(request):
                     request.session['user_id'] = user.user_id 
                     request.session['username'] = user.username  
                     print(user.age)
+                    update_inactive_payments(user.user_id)
+
                     return redirect('user_home')  
                 else:
                     messages.error(request, 'Invalid username or password.')
@@ -445,6 +459,15 @@ def fm_login_view(request):
             messages.error(request, 'Invalid username or password.')
 
     return render(request, 'fm_login.html')
+from django.utils import timezone
+from datetime import timedelta
+
+def update_inactive_payments(user_id):
+    now = timezone.now()
+
+    threshold_date = now - timedelta(days=30)
+
+    Payment.objects.filter(user_id=user_id, active=1, payment_date__lt=threshold_date).update(active=0)
 
 
 @custom_login_required
@@ -486,8 +509,11 @@ from .models import Plan, Client
 def plans_view(request):
     plans = Plan.objects.all()  
     plan_id = request.POST.get('plan_id')
-    user_id = request.session.get('user_id') 
-    print(user_id,plan_id)
+    user_id = request.session.get('user_id')
+    previous_plan_amount = request.session.get('previous_plan_amount', None)
+ 
+    print(user_id, plan_id)
+    
     user_age = None
     if user_id:
         try:
@@ -497,23 +523,33 @@ def plans_view(request):
             user_age = None
 
     is_child_plan_enabled = user_age is not None and user_age < 12
-    user_has_plan = Payment.objects.filter(user_id=user_id).exists()
+
+    # Check if the user has an active plan (active=1)
+    user_has_plan = Payment.objects.filter(user_id=user_id, active=1).exists()
 
     current_plan = None
-    if user_id:
-        payment_record = Payment.objects.filter(user_id=user_id).first()
+    current_plan_name = None
+    if user_has_plan:
+        payment_record = Payment.objects.filter(user_id=user_id, active=1).first()
         if payment_record:
             current_plan = payment_record.plan_id
-    print(current_plan)
 
-    current_plan_name = None
-    if current_plan:
-        plan_record = Plan.objects.filter(plan_id=current_plan).first()
-        if plan_record:
-            current_plan_name = plan_record.plan_name
+            # Get the current plan name
+            plan_record = Plan.objects.filter(plan_id=current_plan).first()
+            if plan_record:
+                current_plan_name = plan_record.plan_name
+    
+    print(current_plan)
     print(current_plan_name)
     
-    return render(request, 'plans.html', {'plans': plans, 'is_child_plan_enabled': is_child_plan_enabled,'user_has_plan': user_has_plan,'current_plan':current_plan, 'current_plan_name':current_plan_name})
+    return render(request, 'plans.html', {
+        'plans': plans,
+        'is_child_plan_enabled': is_child_plan_enabled,
+        'user_has_plan': user_has_plan,
+        'current_plan': current_plan,
+        'current_plan_name': current_plan_name,
+        'previous_plan_amount': previous_plan_amount
+    })
 
 from django.shortcuts import render, redirect
 from .models import Plan, Payment 
@@ -535,7 +571,8 @@ def payment_gateway_view(request, plan_id):
             user_id=user_id,
             payment_date=timezone.now(),
             mode='online',
-            status='success'
+            status='success',
+            active=1
         )
         payment.save()  
         return render(request, 'user_home.html')
@@ -552,20 +589,37 @@ from .models import Payment  # Adjust according to your models
 def delete_plan(request):
     if request.method == 'POST':
         # Fetch the user ID from the session
-        plan_id = request.POST.get('plan_id')
         user_id = request.session.get('user_id')
-        print(user_id,plan_id)
+        print("User ID:", user_id)
 
+        # Fetch the plan ID from the POST data
+        plan_id = request.POST.get('plan_id')
+        print("Plan ID:", plan_id)
 
-        # Fetch the payment record associated with the user
-        payment_record = get_object_or_404(Payment, user_id=user_id)
-        
-        # Delete the payment record
-        payment_record.delete()
-        
+        # Fetch the payment records associated with the user
+        payment_records = Payment.objects.filter(user_id=user_id, active=1)
+
+        # Check if there are any active payment records
+        if payment_records.exists():
+            for payment_record in payment_records:
+                plan = Plan.objects.filter(plan_id=payment_record.plan_id).first()
+                if plan:
+                    # Store the plan amount in the session
+                    request.session['previous_plan_amount'] = plan.amount
+
+                # Update the active field to 0
+                payment_record.active = 0
+                payment_record.save()
+            messages.success(request, "Your plan has been successfully deactivated.")
+        else:
+            messages.warning(request, "No active plan found for deactivation.")
+
         # Redirect to the plans page
         return redirect('plans')  # Adjust the redirect as needed
+
+    # If not a POST request, redirect to plans
     return redirect('plans')
+
 
 from django.shortcuts import redirect
 @custom_login_required

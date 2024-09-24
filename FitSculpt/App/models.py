@@ -52,6 +52,7 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(default=timezone.now)  
     mode = models.CharField(max_length=50) 
     status = models.CharField(max_length=50)  
+    active=models.IntegerField()
     class Meta:
         managed = False
         db_table = 'tbl_payment'

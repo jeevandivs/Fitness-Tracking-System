@@ -98,36 +98,39 @@
         <table>
             <thead>
                 <tr>
-                    <th>Plan ID</th>
                     <th>Plan Name</th>
                     <th>Amount</th>
                     <th>Description</th>
-                    <th>Service ID</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for plan in plans %}
-                <tr>
-                    <td>{{ plan.plan_id }}</td>
-                    <td>{{ plan.plan_name }}</td>
-                    <td>${{ plan.amount }}</td>
-                    <td>{{ plan.description }}</td>
-                    <td>{{ plan.service_id }}</td>
-                    <td>
-                        {% if plan.plan_id == 4 and not is_child_plan_enabled %}
-                            <button disabled>Not Eligible</button>
-                        {% else %}
-                            <form action="{% url 'select_plan' %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="plan_id" value="{{ plan.plan_id }}">
-                                <button type="submit">Select</button>
-                            </form>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
+<tr>
+    <td>{{ plan.plan_name }}</td>
+    <td>${{ plan.amount }}</td>
+    <td>{{ plan.description }}</td>
+    <td>
+        {% if user_has_plan %}
+            <button disabled>Selection Disabled</button>
+        {% elif plan.plan_id == 4 and not is_child_plan_enabled %}
+            <button disabled>Not Eligible</button>
+        {% elif previous_plan_amount and plan.amount < previous_plan_amount %}
+            <button disabled>Cheaper Plans Disabled</button> 
+            <p>Because You have deactivated the Previous plan before expiry of 30 days<br>You can try again in 30 days to get the cheaper plan</p> <!-- Disable cheaper plans -->
+        {% else %}
+            <form action="{% url 'select_plan' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="plan_id" value="{{ plan.plan_id }}">
+                <button type="submit">Select</button>
+            </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+
             </tbody>
+            
         </table>
     </div>
 </body>
