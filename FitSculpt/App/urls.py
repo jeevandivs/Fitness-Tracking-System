@@ -44,6 +44,7 @@ urlpatterns = [
     path('update_food/<int:food_id>/', views.update_food, name='update_food'),
     path('delete_food/<int:food_id>/', views.delete_food, name='delete_food'),
     path('fm_plans/', views.fm_plans, name='fm_plans'),
+    
 
 
 
@@ -61,6 +62,10 @@ urlpatterns = [
     path('view_certificate/<int:user_id>/', views.view_certificate, name='view_certificate'),
     path('admin_payment/', views.admin_payment, name='admin_payment'),
     path('admin_plans/', views.admin_plans, name='admin_plans'),
+    path('see_all_plan/', views.see_all_plan, name='see_all_plan'),
+    path('add_plan/', views.add_plan, name='add_plan'),
+    path('update_plan/<int:plan_id>/', views.update_plan, name='update_plan'),
+    path('admin_delete_plan/<int:plan_id>/', views.admin_delete_plan, name='admin_delete_plan'),
 
 
 

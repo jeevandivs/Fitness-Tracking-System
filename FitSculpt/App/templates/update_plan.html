@@ -1,12 +1,12 @@
 {% load static %}
 {% block content %}
-{% include 'fm_header.html' %}
+{% include 'admin_header.html' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Food</title>
+    <title>Update Plans</title>
     <style>
         body {
             background-color: #f8f9fa;
@@ -95,30 +95,24 @@
     </style>
 </head>
 <body>
-    <h1>Update Food: {{ food.food_name }}</h1>
+    <h1>Update Plan: {{ plan.plan_name }}</h1>
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <label for="food_name">Food Name:</label>
-        <input type="text" id="food_name" name="food_name" value="{{ food.food_name }}" required>
+        <label for="plan_name">Plan Name:</label>
+        <input type="text" id="plan_name" name="plan_name" value="{{ plan.plan_name }}" required>
 
-        <label for="food_type">Food Type:</label>
-        <input type="text" id="food_type" name="food_type" value="{{ food.food_type }}" required>
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" value="{{ plan.amount }}" required>
 
-        <label for="calories">Calories:</label>
-        <input type="number" id="calories" name="calories" value="{{ food.calories }}" required>
+        <label for="description">Description :</label>
+        <input type="text" id="description" name="description" value="{{ plan.description }}" required>
 
-        <label for="proteins">Proteins:</label>
-        <input type="number" id="proteins" name="proteins" value="{{ food.proteins }}" required>
+        <label for="service_no">Service Number:</label>
+        <input type="number" id="service_no" name="service_no" value="{{ plan.service_no }}" required>
 
-        <label for="carbs">Carbs:</label>
-        <input type="number" id="carbs" name="carbs" value="{{ food.carbs }}" required>
-
-        <label for="fats">Fats:</label>
-        <input type="number" id="fats" name="fats" value="{{ food.fats }}" required>
-
-        <button type="submit">Update Food</button>
+        <button type="submit">Update Plan</button>
     </form>
-    <center><a href="{% url 'fm_nutritions' %}">Back to Nutritions</a></center>
+    <center><a href="{% url 'admin_plans' %}">Back to Plans</a></center>
     <footer>
         <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
     </footer>

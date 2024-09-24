@@ -1,0 +1,24 @@
+{% load static %}
+{% block content %}
+{% include 'admin_header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Plan</title>
+</head>
+<body>
+    <h1>Delete Plan: {{ plan.plan_name }}</h1>
+    <p>Are you sure you want to delete this Plan?</p>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <button type="submit">Yes, Delete</button>
+    </form>
+    <a href="{% url 'admin_plans' %}">Cancel</a>
+</body>
+</html>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>  
+{% endblock %}
