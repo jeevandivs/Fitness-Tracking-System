@@ -78,6 +78,10 @@
     .edit-form button:hover {
         background-color: #b35138;
     }
+    input.is-invalid, select.is-invalid {
+    border-color: red;
+    background-color: #f8d7da;
+}
 </style>
 <section class="section" id="profile">
     <div class="container">
@@ -137,5 +141,41 @@
             this.textContent = 'Cancel';
         }
     });
+document.addEventListener('DOMContentLoaded', function () {
+    const usernameInput = document.querySelector('input[name="username"]');
+    const heightInput = document.querySelector('input[name="height"]');
+    const weightInput = document.querySelector('input[name="weight"]');
+    
+    // Username validation (real-time)
+    usernameInput.addEventListener('input', function() {
+        const usernameRegex = /^[A-Za-z]\w{5,29}$/;
+        if (!usernameRegex.test(usernameInput.value)) {
+            usernameInput.setCustomValidity('Username must start with a letter and be 6-30 characters.');
+        } else {
+            usernameInput.setCustomValidity('');
+        }
+    });
+
+    // Height validation (real-time)
+    heightInput.addEventListener('input', function() {
+        const height = parseInt(heightInput.value);
+        if (height < 60 || height > 230 || isNaN(height)) {
+            heightInput.setCustomValidity('Height must be between 60 cm and 230 cm.');
+        } else {
+            heightInput.setCustomValidity('');
+        }
+    });
+
+    // Weight validation (real-time)
+    weightInput.addEventListener('input', function() {
+        const weight = parseInt(weightInput.value);
+        if (weight < 20 || weight > 300 || isNaN(weight)) {
+            weightInput.setCustomValidity('Weight must be between 20 kg and 300 kg.');
+        } else {
+            weightInput.setCustomValidity('');
+        }
+    });
+});
+
 </script>
 {% endblock %}

@@ -1,5 +1,11 @@
+{% load static %}
+{% block content %}
+{% include 'admin_header.html' %}
 {% if certificate_url %}
     <img src="{{ certificate_url }}" width="100%" height="600px"/>
 {% else %}
     <p>No certificate available.</p>
 {% endif %}
+<a href="{% url 'admin_fm' %}">Go Back</a>
+{% endblock %}
+

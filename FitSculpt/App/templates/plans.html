@@ -90,7 +90,7 @@
                 You have an active plan. 
                 <form action="{% url 'delete_plan' %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit">Delete Current Plan</button>
+                    <button type="submit">Delete & Change Current Plan</button>
                 </form>
             </div>
         {% endif %}
@@ -99,7 +99,7 @@
             <thead>
                 <tr>
                     <th>Plan Name</th>
-                    <th>Amount</th>
+                    <th>Amount/30 days</th>
                     <th>Description</th>
                     <th>Action</th>
                 </tr>

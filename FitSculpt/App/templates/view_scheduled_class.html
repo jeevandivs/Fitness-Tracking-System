@@ -1,0 +1,77 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 100px auto 50px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        color: #b35138;
+        margin-bottom: 15px;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    a {
+        color: #b35138;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #9f2c1d;
+    }
+
+    .no-class {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #777;
+        margin-top: 30px;
+    }
+</style>
+
+<div class="container">
+    <h2>Your Scheduled Class</h2>
+
+    {% if client_schedule.class_link %}
+        <div class="card">
+            <h3>Trainer: {{ client_schedule.fm_name }}</h3>
+            <p><strong>Class Link:</strong> <a href="{{ client_schedule.class_link }}" target="_blank">Join Class</a></p>
+            <p><strong>Scheduled Timing:</strong> {{ client_schedule.timing }}</p>
+        </div>
+    {% else %}
+        <p class="no-class">No class has been scheduled for you yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

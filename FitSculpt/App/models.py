@@ -120,6 +120,7 @@ class Workout(models.Model):
     body_part = models.CharField(max_length=100)
     duration = models.IntegerField()  
     workout_image = models.FileField(upload_to='workout_img/', blank=True, null=True)
+    reference_video=models.CharField(max_length=200)
 
     class Meta:
         managed = False
@@ -158,3 +159,20 @@ class Nutrition(models.Model):
 
     def __str__(self):
         return self.nutrition_no
+
+
+class ClientFM(models.Model):
+    id=models.AutoField(primary_key=True)
+    client_id=models.IntegerField()
+    fm_id=models.IntegerField()
+    client_name=models.CharField(max_length=50)
+    fm_name=models.CharField(max_length=50)
+    class_link=models.CharField(max_length=200)
+    timing=models.CharField(max_length=50)
+
+    class Meta:
+        managed=False
+        db_table= 'tbl_client_fm'
+
+    def __str__(self):
+        return f"{self.client_name} with {self.fm_name}"

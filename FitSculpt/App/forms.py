@@ -5,6 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 
 from django import forms
 from .models import Client  # Adjust based on your project structure
+import re
 
 class ClientUpdateForm(forms.ModelForm):
     GENDER_CHOICES = [
@@ -30,12 +31,43 @@ class ClientUpdateForm(forms.ModelForm):
             'weight': forms.NumberInput(attrs={'placeholder': 'Enter your weight in Kilograms', 'class': 'form-control'}),
         }
 
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        username_regex = r'^[A-Za-z]\w{5,29}$'
+        
+        # Check if the username follows the required pattern
+        if not re.match(username_regex, username):
+            raise forms.ValidationError("Username must start with a letter and be between 6 to 30 characters.")
+        
+        # Check if the username already exists, excluding the current user
+        if Client.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("This username is already taken. Please choose a different one.")
+
+        return username
+
+    def clean_height(self):
+        height = self.cleaned_data['height']
+        if height < 60 or height > 230:
+            raise forms.ValidationError("Height must be between 60 cm and 230 cm.")
+        return height
+
+    def clean_weight(self):
+        weight = self.cleaned_data['weight']
+        if weight < 20 or weight > 300:
+            raise forms.ValidationError("Weight must be between 20 kg and 300 kg.")
+        return weight
+
+
 
 
 
 from django import forms
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from .models import FitnessManager  # Adjust based on your project structure
+from django import forms
+from django.core.validators import MinLengthValidator, MaxLengthValidator
+import re
+from .models import FitnessManager, Client  # Adjust based on your project structure
 
 class FmUpdateForm(forms.ModelForm):
     class Meta:
@@ -59,6 +91,21 @@ class FmUpdateForm(forms.ModelForm):
             MinLengthValidator(8, message='Password must be at least 8 characters long.'),
             MaxLengthValidator(20, message='Password cannot exceed 20 characters.'),
         ])
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        username_regex = r'^[A-Za-z]\w{5,29}$'
+        
+        # Check if the username follows the required pattern
+        if not re.match(username_regex, username):
+            raise forms.ValidationError("Username must start with a letter and be between 6 to 30 characters.")
+        
+        # Check if the username already exists, excluding the current user
+        if FitnessManager.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("This username is already taken. Please choose a different one.")
+
+        return username
+
 
 
 

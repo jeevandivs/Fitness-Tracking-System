@@ -324,20 +324,24 @@ def admin_payment(request):
 
 @fm_custom_login_required
 def fm_profile_view(request):
-    user_id = request.session.get('fm_user_id')  
+    user_id = request.session.get('fm_user_id')
     if user_id:
-        tbl_fitness_manager = FitnessManager.objects.get(user_id=user_id)  
+        tbl_fitness_manager = FitnessManager.objects.get(user_id=user_id)
         
         if request.method == 'POST':
             form = FmUpdateForm(request.POST, instance=tbl_fitness_manager)
             if form.is_valid():
                 form.save()
                 return redirect('fm_profile')
+            else:
+                return render(request, 'fm_profile.html', {'form': form, 'tbl_fitness_manager': tbl_fitness_manager})
         else:
             form = FmUpdateForm(instance=tbl_fitness_manager)
         
         return render(request, 'fm_profile.html', {'form': form, 'tbl_fitness_manager': tbl_fitness_manager})
+    
     return redirect('fm_login')
+
 
 @fm_custom_login_required
 def fm_logout_view(request):
@@ -528,9 +532,15 @@ def user_profile_view(request):
 
     if user_id:
         client = Client.objects.get(user_id=user_id)  
-        
+
         if request.method == 'POST':
             form = ClientUpdateForm(request.POST, instance=client)
+            
+            new_username = request.POST.get('username')
+            
+            if Client.objects.filter(username=new_username).exclude(user_id=user_id).exists():
+                form.add_error('username', "This username is already taken.")
+            
             if form.is_valid():
                 form.save()
                 return redirect('user_home')
@@ -543,7 +553,9 @@ def user_profile_view(request):
             bmi = client.weight / (height_in_meters ** 2)
 
         return render(request, 'user_profile.html', {'form': form, 'client': client, 'bmi': bmi})
+    
     return redirect('login')
+
 
 @custom_login_required
 def logout_view(request):
@@ -865,13 +877,24 @@ def view_certificate(request, user_id):
 @custom_login_required
 def view_workout_img(request, workout_id):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT workout_image FROM tbl_workouts WHERE workout_id = %s", [workout_id])
-        workout_image = cursor.fetchone()[0]
-    
+        cursor.execute("SELECT workout_image, reference_video FROM tbl_workouts WHERE workout_id = %s", [workout_id])
+
+        result = cursor.fetchone()
+
+        if result:
+            workout_image, reference_video = result
+        else:
+            workout_image, reference_video = None, None
+
+    context = {
+    'workout_image': workout_image,
+    'reference_video': reference_video,
+}
+
     workout_url = settings.MEDIA_URL + workout_image
     print(workout_url)
     
-    return render(request, 'workout_media.html', {'workout_url': workout_url})
+    return render(request, 'workout_media.html', {'workout_url': workout_url, 'reference_video': reference_video})
 
 from django.shortcuts import render, redirect
 from .models import Workout
@@ -898,6 +921,7 @@ def add_workout(request):
         body_part = request.POST['body_part']
         duration = request.POST['duration']
         workout_image = request.FILES['workout_image']
+        reference_video=request.POST['reference_video']
 
         if Workout.objects.filter(workout_name=workout_name).exists():
             # Workout already exists, add an error message
@@ -911,7 +935,8 @@ def add_workout(request):
             description=description,
             body_part=body_part,
             duration=duration,
-            workout_image=workout_image
+            workout_image=workout_image,
+            reference_video=reference_video
         )
         workout.save()  # This saves the workout and assigns the workout_id
         workout_id = workout.workout_id  # Get the auto-incremented workout_id
@@ -987,6 +1012,7 @@ def update_workout(request, workout_id):
         workout.description = request.POST.get('description', workout.description)
         workout.body_part = request.POST.get('body_part', workout.body_part)
         workout.duration = request.POST.get('duration', workout.duration)
+        workout.reference_video=request.POST.get('reference_video',workout.reference_video)
 
         # Handle the workout image if provided
         if 'workout_image' in request.FILES:
@@ -1221,19 +1247,15 @@ def workouts_by_day_view(request, day):
         plan_id = result[0] if result else None
 
     if plan_id:
-        # Fetch the plan details
         plan = Plan.objects.get(plan_id=plan_id)
 
-        # Fetch services associated with the plan for the selected day
         services = Service.objects.filter(service_no=plan.service_no, day=day)
 
-        # Get the corresponding workouts
         workouts = []
         for service in services:
             workout = Workout.objects.get(workout_id=service.workout_id)
             workouts.append(workout)
 
-        # Render the template with the workouts
         context = {
             'plan': plan,
             'workouts': workouts,
@@ -1241,6 +1263,219 @@ def workouts_by_day_view(request, day):
         return render(request, 'workouts.html', context)
     else:
         return render(request, 'workouts.html', {'error': 'No active plan found.'})
+    
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from .models import FitnessManager, ClientFM
+from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import render, redirect
+from .models import ClientFM
+
+@custom_login_required
+def personal_workout_view(request):
+    user_id = request.session.get('user_id')
+    client_id = user_id  # Assuming client's id is the same as the session user's id
+    
+    # Check if the user has already selected a trainer
+    selected_trainer = ClientFM.objects.filter(client_id=client_id).first()
+
+    context = {
+        'trainer_selected': selected_trainer
+    }
+    return render(request, 'personal_workout.html', context)
+
+from django.shortcuts import render
+from .models import FitnessManager, ClientFM, Designations
+from django.db.models import Q
+
+@custom_login_required
+def select_trainer_view(request):
+    user_id = request.session.get('user_id')
+    if user_id is None:
+        messages.error(request, "User not logged in.")
+        return redirect('login')  # Redirect to your login page
+
+    client_id = user_id  
+
+    try:
+        client = Client.objects.get(user_id=client_id)
+    except Client.DoesNotExist:
+        messages.error(request, "Client not found.")
+        return redirect('some_error_page')  # Redirect to an appropriate error page
+
+    if request.method == 'POST':
+        trainer_id = request.POST.get('trainer_id')
+        selected_time = request.POST.get('timing')
+
+        if not selected_time:
+            messages.error(request, "Timing cannot be empty.")
+            return redirect('select_trainer')
+
+        # Update or create a new ClientFM record
+        selected_trainer = ClientFM.objects.filter(client_id=client_id).first()
+
+        try:
+            fitness_manager = FitnessManager.objects.get(user_id=trainer_id)
+        except FitnessManager.DoesNotExist:
+            messages.error(request, "Selected trainer does not exist.")
+            return redirect('select_trainer')
+
+        if selected_trainer:
+            selected_trainer.fm_id = trainer_id
+            selected_trainer.timing = selected_time
+            selected_trainer.client_name = client.name  # Ensure this field is updated
+            selected_trainer.fm_name = fitness_manager.name  # Ensure this field is updated
+            selected_trainer.save()
+        else:
+            ClientFM.objects.create(
+                client_id=client_id,
+                fm_id=trainer_id,
+                timing=selected_time,
+                client_name=client.name, 
+                fm_name=fitness_manager.name    
+            )
+        return redirect('personal_workout')
+
+    # Get fitness managers with designation_id = 2 or 5 and status = 1
+    fitness_managers = FitnessManager.objects.filter(
+        Q(designation_id=5) | 
+        Q(designation_id=2),
+        status=1
+    )
+
+    # Fetch the designations with id 2 and 5
+    designations = Designations.objects.filter(designation_id__in=[2, 5])
+    designation_map = {designation.designation_id: designation.designation for designation in designations}
+
+    qualifications = Qualifications.objects.filter(qualification_id__in=[2, 5])
+    qualification_map = {qualification.qualification_id: qualification.qualification for qualification in qualifications}
+
+    # Predefined time slots in the format '6 AM', '7 AM', etc.
+    predefined_times = ['6 AM', '7 AM', '8 AM', '5 PM', '6 PM', '7 PM']
+    
+    # Determine assigned times for trainers
+    trainers_with_details = []
+    for trainer in fitness_managers:
+        assigned_sessions = ClientFM.objects.filter(fm_id=trainer.user_id).values_list('timing', flat=True)
+        assigned_times = set(assigned_sessions)  # Convert to set for efficient lookup
+
+        # Filter available times
+        available_times = [time for time in predefined_times if time not in assigned_times]
+
+        trainers_with_details.append({
+            'trainer': trainer,
+            'available_times': available_times,  # Pass available times to the template
+            'designation': designation_map.get(trainer.designation_id, 'Unknown') ,
+             'qualification': qualification_map.get(trainer.qualification_id, 'Unknown') 
+              # Fetch corresponding designation name
+        })
+
+    context = {
+        'trainers_with_details': trainers_with_details,
+    }
+    return render(request, 'select_trainer.html', context)
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import ClientFM, FitnessManager, Client
+
+@fm_custom_login_required
+def set_live_session_view(request):
+    user_id = request.session.get('fm_user_id')
+    if not user_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+
+    try:
+        fitness_manager = FitnessManager.objects.get(user_id=user_id)
+    except FitnessManager.DoesNotExist:
+        messages.error(request, "Fitness Manager does not exist. Please contact support.")
+        return redirect('set_live_session')
+
+    if request.method == 'POST':
+        class_link = request.POST.get('class_link')
+        selected_client_id = request.POST.get('client')
+        
+        try:
+            client_fm = ClientFM.objects.get(client_id=selected_client_id, fm_id=fitness_manager.user_id)
+            client_fm.class_link = class_link
+            client_fm.save()
+            messages.success(request, "Class link updated successfully.")
+        except ClientFM.DoesNotExist:
+            messages.error(request, "Client not found or not assigned to you.")
+
+        return redirect('set_live_session')
+
+    # Get ClientFM entries for this fitness manager
+    clients = ClientFM.objects.filter(fm_id=fitness_manager.user_id)
+
+    if not clients.exists():
+        messages.info(request, "No clients have selected you as their fitness manager.")
+
+    # Retrieve client IDs from ClientFM and get corresponding Client objects
+    client_ids = [client.client_id for client in clients]
+    client_details = Client.objects.filter(user_id__in=client_ids)  # Use user_id instead of id
+
+    # Create a dictionary mapping user_id to client details
+    client_details_dict = {client.user_id: client for client in client_details}
+    print(client_details_dict)
+
+    # Create a list of dictionaries with ClientFM and Client details
+    clients_with_details = [
+        {
+            'client_id': client.client_id,
+            'client_name': client.client_name,
+            'class_link': client.class_link,
+            'fm_name': client.fm_name
+        }
+        for client in clients
+    ]
+    print(clients_with_details)
+
+    context = {
+        'fitness_manager': fitness_manager,
+        'clients': clients_with_details,  # This contains ClientFM instances with details
+        'client_details': client_details_dict,  # This is now a dictionary
+    }
+    return render(request, 'set_live_session.html', context)
+
+
+
+
+
+
+
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+
+@custom_login_required 
+def view_scheduled_class(request):
+    user_id = request.session.get('user_id')
+
+    client_schedule = ClientFM.objects.filter(client_id=user_id).first()
+
+    if client_schedule:
+        context = {
+            'client_schedule': client_schedule,
+        }
+        return render(request, 'view_scheduled_class.html', context)
+    else:
+        return render(request, 'view_scheduled_class.html', {'client_schedule': None})
+
+
+
+
+
+@custom_login_required
+def personal_nutrition_view(request):
+    return render(request, 'personal_nutrition.html')
+
 
 from django.shortcuts import render, redirect
 from .models import Client, Nutrition, FoodDatabase

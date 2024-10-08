@@ -1,0 +1,116 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Live Session</title>
+    <style>
+        /* Add your CSS styling here */
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .client-details {
+            margin-bottom: 20px;
+        }
+        .submit-button {
+            background-color: #b35138;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-button:hover {
+            background-color: #9f2c1d;
+        }
+        .client-form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Set Live Session</h1>
+
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <label for="client">Select Client:</label>
+    <select name="client" id="client-dropdown" onchange="showClientDetails()">
+        <option value="">--Select a client--</option>
+        {% for client in clients %}
+            <option value="{{ client.client_id }}">{{ client.client_name }}</option>
+        {% endfor %}
+    </select>
+
+    <div id="client-details" style="display:none;" class="client-form">
+        <h3>Client Details</h3>
+        <form method="POST" id="class-link-form">
+            {% csrf_token %}
+            <div id="details"></div>
+            <label for="class_link">Class Link:</label>
+            <input type="url" name="class_link" id="class_link" required>
+            <input type="hidden" name="client" id="client_id" value="">
+            <button type="submit" class="submit-button">Set Class Link</button>
+        </form>
+    </div>
+
+    <h2>Clients:</h2>
+    <ul>
+        {% for client in clients %}
+            <li>{{ client.client_name }} - {{ client.class_link }} - {{ client.fm_name }}</li>
+        {% empty %}
+            <li>No clients available.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script> 
+    const clientDetails = { { client_details | safe } };
+    
+    function showClientDetails() {
+        const dropdown = document.getElementById("client-dropdown");
+        const selectedClientId = dropdown.value;
+        const detailsDiv = document.getElementById("details");
+        const clientDetailsDiv = document.getElementById("client-details");
+        const classLinkInput = document.getElementById("class_link");
+        const clientIdInput = document.getElementById("client_id");
+
+        if (selectedClientId) {
+            const clientDetail = clientDetails[selectedClientId];
+            detailsDiv.innerHTML = `
+                <p><strong>Name:</strong> ${clientDetail.name}</p>
+                <p><strong>Email:</strong> ${clientDetail.email}</p>
+                <p><strong>Phone:</strong> ${clientDetail.phone}</p>
+                <p><strong>Gender:</strong> ${clientDetail.gender}</p>
+                <p><strong>Height:</strong> ${clientDetail.height}</p>
+                <p><strong>Weight:</strong> ${clientDetail.weight}</p>
+            `;
+            classLinkInput.value = clientDetail.class_link || '';  // Pre-fill the class link if it exists
+            clientIdInput.value = selectedClientId;  // Set the hidden input to the selected client ID
+            clientDetailsDiv.style.display = "block";
+        } else {
+            clientDetailsDiv.style.display = "none";
+            detailsDiv.innerHTML = '';
+            classLinkInput.value = '';
+            clientIdInput.value = '';
+        }
+    }
+</script>
+
+{% endblock %}

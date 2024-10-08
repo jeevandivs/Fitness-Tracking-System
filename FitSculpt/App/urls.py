@@ -19,6 +19,13 @@ urlpatterns = [
     path('workouts/day/<int:day>/', views.workouts_by_day_view, name='workouts_by_day'),
     path('view_workout_img/<int:workout_id>/', views.view_workout_img, name='view_workout_img'),
     path('nutrition/', views.nutrition_view, name='nutrition'),
+    path('personal_workout', views.personal_workout_view, name='personal_workout'),
+    path('select_trainer/', views.select_trainer_view, name='select_trainer'),
+    path('set_live_session/', views.set_live_session_view, name='set_live_session'),
+    path('view-scheduled-class/', views.view_scheduled_class, name='view_scheduled_class'),
+    path('personal_nutrition', views.personal_nutrition_view, name='personal_nutrition'),
+
+
 
 
 

@@ -1,0 +1,127 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Trainer</title>
+    <style>
+        /* Add your CSS styling here */
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .trainer-info {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none; /* Hide initially */
+        }
+        .timing-dropdown {
+            display: none; /* Hide initially */
+        }
+        .submit-button {
+            background-color: #b35138;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Hide initially */
+        }
+        .submit-button:hover {
+            background-color: #9f2c1d;
+        }
+    </style>
+    <script>
+        function showTrainerDetails() {
+            var select = document.getElementById('trainerSelect');
+            var trainerInfo = document.getElementById('trainerInfo');
+            var timingDropdown = document.getElementById('timingDropdown');
+            var submitButton = document.getElementById('submitButton');
+            
+            // Clear previous details
+            trainerInfo.innerHTML = '';
+            submitButton.style.display = 'none';
+            timingDropdown.style.display = 'none'; // Hide timing dropdown initially
+
+            // Get the selected trainer's data
+            var selectedIndex = select.selectedIndex;
+            if (selectedIndex > 0) {
+                var selectedTrainer = select.options[selectedIndex];
+
+                // Show trainer details
+                var trainerName = selectedTrainer.getAttribute('data-name');
+                var trainerDesignation = selectedTrainer.getAttribute('data-designation');
+                var trainerAvailableTimes = selectedTrainer.getAttribute('data-available-times').split(", ");
+
+                trainerInfo.innerHTML = `
+                    <strong>Name:</strong> ${trainerName} <br>
+                    <strong>Designation:</strong> ${trainerDesignation} <br>
+                    <strong>Available Times:</strong> ${trainerAvailableTimes.join(", ")}`;
+                trainerInfo.style.display = 'block';
+
+                // Populate timing dropdown
+                var timingSelect = document.getElementById('timing');
+                timingSelect.innerHTML = '<option value="">Select a Timing</option>'; // Reset options
+                for (var i = 0; i < trainerAvailableTimes.length; i++) {
+                    timingSelect.innerHTML += `<option value="${trainerAvailableTimes[i]}">${trainerAvailableTimes[i]}</option>`;
+                }
+
+                // Show timing dropdown
+                timingDropdown.style.display = 'block';
+                submitButton.style.display = 'inline-block'; // Show the select button
+            } else {
+                trainerInfo.style.display = 'none'; // Hide if no trainer is selected
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Select Trainer</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label for="trainerSelect">Choose a Fitness Manager:</label>
+        <select id="trainerSelect" name="trainer_id" onchange="showTrainerDetails()" required>
+            <option value="">Select a Trainer</option>
+            {% for trainer in trainers_with_details %}
+                <option value="{{ trainer.trainer.user_id }}" 
+                        data-name="{{ trainer.trainer.name }}"
+                        data-designation="{{ trainer.designation }}"
+                        data-available-times="{{ trainer.available_times|join:', ' }}">
+                    {{ trainer.trainer.name }} - {{ trainer.designation }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div class="trainer-info" id="trainerInfo"></div>
+
+        <div class="timing-dropdown" id="timingDropdown">
+            <label for="timing">Select Timing:</label>
+            <select id="timing" name="timing" required>
+                <option value="">Select a Timing</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </div>
+
+        <button type="submit" id="submitButton" class="submit-button">Select Trainer</button>
+    </form>
+</div>
+
+</body>
+</html>
+{% endblock %}

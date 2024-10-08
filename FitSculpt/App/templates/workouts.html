@@ -197,6 +197,16 @@ footer {
             <p>Please Select the Day.</p>
         {% endfor %}
     </div>
+    <div class="plan-buttons">
+        {% if plan.plan_name == 'Premium Plan' %}
+            <a href="{% url 'personal_workout' %}" class="day-button">Workout Guidance</a>
+            <a href="{% url 'personal_nutrition' %}" class="day-button">Nutrition Guidance</a>
+        {% elif plan.plan_name == 'Standard Plan' %}
+            <a href="{% url 'personal_workout' %}" class="day-button">Workout Guidance</a>
+        {% elif plan.plan_name == 'Child Plan' %}
+            <a href="{% url 'personal_nutrition' %}" class="day-button">Nutrition Guidance</a>
+        {% endif %}
+    </div>
 {% else %}
     <p>{{ error }}</p>
 {% endif %}
