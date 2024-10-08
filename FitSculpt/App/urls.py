@@ -24,7 +24,7 @@ urlpatterns = [
     path('set_live_session/', views.set_live_session_view, name='set_live_session'),
     path('view-scheduled-class/', views.view_scheduled_class, name='view_scheduled_class'),
     path('personal_nutrition', views.personal_nutrition_view, name='personal_nutrition'),
-
+    path('send-message/<int:fm_id>/', views.client_message_view, name='send_message'),
 
 
 
@@ -73,6 +73,8 @@ urlpatterns = [
     path('add_plan/', views.add_plan, name='add_plan'),
     path('update_plan/<int:plan_id>/', views.update_plan, name='update_plan'),
     path('admin_delete_plan/<int:plan_id>/', views.admin_delete_plan, name='admin_delete_plan'),
+    path('view_sessions/', views.view_sessions_view, name='view_sessions'),
+
 
 
 

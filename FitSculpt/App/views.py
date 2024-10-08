@@ -1378,6 +1378,11 @@ def select_trainer_view(request):
     return render(request, 'select_trainer.html', context)
 
 
+@admin_custom_login_required
+def view_sessions_view(request):
+    sessions = ClientFM.objects.all()
+    
+    return render(request, 'view_sessions.html', {'sessions': sessions})
 
 
 from django.shortcuts import render, redirect
@@ -1387,6 +1392,8 @@ from .models import ClientFM, FitnessManager, Client
 @fm_custom_login_required
 def set_live_session_view(request):
     user_id = request.session.get('fm_user_id')
+    clients = Client.objects.all()
+
     if not user_id:
         messages.error(request, "User not authenticated.")
         return redirect('fm_login')
@@ -1399,7 +1406,7 @@ def set_live_session_view(request):
 
     if request.method == 'POST':
         class_link = request.POST.get('class_link')
-        selected_client_id = request.POST.get('client')
+        selected_client_id = request.POST.get('client_id')
         
         try:
             client_fm = ClientFM.objects.get(client_id=selected_client_id, fm_id=fitness_manager.user_id)
@@ -1408,7 +1415,7 @@ def set_live_session_view(request):
             messages.success(request, "Class link updated successfully.")
         except ClientFM.DoesNotExist:
             messages.error(request, "Client not found or not assigned to you.")
-
+        
         return redirect('set_live_session')
 
     # Get ClientFM entries for this fitness manager
@@ -1417,36 +1424,11 @@ def set_live_session_view(request):
     if not clients.exists():
         messages.info(request, "No clients have selected you as their fitness manager.")
 
-    # Retrieve client IDs from ClientFM and get corresponding Client objects
-    client_ids = [client.client_id for client in clients]
-    client_details = Client.objects.filter(user_id__in=client_ids)  # Use user_id instead of id
-
-    # Create a dictionary mapping user_id to client details
-    client_details_dict = {client.user_id: client for client in client_details}
-    print(client_details_dict)
-
-    # Create a list of dictionaries with ClientFM and Client details
-    clients_with_details = [
-        {
-            'client_id': client.client_id,
-            'client_name': client.client_name,
-            'class_link': client.class_link,
-            'fm_name': client.fm_name
-        }
-        for client in clients
-    ]
-    print(clients_with_details)
-
     context = {
         'fitness_manager': fitness_manager,
-        'clients': clients_with_details,  # This contains ClientFM instances with details
-        'client_details': client_details_dict,  # This is now a dictionary
+        'clients': clients,  # This contains ClientFM instances
     }
     return render(request, 'set_live_session.html', context)
-
-
-
-
 
 
 
@@ -1621,3 +1603,28 @@ def admin_delete_plan(request, plan_id):
         return redirect('see_all_plan')
 
     return render(request, 'admin_delete_plan.html', {'plan': plan}) 
+
+
+from django.shortcuts import render, redirect
+from .models import Message
+
+@custom_login_required
+def client_message_view(request, fm_id):
+    client_id = request.session.get('user_id')
+
+    if request.method == 'POST':
+        message_text = request.POST.get('message_text')
+        
+        # Create a new message entry
+        Message.objects.create(
+            sender_id=client_id,
+            receiver_id=fm_id,  # Fitness manager's ID
+            message_text=message_text
+        )
+        return redirect('send_message', fm_id=fm_id)
+
+    # Fetch conversation history
+    messages = Message.objects.filter(sender_id=client_id, receiver_id=fm_id) | \
+               Message.objects.filter(sender_id=fm_id, receiver_id=client_id)
+    
+    return render(request, 'client_message.html', {'messages': messages, 'fm_id': fm_id})

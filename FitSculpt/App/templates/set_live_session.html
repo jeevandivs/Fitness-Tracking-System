@@ -1,116 +1,180 @@
 {% load static %}
 {% block content %}
 {% include 'fm_header.html' %}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Live Session</title>
     <style>
-        /* Add your CSS styling here */
+        /* General container styling */
         .container {
-            max-width: 800px;
             margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
+            padding: 80px;
+            max-width: 1000px;
+            background-color: #f9f9f9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
-        h1 {
+
+        /* Page title styling */
+        .page-title {
             text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
             color: #333;
+            font-weight: bold;
         }
-        .client-details {
+
+        /* Styling for the messages */
+        .message-container {
             margin-bottom: 20px;
         }
-        .submit-button {
-            background-color: #b35138;
-            color: white;
-            padding: 10px 20px;
-            border: none;
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
             border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Table styling */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 1.2em;
+            text-align: left;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+        .styled-table th {
+            background-color: #020902;
+            color: white;
+        }
+
+        .styled-table tbody tr {
+            background-color: #f3f3f3;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Form styling inside the table */
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Button styling */
+        .btn {
+            padding: 10px 15px;
+            background-color: #af654c;
+            color: white;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
         }
-        .submit-button:hover {
-            background-color: #9f2c1d;
+
+        .btn:hover {
+            background-color: #45a049;
         }
-        .client-form {
-            margin-bottom: 20px;
+
+        /* Make sure the button is aligned under the "Action" header */
+        td form {
+            display: flex;
+            justify-content: center;
+        }
+
+        td form input {
+            margin-right: 5px;
+        }
+
+        td form button {
+            margin-top: 0;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fffcfc;
+            color: white;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1 class="page-title">Set Live Session for {{ fitness_manager.fm_name }}</h1>
 
-<div class="container">
-    <h1>Set Live Session</h1>
+        {% if messages %}
+            <div class="message-container">
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
-    {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-info">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Current Class Link</th>
+                    <th>New Class Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.client_name }}</td>
+                    <td>{% if client.class_link %}{{ client.class_link }}{% else %}Not Set{% endif %}</td>
+                    <td>
+                        <form method="POST" action="{% url 'set_live_session' %}">
+                            {% csrf_token %}
+                            <input type="text" name="class_link" placeholder="Enter new class link" required>
+                            <input type="hidden" name="client_id" value="{{ client.client_id }}">
+                            <button type="submit" class="btn btn-primary">Update Link</button>
+                        </form>
+                    </td>
+                </tr>
+                <a href="#" class="schedule-button">Message to the Clients</a>
 
-    <label for="client">Select Client:</label>
-    <select name="client" id="client-dropdown" onchange="showClientDetails()">
-        <option value="">--Select a client--</option>
-        {% for client in clients %}
-            <option value="{{ client.client_id }}">{{ client.client_name }}</option>
-        {% endfor %}
-    </select>
-
-    <div id="client-details" style="display:none;" class="client-form">
-        <h3>Client Details</h3>
-        <form method="POST" id="class-link-form">
-            {% csrf_token %}
-            <div id="details"></div>
-            <label for="class_link">Class Link:</label>
-            <input type="url" name="class_link" id="class_link" required>
-            <input type="hidden" name="client" id="client_id" value="">
-            <button type="submit" class="submit-button">Set Class Link</button>
-        </form>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No clients found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    <h2>Clients:</h2>
-    <ul>
-        {% for client in clients %}
-            <li>{{ client.client_name }} - {{ client.class_link }} - {{ client.fm_name }}</li>
-        {% empty %}
-            <li>No clients available.</li>
-        {% endfor %}
-    </ul>
-</div>
-
-<script> 
-    const clientDetails = { { client_details | safe } };
-    
-    function showClientDetails() {
-        const dropdown = document.getElementById("client-dropdown");
-        const selectedClientId = dropdown.value;
-        const detailsDiv = document.getElementById("details");
-        const clientDetailsDiv = document.getElementById("client-details");
-        const classLinkInput = document.getElementById("class_link");
-        const clientIdInput = document.getElementById("client_id");
-
-        if (selectedClientId) {
-            const clientDetail = clientDetails[selectedClientId];
-            detailsDiv.innerHTML = `
-                <p><strong>Name:</strong> ${clientDetail.name}</p>
-                <p><strong>Email:</strong> ${clientDetail.email}</p>
-                <p><strong>Phone:</strong> ${clientDetail.phone}</p>
-                <p><strong>Gender:</strong> ${clientDetail.gender}</p>
-                <p><strong>Height:</strong> ${clientDetail.height}</p>
-                <p><strong>Weight:</strong> ${clientDetail.weight}</p>
-            `;
-            classLinkInput.value = clientDetail.class_link || '';  // Pre-fill the class link if it exists
-            clientIdInput.value = selectedClientId;  // Set the hidden input to the selected client ID
-            clientDetailsDiv.style.display = "block";
-        } else {
-            clientDetailsDiv.style.display = "none";
-            detailsDiv.innerHTML = '';
-            classLinkInput.value = '';
-            clientIdInput.value = '';
-        }
-    }
-</script>
+</body>
+</html>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
 
 {% endblock %}

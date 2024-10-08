@@ -176,3 +176,19 @@ class ClientFM(models.Model):
 
     def __str__(self):
         return f"{self.client_name} with {self.fm_name}"
+
+# models.py
+
+class Message(models.Model):
+    id = models.AutoField(primary_key=True)
+    sender_id = models.IntegerField()  # Could be the client or the trainer
+    receiver_id = models.IntegerField()  # Could be the client or the trainer
+    message_text = models.CharField(max_length=1000)
+    message_reply = models.CharField(max_length=1000)
+
+
+    class Meta:
+        db_table = 'tbl_messages'
+
+    def __str__(self):
+        return f"Message from {self.sender_id} to {self.receiver_id}"

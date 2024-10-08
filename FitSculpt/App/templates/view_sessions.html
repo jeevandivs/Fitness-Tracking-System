@@ -1,0 +1,93 @@
+{% load static %}
+{% block content %}
+{% include 'admin_header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Sessions</title>
+    <style>
+        /* General container styling */
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 1000px;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Page title styling */
+        .page-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Table styling */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 1.2em;
+            text-align: left;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+        .styled-table th {
+            background-color: #020902;
+            color: white;
+        }
+
+        .styled-table tbody tr {
+            background-color: #f3f3f3;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">All Live Sessions</h1>
+
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Fitness Manager Name</th>
+                    <th>Class Link</th>
+                    <th>Timing</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>{{ session.client_name }}</td>
+                    <td>{{ session.fm_name }}</td>
+                    <td>{% if session.class_link %}{{ session.class_link }}{% else %}Not Set{% endif %}</td>
+                    <td>{{ session.timing }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No sessions available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+{% endblock %}

@@ -155,3 +155,17 @@ class Fm_SetPasswordForm(forms.Form):
 
         if new_password and confirm_password and new_password != confirm_password:
             raise forms.ValidationError("Passwords do not match")
+        
+
+# forms.py
+
+from django import forms
+from .models import Message
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['message_text']
+        widgets = {
+            'message_text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter your message...'}),
+        }
