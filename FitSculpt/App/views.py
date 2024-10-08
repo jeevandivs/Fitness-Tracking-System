@@ -1624,7 +1624,73 @@ def client_message_view(request, fm_id):
         return redirect('send_message', fm_id=fm_id)
 
     # Fetch conversation history
-    messages = Message.objects.filter(sender_id=client_id, receiver_id=fm_id) | \
-               Message.objects.filter(sender_id=fm_id, receiver_id=client_id)
+    messages = (Message.objects.filter(sender_id=client_id, receiver_id=fm_id) | 
+               Message.objects.filter(sender_id=fm_id, receiver_id=client_id)).order_by('-id')
     
     return render(request, 'client_message.html', {'messages': messages, 'fm_id': fm_id})
+
+@fm_custom_login_required
+def view_messages(request):
+    fm_id = request.session.get('fm_user_id')  # Get fitness manager's ID from session
+
+    clients = Message.objects.filter(receiver_id=fm_id).values('sender_id').distinct()
+    client_details = {client.user_id: client.name for client in Client.objects.filter(user_id__in=[client['sender_id'] for client in clients])}
+
+    context = {
+        'clients': client_details.items()  # Pass client IDs and names as a tuple
+    }
+    return render(request, 'view_messages.html', context)
+
+
+@fm_custom_login_required
+def view_client_messages(request, client_id):
+    fm_id = request.session.get('fm_user_id') 
+
+    messages = Message.objects.filter(receiver_id=fm_id, sender_id=client_id).order_by('-id')
+    
+    client_name = Client.objects.filter(user_id=client_id).values_list('name', flat=True).first()   
+
+    context = {
+        'messages': messages,
+        'client_id': client_id,
+        'client_name': client_name  # Add client name to context
+    }
+    
+    return render(request, 'view_client_messages.html', context)
+
+
+@fm_custom_login_required
+def send_message_to_client(request, client_id):
+    fm_id = request.session.get('fm_user_id')  # Get fitness manager's ID from session
+    
+    if request.method == 'POST':
+        message_reply = request.POST.get('message_reply')  # Get the reply message text from the form
+        new_message = Message(
+            sender_id=client_id,  # Client is still considered the sender
+            receiver_id=fm_id,  # Fitness manager is the receiver
+            message_reply=message_reply  # Save the message in the message_reply field
+        )
+        new_message.save()  # Save the new message to the database
+
+        return redirect('view_client_messages', client_id=client_id)
+
+    return HttpResponse(status=405)  # Method Not Allowed if not POST
+
+
+
+@fm_custom_login_required
+def reply_message(request, message_id):
+    if request.method == 'POST':
+        reply_text = request.POST.get('reply_text')
+        fm_id = request.session.get('fm_user_id')  
+        
+        try:
+            message = Message.objects.get(id=message_id, receiver_id=fm_id)
+            message.message_reply = reply_text
+            message.save()
+            return redirect('view_messages')
+        except Message.DoesNotExist:
+            return HttpResponse("Message not found or you don't have permission to reply", status=404)
+    else:
+        return HttpResponse(status=405)
+

@@ -51,9 +51,10 @@ urlpatterns = [
     path('update_food/<int:food_id>/', views.update_food, name='update_food'),
     path('delete_food/<int:food_id>/', views.delete_food, name='delete_food'),
     path('fm_plans/', views.fm_plans, name='fm_plans'),
-    
-
-
+    path('view_messages/', views.view_messages, name='view_messages'),
+    path('view_messages/messages/<int:client_id>/', view_client_messages, name='view_client_messages'),
+    path('messages/reply/<int:message_id>/', reply_message, name='reply_message'),
+    path('view_messages/send_message/<int:client_id>/', send_message_to_client, name='send_message_to_client'),
 
 
 
