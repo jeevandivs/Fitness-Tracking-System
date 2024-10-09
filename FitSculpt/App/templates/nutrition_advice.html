@@ -1,0 +1,111 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Advice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 90px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .select-button {
+            background-color: #b35138;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .select-button:hover {
+            background-color: #9f2c1d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Nutrition Advice for Your Clients</h1>
+
+        {% if client_fm_details %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Client Name</th>
+                    <th>Fitness Manager</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in client_fm_details %}
+                <tr>
+                    <td>{{ detail.client_id }}</td>
+                    <td>{{ detail.client_name }}</td>
+                    <td>{{ detail.fm_name }}</td>
+                    <td>
+                        <form method="post" action="#">
+                            {% csrf_token %}
+                            <input type="hidden" name="client_id" value="{{ detail.client_id }}">
+                            <button type="submit" class="select-button">Select</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No clients found for this fitness manager.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>  
+{% endblock %}

@@ -1,0 +1,193 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Dietitian</title>
+    <style>
+        /* General body and content styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .content-wrapper {
+            padding: 40px 20px;
+            margin-top: 100px; /* Ensure content is below the header */
+            background-color: #ffffff;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        form {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        label {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 1rem;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #b35138;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #9f2c1d;
+        }
+
+        #fm-details {
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            max-width: 500px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #fffcfc;
+            color: white;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            select {
+                font-size: 1rem;
+            }
+
+            button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="content-wrapper">
+    <h1>Select a Dietitian</h1>
+    <h2>Client: {{ client_name }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="fitness_manager">Select Fitness Manager:</label>
+        <select name="fitness_manager" id="fitness_manager" required>
+            <option value="">--Select a Fitness Manager--</option>
+            {% for fm_detail in fitness_managers %}
+                <option value="{{ fm_detail.fm.user_id }}">
+                    {{ fm_detail.fm.name }} - {{ fm_detail.fm.email }} - {{ fm_detail.fm.phone }}
+                    - {{ fm_detail.designation }} - {{ fm_detail.qualification }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Select</button>
+    </form>
+
+    <h3>Details of the Selected Fitness Manager</h3>
+    <div id="fm-details">
+        <!-- Details will be displayed here upon selection -->
+    </div>
+</div>
+
+<script>
+    const fitnessManagers = {
+        {% for fm_detail in fitness_managers %}
+        '{{ fm_detail.fm.user_id }}': {
+            name: '{{ fm_detail.fm.name }}',
+            email: '{{ fm_detail.fm.email }}',
+            phone: '{{ fm_detail.fm.phone }}',
+            designation: '{{ fm_detail.designation }}',
+            qualification: '{{ fm_detail.qualification }}'
+        },
+        {% endfor %}
+    };
+
+    document.getElementById('fitness_manager').addEventListener('change', function() {
+        const selectedId = this.value;
+        const detailsDiv = document.getElementById('fm-details');
+
+        if (selectedId) {
+            const manager = fitnessManagers[selectedId];
+            detailsDiv.innerHTML = `
+                <p><strong>Name:</strong> ${manager.name}</p>
+                <p><strong>Email:</strong> ${manager.email}</p>
+                <p><strong>Phone:</strong> ${manager.phone}</p>
+                <p><strong>Designation:</strong> ${manager.designation}</p>
+                <p><strong>Qualification:</strong> ${manager.qualification}</p>
+            `;
+        } else {
+            detailsDiv.innerHTML = '';
+        }
+    });
+</script>
+
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+</body>
+</html>
+{% endblock %}

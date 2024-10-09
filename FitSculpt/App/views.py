@@ -1456,7 +1456,69 @@ def view_scheduled_class(request):
 
 @custom_login_required
 def personal_nutrition_view(request):
-    return render(request, 'personal_nutrition.html')
+    user_id = request.session.get('user_id')
+    client_id = user_id  
+    print(client_id)
+    selected_dietitian = ClientFM2.objects.filter(client_id=client_id).first()
+
+    context = {
+        'dietitian_selected': selected_dietitian
+    }
+    return render(request, 'personal_nutrition.html', context)
+
+
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Client
+from .models import FitnessManager, ClientFM2  # Import your models
+from .models import FitnessManager, Qualifications, Designations, ClientFM2
+
+from django.shortcuts import render, redirect
+from .models import FitnessManager, ClientFM2, Client, Designations, Qualifications
+
+@custom_login_required
+def select_dietitian_view(request):
+    user_id = request.session.get('user_id')
+
+    # Fetch the client's name based on the logged-in user's ID
+    try:
+        client = Client.objects.get(user_id=user_id)
+        client_name = client.name  # Assuming 'fname' is the field for the client's name
+    except Client.DoesNotExist:
+        client_name = None
+
+    # Fetch fitness managers with specified qualifications and status
+    fitness_managers = FitnessManager.objects.filter(qualification_id=3, designation_id=3, status=1)
+
+    # Create a list to hold the fitness manager details with designation and qualification
+    fm_details = []
+    for fm in fitness_managers:
+        designation = Designations.objects.get(designation_id=fm.designation_id)
+        qualification = Qualifications.objects.get(qualification_id=fm.qualification_id)
+        fm_details.append({
+            'fm': fm,
+            'designation': designation.designation,
+            'qualification': qualification.qualification
+        })
+
+    if request.method == 'POST':
+        selected_fm_id = request.POST.get('fitness_manager')
+        if selected_fm_id:
+            # Create a new entry in ClientFM2
+            ClientFM2.objects.create(
+                client_id=user_id,
+                fm_id=selected_fm_id,
+                client_name=client_name,
+                fm_name=FitnessManager.objects.get(user_id=selected_fm_id).name
+            )
+            return redirect('personal_nutrition')  # Redirect to a success page or wherever you want
+
+    return render(request, 'select_dietitian.html', {
+        'fitness_managers': fm_details,  # Pass the detailed fitness manager list
+        'client_name': client_name,
+    })
+
 
 
 from django.shortcuts import render, redirect
@@ -1469,6 +1531,16 @@ def nutrition_view(request):
 
     if user_id:
         client = Client.objects.get(user_id=user_id)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND active=1", [user_id])
+            result = cursor.fetchone()
+            plan_id = result[0] if result else None
+
+        plan = None
+        if plan_id:
+            plan = Plan.objects.get(plan_id=plan_id)
+
+
         height_in_meters = client.height / 100 if client.height else None
         bmi = client.weight / (height_in_meters ** 2) if client.weight and client.height else None
 
@@ -1515,7 +1587,8 @@ def nutrition_view(request):
             'food_details': food_details,
             'bmi': bmi,
             'client': client,
-            'nutrition_category': nutrition_category
+            'nutrition_category': nutrition_category,
+            'plan': plan
         })
     
     return redirect('login')
@@ -1693,4 +1766,73 @@ def reply_message(request, message_id):
             return HttpResponse("Message not found or you don't have permission to reply", status=404)
     else:
         return HttpResponse(status=405)
+    
+@fm_custom_login_required
+def nutrition_advice_view(request):
+    fm_id = request.session.get('fm_user_id') 
+    
+    client_fm_details = ClientFM2.objects.filter(fm_id=fm_id)  
+    
+    return render(request, 'nutrition_advice.html', {'client_fm_details': client_fm_details})
+
+@fm_custom_login_required
+def fm_nutrition_advice(request):
+    fm_id = request.session.get('fm_user_id') 
+        
+    return render(request, 'fm_nutrition_advice.html')
+
+@custom_login_required
+def eating_habits_view(request):
+    client_id = request.session.get('user_id')
+    user = Client.objects.get(user_id=client_id)
+
+    # Get the food type of the user
+    user_food_type = user.food_type
+    print(user_food_type)  # Debugging output to check the food type
+
+    # Fetch unique eating habits based on food type using distinct
+    veg_habits = EatingHabit.objects.filter(food_type='Vegetarian').values('habit', 'habit_no').distinct()
+    non_veg_habits = EatingHabit.objects.filter(food_type='Non-Vegetarian').values('habit', 'habit_no').distinct()
+
+    # Get fm_id associated with the user
+    fm_relation = ClientFM2.objects.filter(client_id=client_id).first()
+    fm_id = fm_relation.fm_id if fm_relation else None
+    print(fm_id)
+    existing_habits = EatingHabit2.objects.filter(client_id=client_id).values_list('habit_no', flat=True)
+
+    context = {
+        'veg_habits': veg_habits,
+        'non_veg_habits': non_veg_habits,
+        'user_food_type': user_food_type,
+        'fm_id': fm_id,
+        'existing_habits': existing_habits  # Send existing habits to the template
+    }
+
+    if request.method == 'POST':
+        selected_habits = request.POST.getlist('selected_habits')
+
+        selected_habits = [habit for habit in selected_habits if habit]
+
+        for habit_no in selected_habits:
+            if habit_no not in existing_habits:
+                EatingHabit2.objects.create(client_id=client_id, fm_id=fm_id, habit_no=habit_no)
+        
+
+        deselected_habits = [habit for habit in existing_habits if habit not in selected_habits]
+        for habit_no in deselected_habits:
+            EatingHabit2.objects.filter(client_id=client_id, habit_no=habit_no).delete()
+        return redirect('eating_habits')  # Redirect after processing
+  # Redirect after processing
+
+    return render(request, 'eating_habits.html', context)
+
+@custom_login_required
+def track_foods_view(request):
+    client_id=request.session.get('user_id')
+    print(client_id)
+    return render(request,'track_foods.html')
+
+
+
+
 

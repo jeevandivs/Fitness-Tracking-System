@@ -1,0 +1,114 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eating Habits</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background color */
+            margin-top: 100px; /* Space for header */
+        }
+        h2, h3 {
+            color: #343a40; /* Dark color for headings */
+        }
+        .card {
+            border: 1px solid #ced4da; /* Light gray border for cards */
+            border-radius: 8px; /* Rounded corners */
+            transition: transform 0.2s; /* Smooth scaling effect on hover */
+        }
+        .card:hover {
+            transform: scale(1.02); /* Scale up on hover */
+        }
+        .btn-primary {
+            background-color: #007bff; /* Primary button color */
+            border: none; /* Remove border */
+        }
+        footer {
+            text-align: center; /* Center footer text */
+            margin-top: 20px; /* Space above footer */
+            color: #6c757d; /* Light gray color for footer text */
+        }
+        .schedule-button {
+            position: absolute; /* Positioning it absolutely */
+            top: 90px; /* Adjust distance from the top */
+            left: 20px; /* Adjust distance from the left */
+            background-color: #007bff; /* Background color */
+            color: white; /* Text color */
+            padding-top: 20px;
+            padding: 10px ; /* Padding for the button */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* Remove underline */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+        .schedule-button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <a href="{% url 'personal_nutrition' %}" class="schedule-button">Go Back</a>
+
+        <h2 class="mb-4 text-center">Eating Habits</h2>
+        <h3 class="mb-4 text-center">Choose Your Diet</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                {% if user_food_type == 'veg' %}
+                    <div class="col-md-12">
+                        <h3 class="text-center">Vegetarian Habits</h3>
+                        <div class="row">
+                            {% for habit in veg_habits %}
+                            <div class="col-md-12 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ habit.habit }}</h5>
+                                        <p class="card-text">Vegetarian</p>
+                                        <input type="checkbox" name="selected_habits" value="{{ habit.habit_no }}" 
+                                        {% if habit.habit_no in existing_habits %} checked{% endif %}> Select
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% elif user_food_type == 'non_veg' %}
+                    <div class="col-md-12">
+                        <h3 class="text-center">Non-Vegetarian Habits</h3>
+                        <div class="row">
+                            {% for habit in non_veg_habits %}
+                            <div class="col-md-12 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ habit.habit }}</h5>
+                                        <p class="card-text">Non-Vegetarian</p>
+                                        <input type="checkbox" name="selected_habits" value="{{ habit.habit_no }}" 
+                                        {% if habit.habit_no in existing_habits %} checked{% endif %}> Select
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{% url 'personal_nutrition' %}" class="schedule-button">Go Back</a>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+
+{% endblock %}

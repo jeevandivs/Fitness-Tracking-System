@@ -46,10 +46,26 @@
     tr:hover {
         background-color: #eaeaea;
     }
+    .day-button{
+        background-color: #b35138;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin: 20px 10px;
+            display: inline-block;
+    }
 </style>
 <section class="section" id="nutrition">
     <div class="container">
+        
         <h2>Personalized Nutrition Plan</h2>
+        {% if plan.plan_name == 'Premium Plan' or plan.plan_name == 'Child Plan' %}
+            <a href="{% url 'personal_nutrition' %}" class="day-button">Nutrition Guidance</a>
+        {% endif %}
 
         <p><strong>BMI:</strong> {{ bmi|floatformat:2 }}</p>
         <p><strong>Nutrition Category:</strong> {{ nutrition_category }}</p>

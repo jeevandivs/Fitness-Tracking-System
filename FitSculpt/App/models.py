@@ -176,19 +176,63 @@ class ClientFM(models.Model):
 
     def __str__(self):
         return f"{self.client_name} with {self.fm_name}"
+    
 
-# models.py
+class ClientFM2(models.Model):
+    id=models.AutoField(primary_key=True)
+    client_id=models.IntegerField()
+    fm_id=models.IntegerField()
+    client_name=models.CharField(max_length=50)
+    fm_name=models.CharField(max_length=50)
+ 
+    class Meta:
+        managed=False
+        db_table= 'tbl_clientfm2'
+
+    def __str__(self):
+        return f"{self.client_name} with {self.fm_name}"
+
 
 class Message(models.Model):
     id = models.AutoField(primary_key=True)
-    sender_id = models.IntegerField()  # Could be the client or the trainer
-    receiver_id = models.IntegerField()  # Could be the client or the trainer
+    sender_id = models.IntegerField()  
+    receiver_id = models.IntegerField()  
     message_text = models.CharField(max_length=1000)
     message_reply = models.CharField(max_length=1000)
 
 
     class Meta:
+        managed=False
         db_table = 'tbl_messages'
 
     def __str__(self):
         return f"Message from {self.sender_id} to {self.receiver_id}"
+
+
+
+class EatingHabit(models.Model):
+    id = models.AutoField(primary_key=True)
+    habit = models.CharField(max_length=50)
+    food_item = models.CharField(max_length=50)
+    food_type = models.CharField(max_length=50)
+    habit_no=models.IntegerField()
+
+    class Meta:
+        managed=False
+        db_table='tbl_food_habits'
+
+    def __str__(self):
+        return f"{self.habit} - {self.food_item} ({self.food_type})"
+    
+class EatingHabit2(models.Model):
+    id = models.AutoField(primary_key=True)
+    client_id=models.IntegerField()
+    fm_id=models.IntegerField()
+    habit_no=models.IntegerField()
+
+    class Meta:
+        managed=False
+        db_table='tbl_eating_habit'
+
+    def __str__(self):
+        return self.habit_no

@@ -23,10 +23,11 @@ urlpatterns = [
     path('select_trainer/', views.select_trainer_view, name='select_trainer'),
     path('set_live_session/', views.set_live_session_view, name='set_live_session'),
     path('view-scheduled-class/', views.view_scheduled_class, name='view_scheduled_class'),
-    path('personal_nutrition', views.personal_nutrition_view, name='personal_nutrition'),
+    path('personal_nutrition/', views.personal_nutrition_view, name='personal_nutrition'),
+    path('select_dietitian/', views.select_dietitian_view, name='select_dietitian'),
     path('send-message/<int:fm_id>/', views.client_message_view, name='send_message'),
-
-
+    path('eating_habits/', views.eating_habits_view, name='eating_habits'),
+    path('track_foods/', views.track_foods_view, name='track_foods'),
 
 
 
@@ -55,6 +56,8 @@ urlpatterns = [
     path('view_messages/messages/<int:client_id>/', view_client_messages, name='view_client_messages'),
     path('messages/reply/<int:message_id>/', reply_message, name='reply_message'),
     path('view_messages/send_message/<int:client_id>/', send_message_to_client, name='send_message_to_client'),
+    path('nutrition_advice/', views.nutrition_advice_view, name='nutrition_advice'),
+
 
 
 
