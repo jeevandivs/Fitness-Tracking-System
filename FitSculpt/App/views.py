@@ -543,7 +543,8 @@ def user_profile_view(request):
             
             if form.is_valid():
                 form.save()
-                return redirect('user_home')
+                messages.success(request, 'Profile Updated successfully')
+                return redirect('user_profile')
         else:
             form = ClientUpdateForm(instance=client)
         
@@ -636,7 +637,8 @@ def payment_gateway_view(request, plan_id):
             active=1
         )
         payment.save()  
-        return render(request, 'user_home.html')
+        messages.success(request, 'Payment Successful')
+        return redirect('plans')
 
     # If it's a GET request, just render the payment gateway form
     return render(request, 'payment_gateway.html', {'plan': plan})
@@ -1336,6 +1338,8 @@ def select_trainer_view(request):
                 client_name=client.name, 
                 fm_name=fitness_manager.name    
             )
+        messages.success(request, 'Selected Trainer successfully')
+
         return redirect('personal_workout')
 
     # Get fitness managers with designation_id = 2 or 5 and status = 1
@@ -1512,6 +1516,7 @@ def select_dietitian_view(request):
                 client_name=client_name,
                 fm_name=FitnessManager.objects.get(user_id=selected_fm_id).name
             )
+            messages.success(request, 'Selected the Dietitian successfully')
             return redirect('personal_nutrition')  # Redirect to a success page or wherever you want
 
     return render(request, 'select_dietitian.html', {
@@ -1767,19 +1772,24 @@ def reply_message(request, message_id):
     else:
         return HttpResponse(status=405)
     
+from django.db.models import OuterRef, Subquery
+
 @fm_custom_login_required
 def nutrition_advice_view(request):
-    fm_id = request.session.get('fm_user_id') 
-    
-    client_fm_details = ClientFM2.objects.filter(fm_id=fm_id)  
+    fm_id = request.session.get('fm_user_id')
+
+    # Get the latest eating habit status for each client
+    eating_habit_subquery = EatingHabit2.objects.filter(client_id=OuterRef('client_id')).order_by('-habit_no')
+
+    client_fm_details = ClientFM2.objects.filter(fm_id=fm_id).annotate(
+        status=Subquery(eating_habit_subquery.values('status')[:1])
+    ).order_by('status', '-id')  # Order by status and then by ID
     
     return render(request, 'nutrition_advice.html', {'client_fm_details': client_fm_details})
 
-@fm_custom_login_required
-def fm_nutrition_advice(request):
-    fm_id = request.session.get('fm_user_id') 
-        
-    return render(request, 'fm_nutrition_advice.html')
+
+
+
 
 @custom_login_required
 def eating_habits_view(request):
@@ -1815,24 +1825,60 @@ def eating_habits_view(request):
 
         for habit_no in selected_habits:
             if habit_no not in existing_habits:
-                EatingHabit2.objects.create(client_id=client_id, fm_id=fm_id, habit_no=habit_no)
+                EatingHabit2.objects.create(client_id=client_id, fm_id=fm_id, habit_no=habit_no,status=0)
         
 
         deselected_habits = [habit for habit in existing_habits if habit not in selected_habits]
         for habit_no in deselected_habits:
             EatingHabit2.objects.filter(client_id=client_id, habit_no=habit_no).delete()
-        return redirect('eating_habits')  # Redirect after processing
+        messages.success(request, 'Selected the Preferences successfully')
+        return redirect('personal_nutrition')  # Redirect after processing
   # Redirect after processing
 
     return render(request, 'eating_habits.html', context)
 
 @custom_login_required
 def track_foods_view(request):
-    client_id=request.session.get('user_id')
-    print(client_id)
-    return render(request,'track_foods.html')
+    client_id = request.session.get('user_id')  # Get the logged-in client ID
+
+    # Fetch all EatingHabit2 records with status=1 for the logged-in client
+    eating_habits = EatingHabit2.objects.filter(client_id=client_id, status=1)
+
+    # Collect all the habit_no's for this client with status=1
+    habit_nos = [habit.habit_no for habit in eating_habits]
+
+    # Fetch food items from EatingHabit based on habit_no
+    food_details = EatingHabit.objects.filter(habit_no__in=habit_nos)
+
+    return render(request, 'track_foods.html', {'food_details': food_details})
 
 
 
 
+
+from django.shortcuts import render, redirect
+from .models import EatingHabit2, EatingHabit
+
+@fm_custom_login_required
+def fm_nutrition_advice(request, client_id):
+    fm_id = request.session.get('fm_user_id')
+
+    # Get the habit numbers for the client
+    eating_habits = EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, status=0)
+
+    # Fetch the food habits based on habit_no
+    habit_nos = [habit.habit_no for habit in eating_habits]
+    food_habits = EatingHabit.objects.filter(habit_no__in=habit_nos)
+
+    if request.method == 'POST':
+        # Mark the EatingHabit2 records as status=1 (Advice provided)
+        EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, status=0).update(status=1)
+        # Redirect to a success page or back to the nutrition advice page
+        messages.success(request, 'Provided the Nutrition successfully')
+        return redirect('nutrition_advice')  # Redirect to the list of clients
+
+    return render(request, 'fm_nutrition_advice.html', {
+        'client_id': client_id,
+        'food_habits': food_habits
+    })
 

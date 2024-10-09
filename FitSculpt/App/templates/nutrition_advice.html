@@ -61,7 +61,12 @@
             transition: background-color 0.3s ease;
         }
 
-        .select-button:hover {
+        .select-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .select-button:hover:not(:disabled) {
             background-color: #9f2c1d;
         }
     </style>
@@ -70,12 +75,20 @@
 
     <div class="container">
         <h1>Nutrition Advice for Your Clients</h1>
+        {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
 
         {% if client_fm_details %}
         <table>
             <thead>
                 <tr>
-                    <th>Client ID</th>
                     <th>Client Name</th>
                     <th>Fitness Manager</th>
                     <th>Select</th>
@@ -84,14 +97,14 @@
             <tbody>
                 {% for detail in client_fm_details %}
                 <tr>
-                    <td>{{ detail.client_id }}</td>
                     <td>{{ detail.client_name }}</td>
                     <td>{{ detail.fm_name }}</td>
                     <td>
-                        <form method="post" action="#">
-                            {% csrf_token %}
-                            <input type="hidden" name="client_id" value="{{ detail.client_id }}">
-                            <button type="submit" class="select-button">Select</button>
+                        <form method="get" action="{% url 'fm_nutrition_advice' detail.client_id %}">
+                            <button type="submit" class="select-button" 
+                                {% if detail.status == 1 %} disabled {% endif %}>
+                                Select
+                            </button>
                         </form>
                     </td>
                 </tr>

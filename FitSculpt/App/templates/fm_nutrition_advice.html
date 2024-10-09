@@ -1,0 +1,127 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Advice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 90px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .confirm-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .confirm-button:hover {
+            background-color: #218838;
+        }
+        .schedule-button {
+            position: absolute; /* Positioning it absolutely */
+            top: 90px; /* Adjust distance from the top */
+            left: 20px; /* Adjust distance from the left */
+            background-color: #007bff; /* Background color */
+            color: white; /* Text color */
+            padding-top: 20px;
+            padding: 10px ; /* Padding for the button */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* Remove underline */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+        .schedule-button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="{% url 'nutrition_advice' %}" class="schedule-button">Go Back</a>
+
+        <h1>Nutrition Advice for Client {{ client_id }}</h1>
+
+        {% if food_habits %}
+        <h3>Food Habits</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Habit</th>
+                    <th>Food Item</th>
+                    <th>Food Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for habit in food_habits %}
+                <tr>
+                    <td>{{ habit.habit }}</td>
+                    <td>{{ habit.food_item }}</td>
+                    <td>{{ habit.food_type }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <form method="post" action="{% url 'fm_nutrition_advice' client_id %}">
+            {% csrf_token %}
+            <input type="hidden" name="client_id" value="{{ client_id }}">
+            <button type="submit" class="confirm-button">Confirm and Provide Advice</button>
+        </form>
+        {% else %}
+        <p>No habits found for this client.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+{% endblock %}

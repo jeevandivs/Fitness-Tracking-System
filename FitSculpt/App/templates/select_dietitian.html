@@ -124,11 +124,37 @@
                 font-size: 1rem;
             }
         }
+        .goback {
+            position: absolute; /* Positioning it absolutely */
+            top: 90px; /* Adjust distance from the top */
+            left: 20px; /* Adjust distance from the left */
+            background-color: #9f2c1d; /* Background color */
+            color: white; /* Text color */
+            padding-top: 20px;
+            padding: 10px ; /* Padding for the button */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* Remove underline */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+        .goback:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
     </style>
 </head>
 <body>
 <div class="content-wrapper">
     <h1>Select a Dietitian</h1>
+    {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    <a href="{% url 'personal_nutrition' %}" class="goback">Go Back</a>
+
     <h2>Client: {{ client_name }}</h2>
 
     <form method="POST">

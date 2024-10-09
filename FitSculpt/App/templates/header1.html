@@ -15,6 +15,9 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
 
     <title>FITSCULPT</title>
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+
 	<script type="text/javascript">
         function preventBack() {
             window.history.forward(); 
@@ -24,13 +27,129 @@
           
         window.onunload = function () { null };
     </script>
+<style>
+    /* General Style */
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
 
-    <!-- Additional CSS Files -->
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
+    /* Navigation Bar Styling */
+    .header-area {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 100;
+    }
 
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+    .main-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px; /* Increased padding for a bigger header */
+        background-color: black;
+    }
 
-    <link rel="stylesheet" href="{% static 'assets/css/templatemo-training-studio.css' %}">
+    /* Logo */
+    .logo {
+        font-size: 35px; /* Increased font size */
+        font-weight: bold;
+        color: white;
+        text-transform: uppercase;
+        text-decoration: none; /* Remove underline */
+    }
+
+    .logo em {
+        color: #ff5722; /* Orange color for SCULPT */
+        font-style: normal;
+        font-size: 40px; /* Increased font size for SCULPT */
+    }
+
+    /* Navigation Links */
+    .nav {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav li {
+        position: relative;
+        margin: 0 15px;
+    }
+
+    .nav a {
+        color: white;
+        font-size: 14px; /* Slightly increased font size for nav links */
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .nav a:hover {
+        color: #ff5722; /* Orange hover effect */
+    }
+
+    /* Dropdown Profile Menu */
+    .dropdown-menu {
+        display: none; /* Hidden by default */
+        background-color: black;
+        border: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        left: -70px;
+        min-width: 150px;
+        z-index: 9999;
+    }
+
+    .dropdown-menu a {
+        color: white;
+        font-size: 14px;
+        padding: 10px;
+        display: block;
+        white-space: nowrap;
+    }
+
+    .dropdown-menu a:hover {
+        background-color: #f0ebe9; /* Hover effect for dropdown */
+    }
+
+    /* Show dropdown when hovering over the parent list item */
+    .dropdown:hover .dropdown-menu {
+        display: block; /* Dropdown is shown on hover */
+    }
+
+    /* Logout Button */
+    .main-button a {
+        background-color: #ff5722;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
+    }
+
+    .main-button a:hover {
+        background-color: #e64a19; /* Darker orange on hover */
+    }
+
+    /* For smaller screens */
+    @media (max-width: 768px) {
+        .main-nav {
+            flex-direction: column;
+        }
+
+        .nav {
+            flex-direction: column;
+        }
+
+        .nav li {
+            margin: 10px 0;
+        }
+    }
+</style>
 
     </head>
     
@@ -42,20 +161,45 @@
                     <nav class="main-nav" style="background-color:black;">
                         <a href="" class="logo">FIT<em> SCULPT</em></a>
                         <ul class="nav">
-                           <li class="scroll-to-section"><a href="{% url 'user_home' %}" class="">HOME</a></li>
-						   <li class="scroll-to-section"><a href="{% url 'user_profile' %}" class="">PROFILE</a></li>
-						    <li class="scroll-to-section"><a href="{% url 'plans' %}" class="">PLAN</a></li>
-						   <li class="scroll-to-section"><a href="{% url 'workouts' %}" class="">WORKOUTS</a></li>
-						   <li class="scroll-to-section"><a href="{% url 'nutrition' %}" class="">NUTRITION</a></li>
-                           <li class="scroll-to-section"><a href="login/mentalfit" class="">MENTAL FITNESS</a></li>
-                           <li class="scroll-to-section"><a href="login/goal" class="">GOAL</a></li>
-						   <li class="scroll-to-section"><a href="login/progress" class="">PROGRESS</a></li>
-						   <li class="scroll-to-section"><a href="login/feedback" class="">Feedback</a></li>
-						   <li class="main-button"><a href="{% url 'logout' %}">Logout</a></li>
-                           
-                        </ul>        
-                       
+                            <li class="scroll-to-section"><a href="{% url 'user_home' %}" class="">HOME</a></li>
+                            <li class="scroll-to-section dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">PROFILE<span class="dropdown-arrow">▼</span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'user_profile' %}" class=""><b>View Profile</b></a></li>
+
+                                </ul>
+                            </li>
+                            <li class="scroll-to-section dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">PLAN<span class="dropdown-arrow">▼</span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'plans' %}" class=""><b>View Plan</b></a></li>
+                                </ul>
+                            </li>
+
+                            <li class="scroll-to-section dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workouts<span class="dropdown-arrow">▼</span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'workouts' %}" class=""><b>View Workouts</b></a></li>
+                                    <li><a href="{% url 'personal_workout' %}" class=""><b>Personal Workout</b></a></li>
+
+                                </ul>
+                            </li>
+                            
+                            <li class="scroll-to-section dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Nutrition<span class="dropdown-arrow">▼</span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'nutrition' %}" class=""><b>View Nutrition</b></a></li>
+                                    <li><a href="{% url 'personal_nutrition' %}" class=""><b>Nutrition Guidance</b></a></li>
+
+                                </ul>
+                            </li>                            <li class="scroll-to-section"><a href="login/mentalfit" class="">MENTAL FITNESS</a></li>
+                            <li class="scroll-to-section"><a href="login/goal" class="">GOAL</a></li>
+                            <li class="scroll-to-section"><a href="login/progress" class="">PROGRESS</a></li>
+                            <li class="scroll-to-section"><a href="login/feedback" class="">Feedback</a></li>
+                            <li class="main-button"><a href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
                     </nav>
+                    
                 </div>
             </div>
         </div>

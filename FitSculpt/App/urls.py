@@ -57,6 +57,8 @@ urlpatterns = [
     path('messages/reply/<int:message_id>/', reply_message, name='reply_message'),
     path('view_messages/send_message/<int:client_id>/', send_message_to_client, name='send_message_to_client'),
     path('nutrition_advice/', views.nutrition_advice_view, name='nutrition_advice'),
+    path('fm_nutrition_advice/<int:client_id>/', views.fm_nutrition_advice, name='fm_nutrition_advice'),
+
 
 
 

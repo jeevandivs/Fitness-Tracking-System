@@ -101,17 +101,27 @@
 
 <div class="content-wrapper">
     <h1>Personal Nutrition</h1>
-    
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<a href="{% url 'eating_habits' %}" class="trainer-button">Select Your Diet Preference</a>
+<a href="{% url 'track_foods' %}" class="trainer-button">Track Your Diet</a>
     <!-- Show selected trainer or prompt to select -->
     {% if dietitian_selected %}
         <p>You have selected Dietitian: <strong>{{ dietitian_selected.fm_name }}</strong></p>
+        <p>If You Want You Can Change The Dietitian</p>
         <a href="{% url 'select_dietitian' %}" class="trainer-button">Change Dietitian</a>
     {% else %}
         <p>Select a personal Dietitian to start your diet plan</p>
         <a href="{% url 'select_dietitian' %}" class="trainer-button">Select a Dietitian</a>
     {% endif %}
-    <a href="{% url 'eating_habits' %}" class="trainer-button">Select Your Eating Habits</a>
-    <a href="{% url 'track_foods' %}" class="trainer-button">Track Your Diet</a>
+   
 
 
 </div>

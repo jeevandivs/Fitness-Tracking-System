@@ -90,6 +90,15 @@
             <img src="{% static 'images/profile-placeholder.png' %}" alt="Profile Picture">
 
             <!-- Profile Information -->
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
             <h2>{{ client.name }}</h2>
             <p><strong>User Name:</strong> {{ client.username }}</p>
             <p><strong>Email:</strong> {{ client.email }}</p>

@@ -229,6 +229,8 @@ class EatingHabit2(models.Model):
     client_id=models.IntegerField()
     fm_id=models.IntegerField()
     habit_no=models.IntegerField()
+    status=models.IntegerField()
+
 
     class Meta:
         managed=False

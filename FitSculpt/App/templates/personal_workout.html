@@ -80,27 +80,52 @@
                 padding: 20px;
             }
         }
+        .goback {
+            position: absolute; /* Positioning it absolutely */
+            top: 90px; /* Adjust distance from the top */
+            left: 20px; /* Adjust distance from the left */
+            background-color: #9f2c1d; /* Background color */
+            color: white; /* Text color */
+            padding-top: 20px;
+            padding: 10px ; /* Padding for the button */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* Remove underline */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+        .goback:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
     </style>
 </head>
 <body>
 
 <div class="content-wrapper">
     <h1>Personal Workout</h1>
+    {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <a href="{% url 'view_scheduled_class' %}" class="schedule-button">See Live Schedule</a>
+        <a href="{% url 'send_message' fm_id=trainer_selected.fm_id %}" class="schedule-button">Message Trainer</a>
     
     <!-- Show selected trainer or prompt to select -->
     {% if trainer_selected %}
-        <p>You have selected trainer: <strong>{{ trainer_selected.fm_name }}</strong></p>
+        <p>You have selected The Trainer: <strong>{{ trainer_selected.fm_name }}</strong></p>
+        <p>If You Want You Can Change The Trainer</p>
         <a href="{% url 'select_trainer' %}" class="trainer-button">Change Trainer</a>
     {% else %}
         <p>Select your personal trainer to start your workout plan</p>
         <a href="{% url 'select_trainer' %}" class="trainer-button">Select a Trainer</a>
     {% endif %}
-    
-    <a href="{% url 'view_scheduled_class' %}" class="schedule-button">See Live Schedule</a>
-    <a href="{% url 'send_message' fm_id=trainer_selected.fm_id %}" class="schedule-button">Message Trainer</a>
 
 </div>
-<a href="{% url 'workouts' %}" class="schedule-button">Go Back</a>
+<a href="{% url 'workouts' %}" class="goback">Go Back</a>
 
 
 <footer>
