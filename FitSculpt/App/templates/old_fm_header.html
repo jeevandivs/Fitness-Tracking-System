@@ -1,0 +1,246 @@
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>FITSCULPT</title>
+	<script type="text/javascript">
+        function preventBack() {
+            window.history.forward(); 
+        } 
+          
+        setTimeout("preventBack()", 0);
+          
+        window.onunload = function () { null };
+    </script>
+    <style>
+        body {
+            background-image: url("{% static 'assets/images/onemore.jpeg' %}");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+    
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            top: 79px;
+            left: 0;
+            bottom: 0; /* Extend sidebar to the bottom of the viewport */
+            background-color: #333;
+            padding-top: 20px;
+            padding-left: 10px;
+            overflow-y: auto;
+        }
+    
+        .sidebar .card {
+            margin-bottom: 20px;
+        }
+    
+        .sidebar .card-body {
+            background-color: #444; /* Card background color */
+            color: #fff; /* Card text color */
+        }
+    
+        .sidebar .card-body a {
+            color: #fff;
+            text-decoration: none;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f5f5;
+            color: #fff;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+            margin-top: 900px;
+        }
+    </style>
+    </head>
+    
+    <body>
+        
+            {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                                        {{ message }}
+                                    </li>
+                                {% endfor %}
+                            </ul> 
+                        {% endif %}
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="{% url 'fm_users' %}">MANAGE CLIENTS</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="{% url 'fm_workouts' %}">MANAGE WORKOUTS</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="{% url 'fm_nutritions' %}">MANAGE NUTRITION</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-rupee"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="{% url 'fm_payment' %}">VIEW PAYMENTS</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-file"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="{% url 'fm_plans' %}">VIEW PLAN</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="formproduct">MANAGE MENTAL FITNESS</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-image"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="formblog">VIEW GOALS</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-file"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="formvedio">VIEW PROGRESS</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="{% url 'set_live_session' %}">Live Session</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><a href="adminviewfeedback">FEEDBACK</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <header class="header-area header-sticky">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav" style="background-color:black;">
+                        <a href="" class="logo">FIT<em> SCULPT</em></a>
+                        <ul class="nav">
+                           <li class="scroll-to-section"><a href="{% url 'fm_home' %}" class="">HOME</a></li>
+						   <li class="scroll-to-section"><a href="{% url 'fm_profile' %}" class="">PROFILE</a></li>
+						   <li class="main-button"><a href="{% url 'fm_logout' %}">Logout</a></li>
+                           
+                        </ul>        
+                       
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+	{% endblock %}

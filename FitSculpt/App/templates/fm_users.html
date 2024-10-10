@@ -7,18 +7,25 @@
         background-color: #f8f9fa;
     }
 
+    /* Make table responsive */
+    .table-responsive {
+        overflow-x: auto; /* Enable horizontal scrolling on smaller screens */
+    }
+
     table {
-        width: 100%;
-        margin-bottom: 20px;
+        width: 100%; /* Use full width */
+        max-width: 200px; /* Set a maximum width for the table */
+        margin: 20px auto; /* Center the table */
         border-collapse: collapse;
         background-color: #fff;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
 
     th, td {
-        padding: 15px;
+        padding: 8px; /* Smaller padding */
         text-align: left;
         border-bottom: 1px solid #ddd;
+        white-space: nowrap; /* Prevent text from wrapping */
     }
 
     th {
@@ -39,72 +46,51 @@
         text-decoration: underline;
     }
 
-    button {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    button:hover {
-        background-color: #c82333;
-    }
-
     form {
         display: inline;
     }
 
-    .section-title {
-        margin: 20px 0;
-        font-size: 24px;
-        color: #343a40;
-    }
-
     .container {
         padding: 20px;
+        margin-left: 300px; /* Adjust this value to match the width of your sidebar */
+        margin-top: 0px;  /* Adjust this value to create space below the header */
     }
 </style>
 
 <div class="container">
-    <div class="section-title">Users</div>
     <center><h1>Active Clients</h1></center>
-      <table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Date Of Birth</th>
-                <th>Username</th>
-                <th>Gender</th>
-                <th>Age</th>
-                <th>Height</th>
-                <th>Weight</th>
-                <th>Joined Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for client in clients %} 
-            <tr>
-                <td>{{ client.user_id }}</td>
-                <td>{{ client.name }}</td>
-                <td>{{ client.email }}</td>
-                <td>{{ client.phone }}</td>
-                <td>{{ client.dob }}</td>
-                <td>{{ client.username }}</td>
-                <td>{{ client.gender }}</td>
-                <td>{{ client.age }}</td>
-                <td>{{ client.height }}</td>
-                <td>{{ client.weight }}</td>
-                <td>{{ client.date_joined }}</td>
-                
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive"> <!-- Add responsive wrapper -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Username</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Height</th>
+                    <th>Weight</th>
+                    <th>Joined Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %} 
+                <tr>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.username }}</td>
+                    <td>{{ client.gender }}</td>
+                    <td>{{ client.age }}</td>
+                    <td>{{ client.height }}</td>
+                    <td>{{ client.weight }}</td>
+                    <td>{{ client.date_joined }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

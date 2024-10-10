@@ -18,7 +18,7 @@
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px; /* Added margin to push it below the header */
+            margin-top: 10px; /* Added margin to push it below the header */
             margin-bottom: 30px; /* Adjusted for spacing */
         }
 
@@ -50,14 +50,14 @@
             background-color: #0056b3;
         }
 
-        .card-container {
+        .nutrition-card-container { /* Renamed class to avoid conflict */
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 20px;
         }
 
-        .card {
+        .nutrition-card { /* Updated class name */
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -67,16 +67,16 @@
             width: 250px; /* Fixed width for the card */
             text-align: center;
         }
-        .card:hover {
+        .nutrition-card:hover {
             transform: scale(1.05);
         }
-        .card h3 {
+        .nutrition-card h3 {
             margin: 10px 0;
             font-size: 1.2em;
             color: #343a40;
         }
 
-        .card a {
+        .nutrition-card a {
             display: inline-block;
             margin-top: 10px;
             color: #007bff;
@@ -84,44 +84,51 @@
             transition: color 0.2s;
         }
 
-        .card a:hover {
+        .nutrition-card a:hover {
             color: #0056b3;
+        }
+
+        /* Layout adjustments */
+        .main-content {
+            margin-left: 270px; /* Assuming the sidebar width is 250px */
+            padding-top: 60px;  /* Adjust to the header height */
         }
 
         footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 40px;margin-left: 240px;
             font-size: 14px;
             color: #666;
         }
     </style>
 </head>
 <body>
-    <h1>Nutritions</h1>
-    <div class="button-container">
-        <a href="{% url 'see_all_food' %}"><button>See the Food Database</button></a>
-        <a href="{% url 'add_food' %}"><button>Add Food</button></a>
-        <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
-        <a href="{% url 'nutrition_advice' %}"><button>Nutrition Advice</button></a>
-
-    </div>
-    <h2>Food Database</h2>
-    <div class="card-container">
-        {% for food in foods %}
-        <div class="card">
-            <h3>{{ food.food_name }}</h3>
-            <a href="{% url 'update_food' food.food_id %}">
-                <button>Update Food</button>
-            </a>
-            <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" style="background-color: #dc3545;">Delete Food</button>
-            </form>
+    <div class="main-content">
+        <h1>Nutritions</h1>
+        <div class="button-container">
+            <a href="{% url 'see_all_food' %}"><button>See the Food Database</button></a>
+            <a href="{% url 'add_food' %}"><button>Add Food</button></a>
+            <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
+            <a href="{% url 'nutrition_advice' %}"><button>Nutrition Advice</button></a>
         </div>
-        {% endfor %}
+
+        <div class="nutrition-card-container">
+            {% for food in foods %}
+            <div class="nutrition-card">
+                <h3>{{ food.food_name }}</h3>
+                <a href="{% url 'update_food' food.food_id %}">
+                    <button>Update Food</button>
+                </a>
+                <form action="{% url 'delete_food' food.food_id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background-color: #dc3545;">Delete Food</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer>  
+</footer>
 {% endblock %}

@@ -4,251 +4,356 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+        rel="stylesheet">
 
     <title>FITSCULPT</title>
-	<script type="text/javascript">
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+
+    <script type="text/javascript">
         function preventBack() {
-            window.history.forward(); 
-        } 
-          
+            window.history.forward();
+        }
         setTimeout("preventBack()", 0);
-          
         window.onunload = function () { null };
     </script>
 
-    <!-- Additional CSS Files -->
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
-
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
-
-    <link rel="stylesheet" href="{% static 'assets/css/templatemo-training-studio.css' %}">
     <style>
+        /* General Style */
         body {
-            background-image: url("{% static 'assets/images/onemore.jpeg' %}");
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
         }
-    
-        .sidebar {
-            width: 250px;
+
+        /* Navigation Bar Styling */
+        .header-area {
             position: fixed;
-            top: 79px;
-            left: 0;
-            bottom: 0; /* Extend sidebar to the bottom of the viewport */
-            background-color: #333;
-            padding-top: 20px;
-            padding-left: 10px;
-            overflow-y: auto;
+            top: 0;
+            width: 100%;
+            z-index: 100;
         }
-    
-        .sidebar .card {
-            margin-bottom: 20px;
+
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: black;
         }
-    
-        .sidebar .card-body {
-            background-color: #444; /* Card background color */
-            color: #fff; /* Card text color */
-        }
-    
-        .sidebar .card-body a {
-            color: #fff;
+
+        /* Logo */
+        .logo {
+            font-size: 35px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
             text-decoration: none;
         }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #f8f5f5;
-            color: #fff;
-            position: relative;
-            width: 100%;
-            bottom: 0;
-            margin-top: 900px;
+
+        .logo em {
+            color: #ff5722;
+            font-style: normal;
+            font-size: 40px;
         }
+
+        /* Navigation Links */
+        .nav {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav li {
+            position: relative;
+            margin: 0 15px;
+        }
+
+        .nav a {
+            color: white;
+            font-size: 14px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #ff5722;
+        }
+
+        /* Sidebar and Cards */
+        .container-wrapper {
+            display: flex;
+            margin-top: 100px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 100px); /* Subtract header height */
+            width: 250px;
+            overflow-y: auto; /* Enable scrolling for sidebar */
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .stat-text a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .stat-text a:hover {
+            color: #ff5722;
+        }
+
+        /* Buttons and Links Styling */
+        .main-button a {
+            background-color: #ff5722;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+        }
+
+        .main-button a:hover {
+            background-color: #e64a19;
+        }
+
+        /* Responsive Styling */
+        @media (max-width: 768px) {
+            .main-nav {
+                flex-direction: column;
+            }
+
+            .nav {
+                flex-direction: column;
+            }
+
+            .nav li {
+                margin: 10px 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto; /* Adjust height for mobile */
+                overflow-y: visible; /* Disable scroll for mobile */
+            }
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .header-area {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background-color: black;
+        }
+
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+        }
+
+        .logo {
+            font-size: 35px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .logo em {
+            color: #ff5722;
+            font-style: normal;
+            font-size: 40px;
+        }
+
+        .nav {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav a {
+            color: white;
+            font-size: 14px;
+            text-transform: uppercase;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .nav a:hover {
+            color: #ff5722;
+        }
+
+        .container-wrapper {
+            display: flex;
+            margin-top: 100px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 100px);
+            width: 250px;
+            position: fixed;
+            top: 100px;
+            left: 0;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .stat-text a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .stat-text a:hover {
+            color: #ff5722;
+        }
+
+        .main-button a {
+            background-color: #ff5722;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+        }   
     </style>
-    </head>
-    
-    <body>
-        
-            {% if messages %}
-                            <ul class="messages">
-                                {% for message in messages %}
-                                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                                        {{ message }}
-                                    </li>
-                                {% endfor %}
-                            </ul> 
-                        {% endif %}
-            <div class="sidebar">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-users"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="{% url 'fm_users' %}">MANAGE CLIENTS</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-users"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="{% url 'fm_workouts' %}">MANAGE WORKOUTS</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-table"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="{% url 'fm_nutritions' %}">MANAGE NUTRITION</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-rupee"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="{% url 'fm_payment' %}">VIEW PAYMENTS</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-file"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="{% url 'fm_plans' %}">VIEW PLAN</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-table"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="formproduct">MANAGE MENTAL FITNESS</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-image"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="formblog">VIEW GOALS</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-file"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="formvedio">VIEW PROGRESS</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-               
-                
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-table"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="{% url 'set_live_session' %}">Live Session</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">   
-                    <div class="card-body">
-                        <div class="stat-widget-five">
-                            <div class="stat-icon dib flat-color-1">
-                                <i class="fa fa-table"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="text-left dib">
-                                    <div class="stat-text"><a href="adminviewfeedback">FEEDBACK</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <header class="header-area header-sticky">
+</head>
+
+<body>
+
+    <header class="header-area header-sticky">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <nav class="main-nav" style="background-color:black;">
-                        <a href="" class="logo">FIT<em> SCULPT</em></a>
+                    <nav class="main-nav">
+                        <a href="#" class="logo">FIT<em>SCULPT</em></a>
                         <ul class="nav">
-                           <li class="scroll-to-section"><a href="{% url 'fm_home' %}" class="">HOME</a></li>
-						   <li class="scroll-to-section"><a href="{% url 'fm_profile' %}" class="">PROFILE</a></li>
-						   <li class="main-button"><a href="{% url 'fm_logout' %}">Logout</a></li>
-                           
-                        </ul>        
-                       
+                            <li class="scroll-to-section"><a href="{% url 'fm_home' %}">HOME</a></li>
+                            <li class="scroll-to-section"><a href="{% url 'fm_profile' %}">PROFILE</a></li>
+                            <li class="main-button"><a href="{% url 'fm_logout' %}">Logout</a></li>
+                        </ul>
                     </nav>
                 </div>
             </div>
         </div>
     </header>
-	{% endblock %}
+
+    <div class="container-wrapper">
+        <div class="sidebar">
+            <!-- Sidebar content -->
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="{% url 'fm_users' %}">View Clients</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="{% url 'fm_workouts' %}">Manage Workouts</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="{% url 'fm_nutritions' %}">Manage Nutrition</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="{% url 'fm_payment' %}">View Payments</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="{% url 'fm_plans' %}">View Plans</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="{% url 'set_live_session' %}">Live Sessions</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="#">Mental Fitness</a></div>
+                    </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="#">View Goals</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="#">View Progress</a></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                        <div class="stat-text"><a href="#">View Feedback</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+{% endblock %}

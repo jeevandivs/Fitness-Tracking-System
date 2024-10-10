@@ -9,17 +9,28 @@
     <title>Update Workout</title>
     <style>
         body {
-            background-color: #f8f9fa;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background-color: #f8f9fa;
         }
 
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px; /* Margin to push it below the header */
             margin-bottom: 20px;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            margin-top: 80px; /* Push content under the header */
+        }
+
+        .main-content {
+            flex-grow: 1;
+            margin-left: 160px; /* Adjust according to sidebar width */
+            padding: 20px;
         }
 
         form {
@@ -28,7 +39,7 @@
             background-color: #fff;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px; /* Rounded corners */
+            border-radius: 8px;
         }
 
         label {
@@ -40,7 +51,8 @@
 
         input[type="text"],
         input[type="number"],
-        textarea {
+        textarea,
+        select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -90,13 +102,22 @@
         }
 
         small {
-            color: #6c757d; 
-            margin: auto;/* Lighter color for the note */
+            color: #6c757d;
         }
 
         .error-message {
             color: red;
             font-size: 12px;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .main-content {
+                margin-left: 0;
+            }
         }
     </style>
     <script>
@@ -129,7 +150,7 @@
             document.getElementById('bodyPartMessage').textContent = bodyPartValid ? '' : 'Please select a body part.';
             return workoutNameValid && descriptionValid && bodyPartValid;
         }
-        
+
         // Attach real-time validation listeners
         window.onload = function() {
             document.getElementById('workout_name').addEventListener('input', function() {
@@ -152,55 +173,57 @@
     </script>
 </head>
 <body>
-    <h1>Update Workout: {{ workout.workout_name }}</h1>
-    <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
-        {% csrf_token %}
-        <label for="workout_name">Workout Name:</label>
-        <input type="text" id="workout_name" name="workout_name" value="{{ workout.workout_name }}" required>
-        <div id="workoutNameMessage" class="error-message"></div> <!-- Validation message -->
+    <div class="container">
+        <div class="main-content">
+            <h1>Update Workout: {{ workout.workout_name }}</h1>
+            <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
+                {% csrf_token %}
+                <label for="workout_name">Workout Name:</label>
+                <input type="text" id="workout_name" name="workout_name" value="{{ workout.workout_name }}" required>
+                <div id="workoutNameMessage" class="error-message"></div>
 
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required>{{ workout.description }}</textarea>
-        <div id="descriptionMessage" class="error-message"></div> <!-- Validation message -->
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required>{{ workout.description }}</textarea>
+                <div id="descriptionMessage" class="error-message"></div>
 
-        <label for="body_part">Body Part:</label>
-        <select id="body_part" name="body_part" required>
-            <option value="" disabled>Select a body part</option>
-            <option value="Chest" {% if workout.body_part == 'Chest' %}selected{% endif %}>Chest</option>
-            <option value="Back" {% if workout.body_part == 'Back' %}selected{% endif %}>Back</option>
-            <option value="Biceps" {% if workout.body_part == 'Biceps' %}selected{% endif %}>Biceps</option>
-            <option value="Triceps" {% if workout.body_part == 'Triceps' %}selected{% endif %}>Triceps</option>
-            <option value="Shoulder" {% if workout.body_part == 'Shoulder' %}selected{% endif %}>Shoulder</option>
-            <option value="Leg" {% if workout.body_part == 'Leg' %}selected{% endif %}>Leg</option>
-        </select>
-        <div id="bodyPartMessage" class="error-message"></div> <!-- Validation message -->
+                <label for="body_part">Body Part:</label>
+                <select id="body_part" name="body_part" required>
+                    <option value="" disabled>Select a body part</option>
+                    <option value="Chest" {% if workout.body_part == 'Chest' %}selected{% endif %}>Chest</option>
+                    <option value="Back" {% if workout.body_part == 'Back' %}selected{% endif %}>Back</option>
+                    <option value="Biceps" {% if workout.body_part == 'Biceps' %}selected{% endif %}>Biceps</option>
+                    <option value="Triceps" {% if workout.body_part == 'Triceps' %}selected{% endif %}>Triceps</option>
+                    <option value="Shoulder" {% if workout.body_part == 'Shoulder' %}selected{% endif %}>Shoulder</option>
+                    <option value="Leg" {% if workout.body_part == 'Leg' %}selected{% endif %}>Leg</option>
+                </select>
+                <div id="bodyPartMessage" class="error-message"></div>
 
-        <label for="duration">Duration (in minutes):</label>
-        <input type="number" id="duration" name="duration" value="{{ workout.duration }}" required>
+                <label for="duration">Duration (in minutes):</label>
+                <input type="number" id="duration" name="duration" value="{{ workout.duration }}" required>
 
-        <label for="workout_image">Workout Image:</label>
-        <input type="file" id="workout_image" name="workout_image" accept="image/*">
-        <small>Leave blank to keep current image.</small><br><br>
+                <label for="workout_image">Workout Image:</label>
+                <input type="file" id="workout_image" name="workout_image" accept="image/*">
+                <small>Leave blank to keep current image.</small><br><br>
 
-        <label for="reference_video">Reference Video</label>
-        <input type="text" id="reference_video" name="reference_video"><br><br>
-        <label for="plans">Select Plans:</label>
-        <select id="plans" name="plans" multiple>
-            {% for plan in all_plans %}
-                <option value="{{ plan.plan_id }}" 
-                    {% if plan in associated_plans %} selected {% endif %}>
-                    {{ plan.plan_name }}
-                </option>
-            {% endfor %}
-        </select>
-        <small>Already selected plans highlighted here.</small>
+                <label for="reference_video">Reference Video</label>
+                <input type="url" id="reference_video" value="{{ workout.reference_video }}" name="reference_video" required><br><br>
 
-        <button type="submit">Update Workout</button>
-    </form>
-    <center><a href="{% url 'fm_workouts' %}">Back to Workouts</a></center>
-    <footer>
-        <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-    </footer>
+                <label for="plans">Select Plans:</label>
+                <select id="plans" name="plans" multiple>
+                    {% for plan in all_plans %}
+                        <option value="{{ plan.plan_id }}" 
+                            {% if plan in associated_plans %} selected {% endif %}>
+                            {{ plan.plan_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small>Already selected plans highlighted here.</small>
+
+                <button type="submit">Update Workout</button>
+            </form>
+            <center><a href="{% url 'fm_workouts' %}">Back</a></center>
+        </div>
+    </div>
 </body>
 </html>
 {% endblock %}

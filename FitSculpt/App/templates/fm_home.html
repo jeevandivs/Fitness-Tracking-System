@@ -9,203 +9,74 @@
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
+        min-height: 100vh; /* Ensure full page height for the background image */
+        margin: 0;
+        padding: 0;
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
     }
 
-    .sidebar {
-        width: 250px;
-        position: fixed;
-        top: 79px;
-        left: 0;
-        bottom: 0; /* Extend sidebar to the bottom of the viewport */
-        background-color: #333;
-        padding-top: 20px;
-        padding-left: 10px;
-        overflow-y: auto;
+    .content-area {
+        flex-grow: 1;
+        padding: 20px;
+        margin-left: 291px; /* Same width as sidebar */
+        background-color: rgba(255, 255, 255, 0.5); /* Make content area slightly transparent */
+        min-height: calc(100vh - 100px); /* Full height minus the header */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .sidebar .card {
-        margin-bottom: 20px;
+    .content-area h1 {
+        font-size: 30px;
+        font-weight: bold;
+        color: #070000;
     }
 
-    .sidebar .card-body {
-        background-color: #444; /* Card background color */
-        color: #fff; /* Card text color */
+    .content-area p {
+        font-size: 20px;
+        color: #020000;
     }
 
-    .sidebar .card-body a {
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .messages li {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+    }
+
+    .alert {
         color: #fff;
-        text-decoration: none;
+        background-color: #ff5722;
     }
+
     footer {
         text-align: center;
         padding: 10px;
-        background-color: #f8f5f5;
+        background-color: rgba(0, 0, 0, 0.7);
         color: #fff;
-        position: relative;
-        width: 100%;
-        bottom: 0;
-        margin-top: 900px;
     }
 </style>
-<body>
+
+<div class="content-area">
     {% if messages %}
-                    <ul class="messages">
-                        {% for message in messages %}
-                            <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                                {{ message }}
-                            </li>
-                        {% endfor %}
-                    </ul> 
-                {% endif %}
-</body>
-    <div class="sidebar">
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'fm_users' %}">MANAGE CLIENTS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'fm_workouts' %}">MANAGE WORKOUTS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-table"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'fm_nutritions' %}">MANAGE NUTRITION</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-rupee"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'fm_payment' %}">VIEW PAYMENTS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-file"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'fm_plans' %}">VIEW PLAN</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-table"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="formproduct">MANAGE MENTAL FITNESS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-image"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="formblog">VIEW GOALS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-file"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="formvedio">VIEW PROGRESS</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-       
-        
-        <div class="card">
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-table"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="{% url 'set_live_session' %}">Live Session</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">   
-            <div class="card-body">
-                <div class="stat-widget-five">
-                    <div class="stat-icon dib flat-color-1">
-                        <i class="fa fa-table"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="text-left dib">
-                            <div class="stat-text"><a href="adminviewfeedback">FEEDBACK</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <footer>
-        <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-    </footer>  
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <b><h1>Welcome to Fitness Manager Dashboard</h1></b>
+    <b><p>This is your fitness management system where you can manage clients, workouts, nutrition plans, and more.</p></b>
+</div>
+
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>  
 {% endblock %}

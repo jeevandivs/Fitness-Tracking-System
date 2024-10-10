@@ -12,13 +12,21 @@
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
             margin: 0;
+            display: flex; /* Use flexbox layout */
+        }
+
+  
+        .content {
+            margin-left: 220px; /* Space for sidebar */
             padding: 20px;
+            flex-grow: 1; 
+            margin-top: 30px;/* Take up remaining space */
         }
 
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px; /* Margin to push it below the header */
+            margin-top: 100px; /* Margin to push it below the header */
             margin-bottom: 20px;
         }
 
@@ -126,57 +134,60 @@
     </script>
 </head>
 <body>
-    <h1>Add Workout</h1>
-    <form action="" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <label for="workout_name">Workout Name:</label>
-        <input type="text" id="workout_name" name="workout_name" required oninput="validateWorkoutName()">
-        <div class="error" id="workout_name_error"></div>
 
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required oninput="validateDescription()"></textarea>
-        <div class="error" id="description_error"></div>
+    <div class="content">
+        <h1>Add Workout</h1>
+        <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <label for="workout_name">Workout Name:</label>
+            <input type="text" id="workout_name" name="workout_name" required oninput="validateWorkoutName()">
+            <div class="error" id="workout_name_error"></div>
 
-        <label for="body_part">Body Part:</label>
-        <select id="body_part" name="body_part" required>
-            <option value="" disabled selected>Select Body Part</option>
-            <option value="Chest">Chest</option>
-            <option value="Back">Back</option>
-            <option value="Biceps">Biceps</option>
-            <option value="Triceps">Triceps</option>
-            <option value="Shoulder">Shoulder</option>
-            <option value="Leg">Leg</option>
-        </select>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required oninput="validateDescription()"></textarea>
+            <div class="error" id="description_error"></div>
 
-        <label for="duration">Duration (in minutes):</label>
-        <input type="number" id="duration" name="duration" required min="1">
+            <label for="body_part">Body Part:</label>
+            <select id="body_part" name="body_part" required>
+                <option value="" disabled selected>Select Body Part</option>
+                <option value="Chest">Chest</option>
+                <option value="Back">Back</option>
+                <option value="Biceps">Biceps</option>
+                <option value="Triceps">Triceps</option>
+                <option value="Shoulder">Shoulder</option>
+                <option value="Leg">Leg</option>
+            </select>
 
-        <label for="workout_image">Workout Image:</label>
-        <input type="file" id="workout_image" name="workout_image" accept="image/*" required>
-        <br><br>
-        <label for="reference_video">Reference Video:</label>
-        <input type="text" id="reference_video" name="reference_video" required>
-        <br><br>
+            <label for="duration">Duration (in minutes):</label>
+            <input type="number" id="duration" name="duration" required min="1">
 
-        <label for="plans">Select Plans (Ctrl+Click to select multiple):</label>
-        <select id="plans" name="plans" multiple>
-            {% for plan in plans %}
-                <option value="{{ plan.plan_id }}">{{ plan.plan_name }}</option>
-            {% endfor %}
-        </select>
-        {% if error_message %}
-        <div class="alert alert-danger" role="alert">
-            {{ error_message }}
-        </div>
-        {% endif %}
-        
-        <button type="submit">Add Workout</button>
-    </form>
-    <center><a href="{% url 'fm_workouts' %}">Back to Workouts</a></center>
-    <footer>
-        <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-    </footer>
+            <label for="workout_image">Workout Image:</label>
+            <input type="file" id="workout_image" name="workout_image" accept="image/*" required>
+            <br><br>
+            <label for="reference_video">Reference Video:</label>
+            <input type="text" id="reference_video" name="reference_video" required>
+            <br><br>
+
+            <label for="plans">Select Plans (Ctrl+Click to select multiple):</label>
+            <select id="plans" name="plans" multiple>
+                {% for plan in plans %}
+                    <option value="{{ plan.plan_id }}">{{ plan.plan_name }}</option>
+                {% endfor %}
+            </select>
+            {% if error_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
+            {% endif %}
+            
+            <button type="submit">Add Workout</button>
+        </form>
+        <center><a href="{% url 'fm_workouts' %}">Back to Workouts</a></center>
+        <footer>
+            <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+        </footer>
+    </div>
 </body>
 </html>
 {% endblock %}

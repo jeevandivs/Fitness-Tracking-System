@@ -12,8 +12,6 @@
         body {
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
         }
 
         h1 {
@@ -30,8 +28,7 @@
             font-size: 1.8em;
         }
 
-        
-        .card-container {
+        .nutrition-box-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -39,7 +36,7 @@
             margin-top: 20px;
         }
 
-        .card {
+        .nutrition-box {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -49,11 +46,11 @@
             transition: transform 0.2s;
         }
 
-        .card:hover {
+        .nutrition-box:hover {
             transform: scale(1.05);
         }
 
-        .card h5 {
+        .nutrition-box h5 {
             margin: 10px 0;
             color: #343a40;
         }
@@ -64,25 +61,41 @@
             font-size: 14px;
             color: #666;
         }
+
+        /* Adjust content to be right of sidebar and below header */
+        .content-wrapper {
+            display: flex;
+        }
+
+        .content-area {
+            flex: 1;
+            padding-left: 220px; /* Adjust this based on the width of your sidebar */
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Nutritions</h1>
+    <div class="content-wrapper">
+        <!-- Content area adjusted to align with sidebar -->
+        <div class="content-area">
+            <h1>Nutritions</h1>
 
-    <h2>Nutrition Structure</h2>
-    <div class="container">
-        <div class="row">
-            {% for nutrition in nutritions %}
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-subtitle mb-2 text-muted">Food Name: {{ nutrition.food.food_name }}</h5>
-                        <h6 class="card-title">Nutrition Number: {{ nutrition.nutrition_no }}</h6>
-                        <p class="card-text">{{ nutrition.description }}</p>
+            <h2>Nutrition Structure</h2>
+            <div class="container">
+                <div class="row">
+                    {% for nutrition in nutritions %}
+                    <div class="col-md-4">
+                        <div class="nutrition-box">
+                            <div class="nutrition-box-body">
+                                <h5 class="nutrition-box-subtitle mb-2 text-muted">Food Name: {{ nutrition.food.food_name }}</h5>
+                                <h6 class="nutrition-box-title">Nutrition Number: {{ nutrition.nutrition_no }}</h6>
+                                <p class="nutrition-box-text">{{ nutrition.description }}</p>
+                            </div>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
 </body>

@@ -2,10 +2,6 @@
 {% include 'fm_header.html' %}
 {% block content %}
 <style>
-    body {
-        background-color: #f9f9f9;
-        font-family: Arial, sans-serif;
-    }
     .container {
         max-width: 800px;
         margin: 0 auto;
@@ -78,11 +74,31 @@
     .edit-form button:hover {
         background-color: #b35138;
     }
+    body {
+        background-image: url("{% static 'assets/images/onemore.jpeg' %}");
+        background-repeat: no-repeat;
+        font-family: Arial, sans-serif;
+        background-size: cover;
+        background-position: center;
+        min-height: 100vh; /* Ensure full page height for the background image */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .background {
+        flex-grow: 1;
+        padding: 20px;
+        margin-left: 290px; /* Same width as sidebar */
+        background-color: rgba(255, 255, 255, 0.5); /* Make content area slightly transparent */
+        min-height: calc(100vh - 100px); /* Full height minus the header */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 </style>
+<div class="background">
 <section class="section" id="profile">
     <div class="container">
         <div class="profile-card">
-            <img src="{% static 'images/profile-placeholder.png' %}" alt="Profile Picture">
 
             <h2>{{ tbl_fitness_manager.name }}</h2>
             <p><strong>User Name:</strong> {{ tbl_fitness_manager.username }}</p>
@@ -116,7 +132,7 @@
         </div>
     </div>
 </section>
-
+</div>
 <script>
     document.getElementById('edit-btn').addEventListener('click', function(event) {
         event.preventDefault();
