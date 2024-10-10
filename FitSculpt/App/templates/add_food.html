@@ -12,13 +12,24 @@
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
             margin: 0;
+            padding: 0;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .content-container {
+            margin-left: 250px; /* Adjust margin to ensure it's next to the sidebar */
             padding: 20px;
+            width: 100%;
         }
 
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px;
+            margin-top: 20px;
             margin-bottom: 20px;
         }
 
@@ -94,6 +105,8 @@
             color: #dc3545; /* Red color for error messages */
             font-size: 0.9em;
         }
+
+      
     </style>
     <script>
         function validateFoodName() {
@@ -153,47 +166,52 @@
     </script>
 </head>
 <body>
-    <h1>Add Food</h1>
-    <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
-        {% csrf_token %}
-        <label for="food_name">Food Name:</label>
-        <input type="text" id="food_name" name="food_name" required>
-        <div id="food_name_error" class="error"></div>
+    <div class="main-content">
+ 
+        <div class="content-container">
+            <h1>Add Food</h1>
+            <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
+                {% csrf_token %}
+                <label for="food_name">Food Name:</label>
+                <input type="text" id="food_name" name="food_name" required>
+                <div id="food_name_error" class="error"></div>
 
-        <label for="food_type">Type:</label>
-        <select id="food_type" name="food_type" required>
-            <option value="">Select Type</option>
-            <option value="Vegetarian">Vegetarian</option>
-            <option value="Non-Vegetarian">Non-Vegetarian</option>
-        </select>
-        <div id="food_type_error" class="error"></div>
+                <label for="food_type">Type:</label>
+                <select id="food_type" name="food_type" required>
+                    <option value="">Select Type</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                </select>
+                <div id="food_type_error" class="error"></div>
 
-        <label for="calories">Calories:</label>
-        <input type="number" id="calories" name="calories" placeholder="In 100 grams" required>
+                <label for="calories">Calories:</label>
+                <input type="number" id="calories" name="calories" placeholder="In 100 grams" required>
 
-        <label for="proteins">Proteins:</label>
-        <input type="number" id="proteins" name="proteins" placeholder="In 100 grams" required>
+                <label for="proteins">Proteins:</label>
+                <input type="number" id="proteins" name="proteins" placeholder="In 100 grams" required>
 
-        <label for="carbs">Carbs:</label>
-        <input type="number" id="carbs" name="carbs" placeholder="In 100 grams" required>
+                <label for="carbs">Carbs:</label>
+                <input type="number" id="carbs" name="carbs" placeholder="In 100 grams" required>
 
-        <label for="fats">Fats:</label>
-        <input type="number" id="fats" name="fats" placeholder="In 100 grams" required>
+                <label for="fats">Fats:</label>
+                <input type="number" id="fats" name="fats" placeholder="In 100 grams" required>
 
-        <label for="nutritional_descriptions">Select Nutritional Descriptions:</label>
-        <select id="nutritional_descriptions" name="nutritional_descriptions" multiple required>
-            {% for nutrition in nutrition_options %}
-                <option value="{{ nutrition.nutrition_no }}">{{ nutrition.first_description }}</option>
-            {% endfor %}
-        </select>
-        <div id="nutritional_description_error" class="error"></div>
-        {% if error_message %}
-            <div class="error">{{ error_message }}</div>
-        {% endif %}
+                <label for="nutritional_descriptions">Select Nutritional Descriptions:</label>
+                <select id="nutritional_descriptions" name="nutritional_descriptions" multiple required>
+                    {% for nutrition in nutrition_options %}
+                        <option value="{{ nutrition.nutrition_no }}">{{ nutrition.first_description }}</option>
+                    {% endfor %}
+                </select>
+                <div id="nutritional_description_error" class="error"></div>
+                {% if error_message %}
+                    <div class="error">{{ error_message }}</div>
+                {% endif %}
 
-        <button type="submit">Add Food</button>
-    </form>
-    <center><a href="{% url 'fm_nutritions' %}">Back to Nutritions</a></center>
+                <button type="submit">Add Food</button>
+            </form>
+            <center><a href="{% url 'fm_nutritions' %}">Back to Nutritions</a></center>
+        </div>
+    </div>
     <footer>
         <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
     </footer>
