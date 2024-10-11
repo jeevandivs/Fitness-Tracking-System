@@ -10,13 +10,18 @@
     <title>Set Live Session</title>
     <style>
         /* General container styling */
+        .main-content {
+            display: flex;
+        }
+
         .container {
-            margin: 50px auto;
+            margin-left: 250px; /* Adjust according to sidebar width */
             padding: 80px;
-            max-width: 1000px;
             background-color: #f9f9f9;
+            max-width: 1000px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            flex-grow: 1;
         }
 
         /* Page title styling */
@@ -114,6 +119,7 @@
         td form button {
             margin-top: 0;
         }
+
         footer {
             margin-top: 50px;
             text-align: center;
@@ -121,55 +127,74 @@
             background-color: #fffcfc;
             color: white;
         }
+        .schedule-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1em;
+    margin-top: 20px;
+}
+
+.schedule-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    color: #fff;
+}
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="page-title">Set Live Session for {{ fitness_manager.fm_name }}</h1>
+    <div class="main-content">
+        <div class="container">
+            <h1 class="page-title">Set Live Session for {{ fitness_manager.fm_name }}</h1>
 
-        {% if messages %}
-            <div class="message-container">
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
-                            {{ message }}
-                        </li>
+            {% if messages %}
+                <div class="message-container">
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                                {{ message }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Current Class Link</th>
+                        <th>New Class Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.client_name }}</td>
+                        <td>{% if client.class_link %}{{ client.class_link }}{% else %}Not Set{% endif %}</td>
+                        <td>
+                            <form method="POST" action="{% url 'set_live_session' %}">
+                                {% csrf_token %}
+                                <input type="text" name="class_link" placeholder="Enter new class link" required>
+                                <input type="hidden" name="client_id" value="{{ client.client_id }}">
+                                <button type="submit" class="btn btn-primary">Update Link</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <a href="{% url 'view_messages' %}" class="schedule-button">Message to the Clients</a>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No clients found.</td>
+                    </tr>
                     {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        <table class="styled-table">
-            <thead>
-                <tr>
-                    <th>Client Name</th>
-                    <th>Current Class Link</th>
-                    <th>New Class Link</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for client in clients %}
-                <tr>
-                    <td>{{ client.client_name }}</td>
-                    <td>{% if client.class_link %}{{ client.class_link }}{% else %}Not Set{% endif %}</td>
-                    <td>
-                        <form method="POST" action="{% url 'set_live_session' %}">
-                            {% csrf_token %}
-                            <input type="text" name="class_link" placeholder="Enter new class link" required>
-                            <input type="hidden" name="client_id" value="{{ client.client_id }}">
-                            <button type="submit" class="btn btn-primary">Update Link</button>
-                        </form>
-                    </td>
-                </tr>
-                <a href="{% url 'view_messages' %}" class="schedule-button">Message to the Clients</a>
-
-                {% empty %}
-                <tr>
-                    <td colspan="4">No clients found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

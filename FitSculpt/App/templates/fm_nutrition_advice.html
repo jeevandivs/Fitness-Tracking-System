@@ -11,14 +11,27 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            display: flex;
+        }
+
+        /* Sidebar alignment and content area styling */
+        .content-area {
+            flex: 1;
+            padding-left: 240px; /* Adjust to the width of your sidebar */
+            padding-top: 70px; /* Adjust to align content below the header */
+            padding-right: 20px; /* Spacing for the right side */
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background-color: #fff;
-            padding: 90px;
+            padding: 40px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
@@ -64,59 +77,70 @@
         .confirm-button:hover {
             background-color: #218838;
         }
+
         .schedule-button {
-            position: absolute; /* Positioning it absolutely */
-            top: 90px; /* Adjust distance from the top */
-            left: 20px; /* Adjust distance from the left */
-            background-color: #007bff; /* Background color */
-            color: white; /* Text color */
-            padding-top: 20px;
-            padding: 10px ; /* Padding for the button */
-            border-radius: 5px; /* Rounded corners */
-            text-decoration: none; /* Remove underline */
-            transition: background-color 0.3s; /* Smooth background color transition */
+            position: absolute; 
+            top: 100px; /* Adjust based on your header height */
+            left: 340px; /* Adjust based on sidebar width */
+            background-color: #b06c34; 
+            color: white; 
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none; 
+            transition: background-color 0.3s; 
         }
+
         .schedule-button:hover {
-            background-color: #0056b3; /* Darker shade on hover */
+            background-color: #b06c34; 
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;margin-left: 240px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="{% url 'nutrition_advice' %}" class="schedule-button">Go Back</a>
+    <div class="content-wrapper">
+        <div class="content-area">
+            <div class="container">
+                <a href="{% url 'nutrition_advice' %}" class="schedule-button">Go Back</a>
 
-        <h1>Nutrition Advice for Client {{ client_id }}</h1>
+                <h1>Nutrition Advice for Client {{ client_id }}</h1>
 
-        {% if food_habits %}
-        <h3>Food Habits</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Habit</th>
-                    <th>Food Item</th>
-                    <th>Food Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for habit in food_habits %}
-                <tr>
-                    <td>{{ habit.habit }}</td>
-                    <td>{{ habit.food_item }}</td>
-                    <td>{{ habit.food_type }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                {% if food_habits %}
+                <h3>Food Habits</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Habit</th>
+                            <th>Food Item</th>
+                            <th>Food Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for habit in food_habits %}
+                        <tr>
+                            <td>{{ habit.habit }}</td>
+                            <td>{{ habit.food_item }}</td>
+                            <td>{{ habit.food_type }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
-        <form method="post" action="{% url 'fm_nutrition_advice' client_id %}">
-            {% csrf_token %}
-            <input type="hidden" name="client_id" value="{{ client_id }}">
-            <button type="submit" class="confirm-button">Confirm and Provide Advice</button>
-        </form>
-        {% else %}
-        <p>No habits found for this client.</p>
-        {% endif %}
+                <form method="post" action="{% url 'fm_nutrition_advice' client_id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="client_id" value="{{ client_id }}">
+                    <button type="submit" class="confirm-button">Confirm and Provide Advice</button>
+                </form>
+                {% else %}
+                <p>No habits found for this client.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
 </body>

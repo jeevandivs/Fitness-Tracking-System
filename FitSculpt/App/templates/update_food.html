@@ -12,13 +12,23 @@
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            display: flex;
+        }
+
+        .content-area {
+            flex: 1;
+            padding-left: 240px; /* Adjust to the width of your sidebar */
+            padding-top: 70px; /* Adjust to align content below the header */
+            padding-right: 20px; /* Spacing for the right side */
         }
 
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px; /* Margin to push it below the header */
             margin-bottom: 20px;
         }
 
@@ -95,30 +105,35 @@
     </style>
 </head>
 <body>
-    <h1>Update Food: {{ food.food_name }}</h1>
-    <form action="" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="food_name">Food Name:</label>
-        <input type="text" id="food_name" name="food_name" value="{{ food.food_name }}" required>
+    <div class="content-wrapper">
+        <div class="content-area">
+            <h1>Update Food: {{ food.food_name }}</h1>
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="food_name">Food Name:</label>
+                <input type="text" id="food_name" name="food_name" value="{{ food.food_name }}" required>
 
-        <label for="food_type">Food Type:</label>
-        <input type="text" id="food_type" name="food_type" value="{{ food.food_type }}" required>
+                <label for="food_type">Food Type:</label>
+                <input type="text" id="food_type" name="food_type" value="{{ food.food_type }}" required>
 
-        <label for="calories">Calories:</label>
-        <input type="number" id="calories" name="calories" value="{{ food.calories }}" required>
+                <label for="calories">Calories:</label>
+                <input type="number" id="calories" name="calories" value="{{ food.calories }}" required>
 
-        <label for="proteins">Proteins:</label>
-        <input type="number" id="proteins" name="proteins" value="{{ food.proteins }}" required>
+                <label for="proteins">Proteins:</label>
+                <input type="number" id="proteins" name="proteins" value="{{ food.proteins }}" required>
 
-        <label for="carbs">Carbs:</label>
-        <input type="number" id="carbs" name="carbs" value="{{ food.carbs }}" required>
+                <label for="carbs">Carbs:</label>
+                <input type="number" id="carbs" name="carbs" value="{{ food.carbs }}" required>
 
-        <label for="fats">Fats:</label>
-        <input type="number" id="fats" name="fats" value="{{ food.fats }}" required>
+                <label for="fats">Fats:</label>
+                <input type="number" id="fats" name="fats" value="{{ food.fats }}" required>
 
-        <button type="submit">Update Food</button>
-    </form>
-    <center><a href="{% url 'fm_nutritions' %}">Back to Nutritions</a></center>
+                <button type="submit">Update Food</button>
+            </form>
+            <center><a href="{% url 'fm_nutritions' %}">Back to Nutritions</a></center>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
     </footer>

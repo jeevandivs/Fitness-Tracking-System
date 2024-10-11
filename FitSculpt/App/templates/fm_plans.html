@@ -12,13 +12,24 @@
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            display: flex;
+        }
+
+        .content-area {
+            flex: 1;
+            padding-left: 300px; /* Adjusted to the width of your sidebar */
+            padding-top: 30px; /* Adjust to align the content under the header */
+            padding-right: 20px; /* Right padding for spacing */
+            padding-bottom: 20px;
         }
 
         h1 {
             text-align: center;
             color: #343a40;
-            margin-top: 80px; /* Added margin to push it below the header */
             margin-bottom: 30px; /* Adjusted for spacing */
         }
 
@@ -94,30 +105,31 @@
     </style>
 </head>
 <body>
-    <h1>Different Plans</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Plan Name</th>
-                <th>Amount</th>
-                <th>Description</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            {% for plan in plans %}
-            <tr>
-                <td>{{ plan.plan_name }}</td>
-                <td>{{ plan.amount }}</td>
-                <td>{{ plan.description }}</td>
-
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="content-wrapper">
+        <div class="content-area">
+            <h1>Different Plans</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plan Name</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plan in plans %}
+                    <tr>
+                        <td>{{ plan.plan_name }}</td>
+                        <td>{{ plan.amount }}</td>
+                        <td>{{ plan.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer>  
+</footer>
 {% endblock %}

@@ -11,14 +11,27 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            display: flex;
+        }
+
+        /* Sidebar alignment and content area styling */
+        .content-area {
+            flex: 1;
+            padding-left: 240px; /* Adjust to the width of your sidebar */
+            padding-top: 70px; /* Adjust to align content below the header */
+            padding-right: 20px; /* Spacing for the right side */
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background-color: #fff;
-            padding: 90px;
+            padding: 40px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
@@ -69,56 +82,69 @@
         .select-button:hover:not(:disabled) {
             background-color: #9f2c1d;
         }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;margin-left: 240px;
+            font-size: 14px;
+            color: #666;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Nutrition Advice for Your Clients</h1>
-        {% if messages %}
-                        <ul class="messages">
-                            {% for message in messages %}
-                                <li class="alert alert-{{ message.tags }}">
-                                    {{ message }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
+    <div class="content-wrapper">
+        <div class="content-area">
+            <div class="container">
+                <h1>Nutrition Advice for Your Clients</h1>
+                
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
 
-        {% if client_fm_details %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Client Name</th>
-                    <th>Fitness Manager</th>
-                    <th>Select</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for detail in client_fm_details %}
-                <tr>
-                    <td>{{ detail.client_name }}</td>
-                    <td>{{ detail.fm_name }}</td>
-                    <td>
-                        <form method="get" action="{% url 'fm_nutrition_advice' detail.client_id %}">
-                            <button type="submit" class="select-button" 
-                                {% if detail.status == 1 %} disabled {% endif %}>
-                                Select
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No clients found for this fitness manager.</p>
-        {% endif %}
+                {% if client_fm_details %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client Name</th>
+                            <th>Fitness Manager</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detail in client_fm_details %}
+                        <tr>
+                            <td>{{ detail.client_name }}</td>
+                            <td>{{ detail.fm_name }}</td>
+                            <td>
+                                <form method="get" action="{% url 'fm_nutrition_advice' detail.client_id %}">
+                                    <button type="submit" class="select-button" 
+                                        {% if detail.status == 1 %} disabled {% endif %}>
+                                        Select
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No clients found for this fitness manager.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
 </body>
 </html>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer>  
+</footer>
 {% endblock %}

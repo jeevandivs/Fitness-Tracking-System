@@ -7,11 +7,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness Manager Nutritions</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         h1 {
@@ -28,33 +29,38 @@
             font-size: 1.8em;
         }
 
-        .nutrition-box-container {
+        /* Flexbox container for nutrition cards */
+        .nutrition-card-container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
+            justify-content: space-between;
             gap: 20px;
+            padding: 0 40px;
             margin-top: 20px;
         }
 
-        .nutrition-box {
+        /* Each nutrition card */
+        .nutrition-card {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            width: 250px;
+            width: 23%; /* Adjust to ensure 4 items fit horizontally */
             text-align: center;
             transition: transform 0.2s;
+            box-sizing: border-box; /* Ensure padding is included within width */
         }
 
-        .nutrition-box:hover {
+        .nutrition-card:hover {
             transform: scale(1.05);
         }
 
-        .nutrition-box h5 {
+        .nutrition-card h5 {
             margin: 10px 0;
             color: #343a40;
         }
 
+        /* Footer styling */
         footer {
             text-align: center;
             margin-top: 40px;
@@ -62,44 +68,56 @@
             color: #666;
         }
 
-        /* Adjust content to be right of sidebar and below header */
-        .content-wrapper {
+        /* Content area aligned with the sidebar and header */
+        .main-content-wrapper {
             display: flex;
         }
 
-        .content-area {
+        .main-content-area {
             flex: 1;
-            padding-left: 220px; /* Adjust this based on the width of your sidebar */
-            margin-top: 20px;
+            padding-left: 270px; /* Adjust to match sidebar width */
+            padding-top: 0px; /* Adjust to match header height */
+        }
+
+        @media (max-width: 1200px) {
+            .nutrition-card {
+                width: 45%; /* On smaller screens, show 2 items per row */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nutrition-card {
+                width: 100%; /* On mobile screens, show 1 item per row */
+            }
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;margin-left: 240px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="content-wrapper">
-        <!-- Content area adjusted to align with sidebar -->
-        <div class="content-area">
+    <div class="main-content-wrapper">
+        <div class="main-content-area">
             <h1>Nutritions</h1>
 
             <h2>Nutrition Structure</h2>
-            <div class="container">
-                <div class="row">
-                    {% for nutrition in nutritions %}
-                    <div class="col-md-4">
-                        <div class="nutrition-box">
-                            <div class="nutrition-box-body">
-                                <h5 class="nutrition-box-subtitle mb-2 text-muted">Food Name: {{ nutrition.food.food_name }}</h5>
-                                <h6 class="nutrition-box-title">Nutrition Number: {{ nutrition.nutrition_no }}</h6>
-                                <p class="nutrition-box-text">{{ nutrition.description }}</p>
-                            </div>
-                        </div>
+            <div class="nutrition-card-container">
+                {% for nutrition in nutritions %}
+                <div class="nutrition-card">
+                    <div class="nutrition-card-body">
+                        <h5 class="nutrition-card-subtitle">Food Name: {{ nutrition.food.food_name }}</h5>
+                        <p class="nutrition-card-text">{{ nutrition.description }}</p>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </body>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer>  
+</footer>
 {% endblock %}
