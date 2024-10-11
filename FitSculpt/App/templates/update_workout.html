@@ -199,7 +199,7 @@
                 <div id="bodyPartMessage" class="error-message"></div>
 
                 <label for="duration">Duration (in minutes):</label>
-                <input type="number" id="duration" name="duration" value="{{ workout.duration }}" required>
+                <input type="number" id="duration" name="duration" value="{{ workout.duration }}" min="1" max="20" required>
 
                 <label for="workout_image">Workout Image:</label>
                 <input type="file" id="workout_image" name="workout_image" accept="image/*">

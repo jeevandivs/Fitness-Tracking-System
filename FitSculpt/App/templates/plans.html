@@ -117,7 +117,7 @@
                 {% for plan in plans %}
 <tr>
     <td>{{ plan.plan_name }}</td>
-    <td>${{ plan.amount }}</td>
+    <td>Rs.{{ plan.amount }}</td>
     <td>{{ plan.description }}</td>
     <td>
         {% if user_has_plan %}

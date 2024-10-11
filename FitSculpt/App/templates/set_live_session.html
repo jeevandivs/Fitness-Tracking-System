@@ -17,8 +17,9 @@
         .container {
             margin-left: 250px; /* Adjust according to sidebar width */
             padding: 80px;
+            margin-top: -60px;
             background-color: #f9f9f9;
-            max-width: 1000px;
+            max-width: 1200px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             flex-grow: 1;
@@ -27,8 +28,8 @@
         /* Page title styling */
         .page-title {
             text-align: center;
-            font-size: 2em;
-            margin-bottom: 20px;
+            font-size: 2.2em;
+            margin-bottom: 30px;
             color: #333;
             font-weight: bold;
         }
@@ -54,23 +55,26 @@
             color: #721c24;
         }
 
-        /* Table styling */
+        /* Responsive table styling */
         .styled-table {
             width: 100%;
             border-collapse: collapse;
             margin: 25px 0;
-            font-size: 1.2em;
+            font-size: 1.1em;
             text-align: left;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .styled-table th, .styled-table td {
-            padding: 12px 15px;
+            padding: 15px 20px;
             border: 1px solid #ddd;
+            word-wrap: break-word;
         }
 
         .styled-table th {
-            background-color: #020902;
+            background-color: #333;
             color: white;
         }
 
@@ -84,12 +88,13 @@
         }
 
         /* Form styling inside the table */
-        input[type="text"] {
+        input[type="text"], input[type="datetime-local"] {
             width: 90%;
             padding: 10px;
             margin-right: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
 
         /* Button styling */
@@ -106,18 +111,45 @@
             background-color: #45a049;
         }
 
-        /* Make sure the button is aligned under the "Action" header */
+        /* Table form alignment */
         td form {
             display: flex;
+            flex-direction: column;
             justify-content: center;
+            align-items: flex-start;
         }
 
-        td form input {
-            margin-right: 5px;
+        td form input, td form button {
+            margin-bottom: 10px;
         }
 
-        td form button {
-            margin-top: 0;
+        /* Adjust columns on smaller screens */
+        @media (max-width: 768px) {
+            .styled-table thead {
+                display: none;
+            }
+
+            .styled-table tr {
+                display: block;
+                margin-bottom: 15px;
+            }
+
+            .styled-table td {
+                display: block;
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+            .styled-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 15px;
+                font-weight: bold;
+                text-align: left;
+            }
         }
 
         footer {
@@ -127,29 +159,43 @@
             background-color: #fffcfc;
             color: white;
         }
-        .schedule-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #4CAF50; /* Green background */
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 1em;
-    margin-top: 20px;
-}
 
-.schedule-button:hover {
-    background-color: #45a049; /* Darker green on hover */
-    color: #fff;
-}
+        .schedule-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-top: -20px;
+        }
+
+        .schedule-button:hover {
+            background-color: #45a049;
+        }
+
+        .client_details {
+            display: inline-block;
+            padding: 5px;
+            background-color: #ba733a;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: small;
+        }
+
+        .client_details:hover {
+            background-color: #9a552a;
+        }
 
     </style>
 </head>
 <body>
     <div class="main-content">
         <div class="container">
-            <h1 class="page-title">Set Live Session for {{ fitness_manager.fm_name }}</h1>
+            <h1 class="page-title">Set Live Session For Training {{ fitness_manager.fm_name }}</h1>
 
             {% if messages %}
                 <div class="message-container">
@@ -162,34 +208,43 @@
                     </ul>
                 </div>
             {% endif %}
+            
+            <a href="{% url 'join_session' %}" class="schedule-button">Join Live Sessions</a>
 
             <table class="styled-table">
                 <thead>
                     <tr>
                         <th>Client Name</th>
                         <th>Current Class Link</th>
-                        <th>New Class Link</th>
+                        <th>Class Timing (Mon to Sat) Client Preferred</th>
+                        <th>Class Time</th>
+                        <th>New Class Link and Time</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for client in clients %}
                     <tr>
-                        <td>{{ client.client_name }}</td>
-                        <td>{% if client.class_link %}{{ client.class_link }}{% else %}Not Set{% endif %}</td>
-                        <td>
+                        <td data-label="Client Name">{{ client.client_name }}
+                            <a href="{% url 'view_client_details' client.client_id %}" class="client_details">View Details</a>
+                        </td>
+                        <td data-label="Current Class Link">{% if client.class_link %}{{ client.class_link }}{% else %}Not Set{% endif %}</td>
+                        <td data-label="Class Timing">{{ client.timing }}</td>
+                        <td data-label="Class Time">{% if client.class_time %}{{ client.class_time }}{% else %}Not Set{% endif %}</td>
+                        <td data-label="New Class Link and Time">
                             <form method="POST" action="{% url 'set_live_session' %}">
                                 {% csrf_token %}
                                 <input type="text" name="class_link" placeholder="Enter new class link" required>
                                 <input type="hidden" name="client_id" value="{{ client.client_id }}">
-                                <button type="submit" class="btn btn-primary">Update Link</button>
+                                <input type="datetime-local" name="class_time" required>
+                                <button type="submit" class="btn">Update Link</button>
                             </form>
                         </td>
+                        <td data-label="Status">{% if client.status %} Updated {% else %}Not Set{% endif %}</td>
                     </tr>
-                    <a href="{% url 'view_messages' %}" class="schedule-button">Message to the Clients</a>
-
                     {% empty %}
                     <tr>
-                        <td colspan="4">No clients found.</td>
+                        <td colspan="6">No clients found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -198,6 +253,7 @@
     </div>
 </body>
 </html>
+
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
 </footer>

@@ -169,6 +169,8 @@ class ClientFM(models.Model):
     fm_name=models.CharField(max_length=50)
     class_link=models.CharField(max_length=200)
     timing=models.CharField(max_length=50)
+    status = models.IntegerField()
+    class_time=models.DateTimeField()
 
     class Meta:
         managed=False
@@ -215,7 +217,10 @@ class EatingHabit(models.Model):
     habit = models.CharField(max_length=50)
     food_item = models.CharField(max_length=50)
     food_type = models.CharField(max_length=50)
-    habit_no=models.IntegerField()
+    intake_time=models.CharField(max_length=50)
+    habit_no=models.IntegerField()  
+    intake_no=models.IntegerField()
+
 
     class Meta:
         managed=False
@@ -230,7 +235,7 @@ class EatingHabit2(models.Model):
     fm_id=models.IntegerField()
     habit_no=models.IntegerField()
     status=models.IntegerField()
-
+    intake_no=models.IntegerField()
 
     class Meta:
         managed=False
@@ -238,3 +243,16 @@ class EatingHabit2(models.Model):
 
     def __str__(self):
         return self.habit_no
+
+class Feedback(models.Model):
+    id = models.AutoField(primary_key=True)
+    user_id=models.IntegerField()
+    content=models.CharField(max_length=1000)
+    star_rating=models.IntegerField(default=0)
+    
+    class Meta:
+        managed=False
+        db_table='tbl_feedback'
+
+    def __str__(self):
+        return self.id

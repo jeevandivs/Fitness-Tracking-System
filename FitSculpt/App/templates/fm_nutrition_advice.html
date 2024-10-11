@@ -108,6 +108,42 @@
             <div class="container">
                 <a href="{% url 'nutrition_advice' %}" class="schedule-button">Go Back</a>
 
+                <h3>Client Details</h3>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td>{{ client.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ client.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone</th>
+                        <td>{{ client.phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Gender</th>
+                        <td>{{ client.gender }}</td>
+                    </tr>
+                    <tr>
+                        <th>Age</th>
+                        <td>{{ client.age }}</td>
+                    </tr>
+                    <tr>
+                        <th>Height</th>
+                        <td>{{ client.height }}</td>
+                    </tr>
+                    <tr>
+                        <th>Weight</th>
+                        <td>{{ client.weight }}</td>
+                    </tr>
+                    <tr>
+                        <th>Food Type</th>
+                        <td>{{ client.food_type }}</td>
+                    </tr>
+                </table>
+
                 <h1>Nutrition Advice for Client {{ client_id }}</h1>
 
                 {% if food_habits %}
@@ -137,7 +173,7 @@
                     <button type="submit" class="confirm-button">Confirm and Provide Advice</button>
                 </form>
                 {% else %}
-                <p>No habits found for this client.</p>
+                <p>No habits found for this client..OR..You Have Already Provided the Diet..</p>
                 {% endif %}
             </div>
         </div>

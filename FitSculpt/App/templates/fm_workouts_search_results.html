@@ -1,0 +1,177 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: 300px; /* Adjust this value based on the width of your sidebar */
+            padding: 20px;
+            background-color: white;
+            min-height: 100vh; /* Ensures content takes up the full viewport height */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        p {
+            color: #666;
+        }
+
+        /* Nutrition card styles */
+        .nutrition-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nutrition-card h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .nutrition-card p {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .nutrition-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nutrition-card ul li {
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Button styles */
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        form button {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+
+        form button:hover {
+            background-color: #c82333;
+        }
+
+        /* Footer styles */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        footer p {
+            color: #666;
+            font-size: 14px;
+        }
+        .back-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff; /* Blue background */
+        color: white; /* White text */
+        text-decoration: none; /* Remove underline */
+        font-size: 16px;
+        border-radius: 5px; /* Rounded corners */
+        transition: background-color 0.3s ease; /* Smooth hover effect */
+    }
+
+    .back-link:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+    }
+
+    .back-link:active {
+        background-color: #004085; /* Even darker blue on click */
+    }
+
+    .back-link:focus {
+        outline: none; /* Remove default focus outline */
+    }
+
+    center {
+        margin-top: 20px; /* Add spacing above the link */
+    }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+        <h1>Search Results</h1>
+        {% if error_message %}
+            <p>{{ error_message }}</p>
+            <center>
+                <a href="{% url 'fm_workouts' %}" class="back-link">Back to Workouts</a>
+            </center>        {% else %}
+            {% for item in workout_details %}
+    <div class="nutrition-card">
+        <h3>{{ item.workout_name }}</h3>  <!-- Ensure this accesses the correct attribute -->
+        <p>Description: {{ item.description }}</p>
+        <p>Body Part: {{ item.body_part }}</p>
+        <p>Duration: {{ item.duration }}</p>
+        <p>Reference Video: {{ item.reference_video }}</p>
+        <a href="{% url 'update_workout' item.workout_id %}">
+            <button>Update Workout</button>
+        </a>
+        <form action="{% url 'delete_workout' item.workout_id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" style="background-color: #dc3545;">Delete Workout</button>
+        </form>
+    </div>
+{% endfor %}
+
+            <center>
+                <a href="{% url 'fm_workouts' %}" class="back-link">Back to Workouts</a>
+            </center>
+        {% endif %}
+    </div>
+</body>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+{% endblock %}

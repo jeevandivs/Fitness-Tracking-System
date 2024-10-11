@@ -99,7 +99,7 @@
             color: #666;
         }
 
-        .content-area {
+        .content-area {  
             margin-left: 280px; /* Adjust this based on sidebar width */
             padding: 20px; /* Padding to provide spacing */
             flex-grow: 1; /* Allows this section to take remaining space */
@@ -117,6 +117,12 @@
             <a href="{% url 'see_all_workouts' %}"><button>See All Workouts</button></a>
             <a href="{% url 'add_workout' %}"><button>Add Workout</button></a>
         </div>
+        <form method="GET" action="{% url 'search_workout' %}">
+            <div class="search-bar">
+                <input type="text" name="q" placeholder="Search by workout name" required>
+                <button type="submit">Search</button>
+            </div>
+        </form>
         <div class="card-container">
             {% for workout in workouts %}
                 <div class="workout-card"> <!-- Updated class name -->

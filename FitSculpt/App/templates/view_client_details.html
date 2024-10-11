@@ -1,0 +1,89 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main container */
+        .client-details-container {
+            display: flex;
+            margin: 20px;
+        }
+
+        .client-details-content {
+            flex-grow: 1;
+            background-color: white;
+            padding: 20px;
+            margin-left: 280px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .back:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            background-color: #f2f3f5;
+            color: rgb(6, 0, 0);
+        }
+    </style>
+</head>
+<body>
+    <div class="client-details-container">
+        <div class="client-details-content">
+            <h1>Client Details Of {{ client.name }}</h1>
+            <p><strong>Username:</strong> {{ client.username }}</p>
+            <p><strong>Email:</strong> {{ client.email }}</p>
+            <p><strong>Phone:</strong> {{ client.phone }}</p>
+            <p><strong>Date of Birth:</strong> {{ client.dob }}</p>
+            <p><strong>Gender:</strong> {{ client.gender }}</p>
+            <p><strong>Age:</strong> {{ client.age }}</p>
+            <p><strong>Height:</strong> {{ client.height }}</p>
+            <p><strong>Weight:</strong> {{ client.weight }}</p>
+            <p><strong>Food Type:</strong> {{ client.food_type }}</p>
+
+            <a href="{% url 'set_live_session' %}" class="back">Back to Session Details</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
+{% endblock %}

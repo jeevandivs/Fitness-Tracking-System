@@ -99,6 +99,32 @@ def update_inactive_payments(user_id):
 
     Payment.objects.filter(user_id=user_id, active=1, payment_date__lt=threshold_date).update(active=0)
 
+from django.utils import timezone
+from datetime import timedelta
+from .models import ClientFM 
+
+def update_expired_classes(user_id):
+    now = timezone.now() 
+
+    threshold_time = now - timedelta(hours=1)
+
+    updated_count = ClientFM.objects.filter(client_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
+
+    return updated_count  
+
+from django.utils import timezone
+from datetime import timedelta
+from .models import ClientFM 
+
+def fm_update_expired_classes(user_id):
+    now = timezone.now() 
+
+    threshold_time = now - timedelta(hours=1)
+
+    updated_count = ClientFM.objects.filter(fm_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
+
+    return updated_count  
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -111,6 +137,7 @@ def login_view(request):
                     request.session['username'] = user.username  
                     print(user.age)
                     update_inactive_payments(user.user_id)
+                    update_expired_classes(user.user_id)
 
                     return redirect('user_home')  
                 else:
@@ -503,7 +530,8 @@ def fm_login_view(request):
             if user.status == 1: 
                 if user.password == password:  
                     request.session['fm_user_id'] = user.user_id 
-                    request.session['username'] = user.username  
+                    request.session['username'] = user.username 
+                    fm_update_expired_classes(user.user_id) 
                     return redirect('fm_home')  
                 
                 else:
@@ -1111,6 +1139,51 @@ def see_all_food(request):
     return render(request, 'fm_nutritions.html', {'foods': foods})
 
 @fm_custom_login_required
+def search_food(request):
+    query = request.GET.get('q')  # Get the search query from the form
+
+    if query:
+        # Search for the food by name
+        foods = FoodDatabase.objects.filter(food_name__icontains=query)
+        
+        # Fetch nutritional details for each food
+        food_with_nutrition = []
+        for food in foods:
+            # Get all related nutritional entries for the food
+            nutrition_details = Nutrition.objects.filter(food_id=food.food_id)
+            food_with_nutrition.append({
+                'food': food,
+                'nutrition': nutrition_details
+            })
+        
+        if foods.exists():
+            return render(request, 'fm_nutritions_search_results.html', {'food_with_nutrition': food_with_nutrition})
+        else:
+            return render(request, 'fm_nutritions_search_results.html', {'error_message': 'No food found matching your query.'})
+    else:
+        return redirect('see_all_food')  # Redirect if no query
+
+
+@fm_custom_login_required
+def search_workout(request):
+    query = request.GET.get('q')  # Get the search query from the form
+
+    if query:
+        # Search for the workouts by name
+        workouts = Workout.objects.filter(workout_name__icontains=query)
+        print(workouts)
+
+        if workouts.exists():
+            # Instead of looping through workouts, just use them directly
+            return render(request, 'fm_workouts_search_results.html', {'workout_details': workouts})
+        else:
+            return render(request, 'fm_workouts_search_results.html', {'error_message': 'No workout found matching your query.'})
+    else:
+        return redirect('see_all_workouts')
+
+
+
+@fm_custom_login_required
 def add_food(request):
     # Fetch unique nutrition_no and their descriptions
     nutrition_options = Nutrition.objects.values('nutrition_no').annotate(
@@ -1264,7 +1337,7 @@ def workouts_by_day_view(request, day):
         }
         return render(request, 'workouts.html', context)
     else:
-        return render(request, 'workouts.html', {'error': 'No active plan found.'})
+        return render(request, 'workouts.html', {'error': 'No active plan found. Please Select a valid Plan'})
     
 
 from django.shortcuts import render, redirect
@@ -1275,18 +1348,24 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import ClientFM
 
+from django.contrib import messages
+
 @custom_login_required
 def personal_workout_view(request):
     user_id = request.session.get('user_id')
-    client_id = user_id  # Assuming client's id is the same as the session user's id
+    client_id = user_id  
     
-    # Check if the user has already selected a trainer
     selected_trainer = ClientFM.objects.filter(client_id=client_id).first()
 
+    if not selected_trainer:
+        messages.error(request, "You have not selected a trainer yet. Please select a trainer to continue.")
+        return redirect('personal_workout')
+    
     context = {
         'trainer_selected': selected_trainer
     }
     return render(request, 'personal_workout.html', context)
+
 
 from django.shortcuts import render
 from .models import FitnessManager, ClientFM, Designations
@@ -1305,7 +1384,7 @@ def select_trainer_view(request):
         client = Client.objects.get(user_id=client_id)
     except Client.DoesNotExist:
         messages.error(request, "Client not found.")
-        return redirect('some_error_page')  # Redirect to an appropriate error page
+        return redirect('login')  # Redirect to an appropriate error page
 
     if request.method == 'POST':
         trainer_id = request.POST.get('trainer_id')
@@ -1357,7 +1436,7 @@ def select_trainer_view(request):
     qualification_map = {qualification.qualification_id: qualification.qualification for qualification in qualifications}
 
     # Predefined time slots in the format '6 AM', '7 AM', etc.
-    predefined_times = ['6 AM', '7 AM', '8 AM', '5 PM', '6 PM', '7 PM']
+    predefined_times = ['6 AM', '7 AM', '8 AM', '5 PM', '6 PM', '7 PM'] 
     
     # Determine assigned times for trainers
     trainers_with_details = []
@@ -1411,14 +1490,33 @@ def set_live_session_view(request):
     if request.method == 'POST':
         class_link = request.POST.get('class_link')
         selected_client_id = request.POST.get('client_id')
-        
+        class_time_str = request.POST.get('class_time')
+        if class_time_str:
+            try:
+                class_time_naive = datetime.strptime(class_time_str, '%Y-%m-%dT%H:%M')
+
+                class_time = timezone.make_aware(class_time_naive, timezone.get_current_timezone())
+
+                if class_time < timezone.now():
+                    messages.error(request, "Class time cannot be set in the past. Please select a future date and time.")
+                    return redirect('set_live_session')
+            except ValueError:
+                messages.error(request, "Invalid date and time format. Please select a valid date and time.")
+                return redirect('set_live_session')
+        else:
+            messages.error(request, "Class time is required.")
+            return redirect('set_live_session')
         try:
             client_fm = ClientFM.objects.get(client_id=selected_client_id, fm_id=fitness_manager.user_id)
             client_fm.class_link = class_link
+            client_fm.class_time = class_time
+            client_fm.status=1
             client_fm.save()
             messages.success(request, "Class link updated successfully.")
         except ClientFM.DoesNotExist:
             messages.error(request, "Client not found or not assigned to you.")
+        except ValueError:
+            messages.error(request, "Invalid class time format.")
         
         return redirect('set_live_session')
 
@@ -1430,10 +1528,45 @@ def set_live_session_view(request):
 
     context = {
         'fitness_manager': fitness_manager,
-        'clients': clients,  # This contains ClientFM instances
+        'clients': clients,
     }
     return render(request, 'set_live_session.html', context)
 
+@fm_custom_login_required
+def join_session(request):
+    fm_id = request.session.get('fm_user_id')
+
+    if not fm_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+
+    active_sessions = ClientFM.objects.filter(fm_id=fm_id, status=1)
+
+    context = {
+        'active_sessions': active_sessions,
+    }
+
+    return render(request, 'join_session.html', context)
+
+
+from django.shortcuts import render, get_object_or_404
+
+
+@fm_custom_login_required
+def view_client_details(request, client_id):
+    user_id = request.session.get('fm_user_id')
+    
+    if not user_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+    
+    # Retrieve the client based on the provided client_id
+    client = get_object_or_404(Client, user_id=client_id)
+
+    context = {
+        'client': client,
+    }
+    return render(request, 'view_client_details.html', context)
 
 
 
@@ -1444,7 +1577,7 @@ from django.http import HttpResponse
 def view_scheduled_class(request):
     user_id = request.session.get('user_id')
 
-    client_schedule = ClientFM.objects.filter(client_id=user_id).first()
+    client_schedule = ClientFM.objects.filter(client_id=user_id,status=1).first()
 
     if client_schedule:
         context = {
@@ -1456,14 +1589,15 @@ def view_scheduled_class(request):
 
 
 
-
-
 @custom_login_required
 def personal_nutrition_view(request):
     user_id = request.session.get('user_id')
     client_id = user_id  
     print(client_id)
     selected_dietitian = ClientFM2.objects.filter(client_id=client_id).first()
+    if not selected_dietitian:
+        messages.error(request, "You have not selected a dietitian yet. Please select a dietitian to continue.")
+        return redirect('select_dietitian')
 
     context = {
         'dietitian_selected': selected_dietitian
@@ -1559,7 +1693,7 @@ def nutrition_view(request):
             else:
                 nutrition_category = 'Obesity'
         else:
-            return render(request, 'nutritions.html', {'error': 'Please update your height and weight to get nutrition suggestions.'})
+            return render(request, 'nutritions.html', {'error': 'Please update your profile to get nutrition suggestions.'})
 
         food_type = 'Vegetarian' if client.food_type == 'veg' else 'Non Vegetarian'
 
@@ -1787,18 +1921,13 @@ def nutrition_advice_view(request):
     
     return render(request, 'nutrition_advice.html', {'client_fm_details': client_fm_details})
 
-
-
-
-
 @custom_login_required
 def eating_habits_view(request):
     client_id = request.session.get('user_id')
     user = Client.objects.get(user_id=client_id)
 
-    # Get the food type of the user
     user_food_type = user.food_type
-    print(user_food_type)  # Debugging output to check the food type
+    print(user_food_type) 
 
     # Fetch unique eating habits based on food type using distinct
     veg_habits = EatingHabit.objects.filter(food_type='Vegetarian').values('habit', 'habit_no').distinct()
@@ -1832,10 +1961,12 @@ def eating_habits_view(request):
         for habit_no in deselected_habits:
             EatingHabit2.objects.filter(client_id=client_id, habit_no=habit_no).delete()
         messages.success(request, 'Selected the Preferences successfully')
-        return redirect('personal_nutrition')  # Redirect after processing
+        return redirect('personal_nutrition') 
   # Redirect after processing
 
     return render(request, 'eating_habits.html', context)
+
+
 
 @custom_login_required
 def track_foods_view(request):
@@ -1865,7 +1996,8 @@ def fm_nutrition_advice(request, client_id):
 
     # Get the habit numbers for the client
     eating_habits = EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, status=0)
-
+    client=Client.objects.get(user_id=client_id)
+    print(client.email)
     # Fetch the food habits based on habit_no
     habit_nos = [habit.habit_no for habit in eating_habits]
     food_habits = EatingHabit.objects.filter(habit_no__in=habit_nos)
@@ -1879,6 +2011,45 @@ def fm_nutrition_advice(request, client_id):
 
     return render(request, 'fm_nutrition_advice.html', {
         'client_id': client_id,
-        'food_habits': food_habits
+        'food_habits': food_habits,
+        'client':client,
     })
 
+@admin_custom_login_required
+def view_feedbacks(request):
+    # Query feedbacks and related clients
+    feedbacks = Feedback.objects.raw('''
+        SELECT f.id, f.content, f.star_rating, c.name 
+        FROM tbl_feedback f 
+        JOIN client c ON f.user_id = c.user_id
+    ''')
+    
+    # Pass the feedbacks to the template
+    context = {
+        'feedbacks': feedbacks
+    }
+    
+    return render(request, 'view_feedbacks.html', context)
+
+
+from django.shortcuts import render, redirect
+from .models import Feedback
+from django.contrib import messages
+
+@custom_login_required
+def feedback(request):
+    client_id = request.session.get('user_id')
+    
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        star_rating = request.POST.get('star_rating')
+        
+        if content and star_rating:
+            feedback = Feedback(user_id=client_id, content=content, star_rating=int(star_rating))
+            feedback.save()
+            messages.success(request, "Thank you for your feedback!")
+            return redirect('feedback')  # Redirect to the feedback page or any other page
+        else:
+            messages.error(request, "Please provide both feedback content and a star rating.")
+    
+    return render(request, 'feedback.html')

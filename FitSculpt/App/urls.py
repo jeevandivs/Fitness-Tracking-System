@@ -21,13 +21,14 @@ urlpatterns = [
     path('nutrition/', views.nutrition_view, name='nutrition'),
     path('personal_workout', views.personal_workout_view, name='personal_workout'),
     path('select_trainer/', views.select_trainer_view, name='select_trainer'),
-    path('set_live_session/', views.set_live_session_view, name='set_live_session'),
     path('view-scheduled-class/', views.view_scheduled_class, name='view_scheduled_class'),
     path('personal_nutrition/', views.personal_nutrition_view, name='personal_nutrition'),
     path('select_dietitian/', views.select_dietitian_view, name='select_dietitian'),
     path('send-message/<int:fm_id>/', views.client_message_view, name='send_message'),
     path('eating_habits/', views.eating_habits_view, name='eating_habits'),
     path('track_foods/', views.track_foods_view, name='track_foods'),
+    path('feedback/', views.feedback, name='feedback'),
+
 
 
 
@@ -46,6 +47,8 @@ urlpatterns = [
     path('update_workout/<int:workout_id>/', views.update_workout, name='update_workout'),
     path('delete_workout/<int:workout_id>/', views.delete_workout, name='delete_workout'),
     path('fm_nutritions/', views.fm_nutritions_view, name='fm_nutritions'),
+    path('search_food/', views.search_food, name='search_food'),
+    path('search_workout/', views.search_workout, name='search_workout'),
     path('fm_nutritions2/', views.fm_nutritions2, name='fm_nutritions2'),
     path('see_all_food/', views.see_all_food, name='see_all_food'),
     path('add_food/', views.add_food, name='add_food'),
@@ -58,8 +61,9 @@ urlpatterns = [
     path('view_messages/send_message/<int:client_id>/', send_message_to_client, name='send_message_to_client'),
     path('nutrition_advice/', views.nutrition_advice_view, name='nutrition_advice'),
     path('fm_nutrition_advice/<int:client_id>/', views.fm_nutrition_advice, name='fm_nutrition_advice'),
-
-
+    path('set_live_session/', views.set_live_session_view, name='set_live_session'),        
+    path('client/<int:client_id>/', view_client_details, name='view_client_details'),
+    path('join_session/', views.join_session, name='join_session'),
 
 
 
@@ -80,8 +84,7 @@ urlpatterns = [
     path('update_plan/<int:plan_id>/', views.update_plan, name='update_plan'),
     path('admin_delete_plan/<int:plan_id>/', views.admin_delete_plan, name='admin_delete_plan'),
     path('view_sessions/', views.view_sessions_view, name='view_sessions'),
-
-
+    path('view_feedbacks/', views.view_feedbacks, name='view_feedbacks'),
 
 
 

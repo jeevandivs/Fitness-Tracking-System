@@ -118,7 +118,7 @@
                 foodNameError.textContent = 'Food name must contain only letters and spaces.';
                 return false;
             } else {
-                foodNameError.textContent = ''; // Clear error message
+                foodNameError.textContent = '';
                 return true;
             }
         }
@@ -131,20 +131,21 @@
                 foodTypeError.textContent = 'Food type must be either Vegetarian or Non-Vegetarian.';
                 return false;
             } else {
-                foodTypeError.textContent = ''; // Clear error message
+                foodTypeError.textContent = '';
                 return true;
             }
         }
 
-        function validateNutritionalDescriptions() {
-            const nutritionalDescriptions = document.getElementById('nutritional_descriptions');
-            const nutritionalDescriptionError = document.getElementById('nutritional_description_error');
+        function validateNumberField(fieldId, errorId, fieldName) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            const value = parseInt(field.value);
 
-            if (nutritionalDescriptions.selectedOptions.length === 0) {
-                nutritionalDescriptionError.textContent = 'At least one nutritional description must be selected.';
+            if (isNaN(value) || value < 1 || value > 99) {
+                error.textContent = fieldName + ' must be a number between 1 and 99.';
                 return false;
             } else {
-                nutritionalDescriptionError.textContent = ''; // Clear error message
+                error.textContent = '';
                 return true;
             }
         }
@@ -152,22 +153,22 @@
         function validateForm() {
             const isFoodNameValid = validateFoodName();
             const isFoodTypeValid = validateFoodType();
-            const isNutritionalDescriptionsValid = validateNutritionalDescriptions();
+            const isCaloriesValid = validateNumberField('calories', 'calories_error', 'Calories');
+            const isProteinsValid = validateNumberField('proteins', 'proteins_error', 'Proteins');
+            const isCarbsValid = validateNumberField('carbs', 'carbs_error', 'Carbs');
+            const isFatsValid = validateNumberField('fats', 'fats_error', 'Fats');
 
-            return isFoodNameValid && isFoodTypeValid && isNutritionalDescriptionsValid;
+            return isFoodNameValid && isFoodTypeValid && isCaloriesValid && isProteinsValid && isCarbsValid && isFatsValid;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Real-time validation
             document.getElementById('food_name').addEventListener('input', validateFoodName);
             document.getElementById('food_type').addEventListener('change', validateFoodType);
-            document.getElementById('nutritional_descriptions').addEventListener('change', validateNutritionalDescriptions);
         });
     </script>
 </head>
 <body>
     <div class="main-content">
- 
         <div class="content-container">
             <h1>Add Food</h1>
             <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
@@ -184,17 +185,21 @@
                 </select>
                 <div id="food_type_error" class="error"></div>
 
-                <label for="calories">Calories:</label>
-                <input type="number" id="calories" name="calories" placeholder="In 100 grams" required>
+                <label for="calories">Calories (Per 100 grams):</label>
+                <input type="number" id="calories" name="calories" min="1" max="99" required>
+                <div id="calories_error" class="error"></div>
 
-                <label for="proteins">Proteins:</label>
-                <input type="number" id="proteins" name="proteins" placeholder="In 100 grams" required>
+                <label for="proteins">Proteins (Per 100 grams):</label>
+                <input type="number" id="proteins" name="proteins" min="1" max="99" required>
+                <div id="proteins_error" class="error"></div>
 
-                <label for="carbs">Carbs:</label>
-                <input type="number" id="carbs" name="carbs" placeholder="In 100 grams" required>
+                <label for="carbs">Carbs (Per 100 grams):</label>
+                <input type="number" id="carbs" name="carbs" min="1" max="99" required>
+                <div id="carbs_error" class="error"></div>
 
-                <label for="fats">Fats:</label>
-                <input type="number" id="fats" name="fats" placeholder="In 100 grams" required>
+                <label for="fats">Fats (Per 100 grams):</label>
+                <input type="number" id="fats" name="fats" min="1" max="99" required>
+                <div id="fats_error" class="error"></div>
 
                 <label for="nutritional_descriptions">Select Nutritional Descriptions:</label>
                 <select id="nutritional_descriptions" name="nutritional_descriptions" multiple required>
@@ -202,7 +207,6 @@
                         <option value="{{ nutrition.nutrition_no }}">{{ nutrition.first_description }}</option>
                     {% endfor %}
                 </select>
-                <div id="nutritional_description_error" class="error"></div>
                 {% if error_message %}
                     <div class="error">{{ error_message }}</div>
                 {% endif %}

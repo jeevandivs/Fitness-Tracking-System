@@ -66,7 +66,7 @@
         }
         .diet_button{
             position: absolute; /* Positioning it absolutely */
-            top: 270px; /* Adjust distance from the top */
+            top: 290px; /* Adjust distance from the top */
             left: 369px; /* Adjust distance from the left */
             background-color: #007bff; /* Background color */
             color: white; /* Text color */
@@ -106,8 +106,8 @@
         {% else %}
         <br>
         <p>No nutrition plan has been provided yet</p>
+        <p>If You Have Already Selected Your Diet Preference, Please Wait Some Time To Get The Diet</p>
         <a href="{% url 'eating_habits' %}" class="diet_button">Please Select Your Diet Preferences</a> 
-
         {% endif %}
     </div>
 

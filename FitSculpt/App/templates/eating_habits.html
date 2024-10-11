@@ -72,9 +72,9 @@
 </head>
 <body>
     <div class="container">
-        <a href="{% url 'personal_nutrition' %}" class="schedule-button">Go Back</a>
 
         <h2 class="mb-4">Choose Your Interests in Diet</h2>
+        <center><p>Don't Forgot to Submit After Selecting the Diet Preferences</p></center>
         <form method="post">
             {% csrf_token %}
             <div class="card-container">
@@ -103,7 +103,7 @@
                 {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <center><button type="submit" class="btn btn-primary">Submit</button></center>
             <a href="{% url 'personal_nutrition' %}" class="schedule-button">Go Back</a>
         </form>
     </div>

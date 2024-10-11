@@ -58,17 +58,46 @@
             margin: 20px 10px;
             display: inline-block;
     }
+    .update{
+            background-color: #b35138;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        .update:hover{
+            background-color: #a04030;
+        }
 </style>
 <section class="section" id="nutrition">
     <div class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+        {% endif %}
         
         <h2>Personalized Nutrition Plan</h2>
         {% if plan.plan_name == 'Premium Plan' or plan.plan_name == 'Child Plan' %}
             <a href="{% url 'personal_nutrition' %}" class="day-button">Nutrition Guidance</a>
         {% endif %}
-
+        
+        {% if bmi %}
         <p><strong>BMI:</strong> {{ bmi|floatformat:2 }}</p>
         <p><strong>Nutrition Category:</strong> {{ nutrition_category }}</p>
+        {% endif %}
 
         {% if food_details %}
     <table>
@@ -96,7 +125,8 @@
         </tbody>
     </table>
 {% else %}
-    <p>No nutrition data available for this category.</p>
+    <p>No nutrition data available for this category. Kindly Update Your Profile Here</p>
+    <a href="{% url 'user_profile' %}" class="update">Update Profile</a> 
 {% endif %}
 
     </div>

@@ -125,8 +125,7 @@
                             <td>{{ detail.fm_name }}</td>
                             <td>
                                 <form method="get" action="{% url 'fm_nutrition_advice' detail.client_id %}">
-                                    <button type="submit" class="select-button" 
-                                        {% if detail.status == 1 %} disabled {% endif %}>
+                                    <button type="submit" class="select-button">
                                         Select
                                     </button>
                                 </form>

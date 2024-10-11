@@ -100,17 +100,37 @@
             font-size: 14px;
             color: #666;
         }
+        .search-bar{
+            margin-left: 460px;
+        }
     </style>
 </head>
 <body>
+    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
     <div class="main-content">
         <h1>Nutritions</h1>
         <div class="button-container">
             <a href="{% url 'see_all_food' %}"><button>See the Food Database</button></a>
             <a href="{% url 'add_food' %}"><button>Add Food</button></a>
-            <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
-            <a href="{% url 'nutrition_advice' %}"><button>Nutrition Advice</button></a>
+            <!-- <a href="{% url 'fm_nutritions2' %}"><button>See All the Nutritional Structure</button></a>
+            <a href="{% url 'nutrition_advice' %}"><button>Nutrition Advice</button></a> -->
         </div>
+        <form method="GET" action="{% url 'search_food' %}">
+            <div class="search-bar">
+                <input type="text" name="q" placeholder="Search by food name" required>
+                <button type="submit">Search</button>
+            </div>
+        </form>
+
+
 
         <div class="nutrition-card-container">
             {% for food in foods %}
