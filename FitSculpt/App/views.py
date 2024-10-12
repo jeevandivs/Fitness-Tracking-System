@@ -99,6 +99,35 @@ def update_inactive_payments(user_id):
 
     Payment.objects.filter(user_id=user_id, active=1, payment_date__lt=threshold_date).update(active=0)
 
+
+
+from django.utils import timezone
+from datetime import timedelta
+from .models import MentalFitness 
+
+def update_expired_mental_classes(user_id):
+    now = timezone.now()
+    print(now) 
+
+    threshold_time = now - timedelta(hours=1)
+
+    updated_counts = MentalFitness.objects.filter(client_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
+
+    return updated_counts  
+
+from django.utils import timezone
+from datetime import timedelta
+from .models import MentalFitness 
+
+def fm_update_expired_mental_classes(user_id):
+    now = timezone.now() 
+
+    threshold_time = now - timedelta(hours=1)
+
+    updated_counts = MentalFitness.objects.filter(fm_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
+
+    return updated_counts 
+
 from django.utils import timezone
 from datetime import timedelta
 from .models import ClientFM 
@@ -125,31 +154,6 @@ def fm_update_expired_classes(user_id):
 
     return updated_count  
 
-from django.utils import timezone
-from datetime import timedelta
-from .models import ClientFM 
-
-def update_expired_mental_classes(user_id):
-    now = timezone.now() 
-
-    threshold_time = now - timedelta(hours=1)
-
-    updated_count = MentalFitness.objects.filter(client_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
-
-    return updated_count  
-
-from django.utils import timezone
-from datetime import timedelta
-from .models import ClientFM 
-
-def fm_update_expired_mental_classes(user_id):
-    now = timezone.now() 
-
-    threshold_time = now - timedelta(hours=1)
-
-    updated_count = MentalFitness.objects.filter(fm_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
-
-    return updated_count 
 
 def login_view(request):
     if request.method == 'POST':
@@ -1386,7 +1390,7 @@ def personal_workout_view(request):
 
     if not selected_trainer:
         messages.error(request, "You have not selected a trainer yet. Please select a trainer to continue.")
-        return redirect('personal_workout')
+        return redirect('select_trainer')
     
     context = {
         'trainer_selected': selected_trainer
@@ -1434,7 +1438,9 @@ def select_trainer_view(request):
             selected_trainer.fm_id = trainer_id
             selected_trainer.timing = selected_time
             selected_trainer.client_name = client.name  # Ensure this field is updated
-            selected_trainer.fm_name = fitness_manager.name  # Ensure this field is updated
+            selected_trainer.fm_name = fitness_manager.name
+            selected_trainer.status=0
+              # Ensure this field is updated
             selected_trainer.save()
         else:
             ClientFM.objects.create(
@@ -1442,7 +1448,9 @@ def select_trainer_view(request):
                 fm_id=trainer_id,
                 timing=selected_time,
                 client_name=client.name, 
-                fm_name=fitness_manager.name    
+                fm_name=fitness_manager.name,    
+                status=0,
+                class_time=datetime.now()
             )
         messages.success(request, 'Selected Trainer successfully')
 
@@ -1589,9 +1597,11 @@ def view_client_details(request, client_id):
     
     # Retrieve the client based on the provided client_id
     client = get_object_or_404(Client, user_id=client_id)
+    goals = Goal.objects.filter(user_id=client_id)
 
     context = {
         'client': client,
+        'goals': goals,
     }
     return render(request, 'view_client_details.html', context)
 
@@ -2371,3 +2381,64 @@ def mental_client_details(request, client_id):
         'client': client,
     }
     return render(request, 'mental_client_details.html', context)
+
+
+
+from django.shortcuts import render, redirect
+from .models import Goal
+from django.utils import timezone
+from django.contrib import messages
+
+from datetime import date
+
+@custom_login_required
+def goal(request):
+    user_id = request.session.get('user_id')
+    goal = Goal.objects.filter(user_id=user_id).first()
+
+    if goal and goal.end_date:
+        today = date.today()
+        remaining_days = (goal.end_date - today).days
+    else:
+        remaining_days = None
+
+    return render(request, 'goal.html', {'goal': goal, 'remaining_days': remaining_days})
+
+
+@custom_login_required
+def set_goal(request):
+    if request.method == 'POST':
+        user_id = request.session.get('user_id')
+        Goal.objects.create(
+            target_type=request.POST['target_type'],
+            starting_value=request.POST['starting_value'],
+            target_value=request.POST['target_value'],
+            current_value=request.POST['starting_value'],  # Initially set current_value to starting_value
+            user_id=user_id,
+            no_of_days=request.POST['no_of_days'],
+            description=request.POST['description'],
+            start_date=request.POST['start_date'],
+            end_date=timezone.now() + timezone.timedelta(days=int(request.POST['no_of_days']))
+        )
+        messages.success(request, 'Goal set successfully.')
+    return redirect('goal')
+
+@custom_login_required
+def update_goal(request, goal_id):
+    if request.method == 'POST':
+        goal = Goal.objects.get(id=goal_id)
+        goal.current_value = request.POST['current_value']
+        goal.target_value = request.POST['target_value']
+        goal.no_of_days = request.POST['no_of_days']
+
+        goal.save()
+        messages.success(request, 'Goal updated successfully.')
+    return redirect('goal')
+
+
+@custom_login_required
+def delete_goal(request, goal_id):
+    goal = Goal.objects.get(id=goal_id)
+    goal.delete()
+    messages.success(request, 'Goal deleted successfully.')
+    return redirect('goal')

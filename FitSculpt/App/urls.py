@@ -32,6 +32,10 @@ urlpatterns = [
     path('share_thoughts/', views.share_thoughts_view, name='share_thoughts'),
     path('select_mha/', views.select_mha_view, name='select_mha'),
     path('view_scheduled_class_mha/', views.view_scheduled_class_mha, name='view_scheduled_class_mha'),
+    path('goal/', views.goal, name='goal'),
+    path('set_goal/', views.set_goal, name='set_goal'),
+    path('update_goal/<int:goal_id>/', views.update_goal, name='update_goal'),
+    path('delete_goal/<int:goal_id>/', views.delete_goal, name='delete_goal'),
 
 
 

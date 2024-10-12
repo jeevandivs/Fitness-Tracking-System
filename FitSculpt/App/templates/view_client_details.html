@@ -76,7 +76,26 @@
             <p><strong>Weight:</strong> {{ client.weight }}</p>
             <p><strong>Food Type:</strong> {{ client.food_type }}</p>
 
-            <a href="{% url 'set_live_mental_session' %}" class="back">Back to Session Details</a>
+            <a href="{% url 'set_live_session' %}" class="back">Back to Session Details</a>
+            <div class="goal-list">
+                <h2>Goals</h2>
+                {% if goals %}
+                    {% for goal in goals %}
+                        <div class="goal-item">
+                            <h3>Goal  - {{ goal.target_type }}</h3>
+                            <p><strong>Start Value:</strong> {{ goal.starting_value }}</p>
+                            <p><strong>Target Value:</strong> {{ goal.target_value }}</p>
+                            <p><strong>Current Value:</strong> {{ goal.current_value }}</p>
+                            <p><strong>Number of Days:</strong> {{ goal.no_of_days }}</p>
+                            <p><strong>Start Date:</strong> {{ goal.start_date }}</p>
+                            <p><strong>End Date:</strong> {{ goal.end_date }}</p>
+                            <p><strong>Description:</strong> {{ goal.description }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No goals set for this client.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 

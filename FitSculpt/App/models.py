@@ -276,3 +276,22 @@ class MentalFitness(models.Model):
 
     def __str__(self):
         return self.id
+    
+class Goal(models.Model):
+    id = models.AutoField(primary_key=True)
+    target_type=models.CharField(max_length=50)
+    starting_value=models.IntegerField()
+    target_value=models.IntegerField()
+    current_value=models.IntegerField()
+    user_id=models.IntegerField()
+    no_of_days=models.IntegerField()
+    start_date=models.DateField()
+    end_date=models.DateField()
+    description=models.CharField(max_length=500)
+
+    class Meta:
+        managed=False
+        db_table='tbl_goal'
+
+    def __str__(self):
+        return self.id
