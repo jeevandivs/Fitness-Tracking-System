@@ -1,0 +1,94 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 100px auto 50px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        color: #b35138;
+        margin-bottom: 15px;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    a {
+        color: #b35138;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #9f2c1d;
+    }
+
+    .no-class {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #777;
+        margin-top: 30px;
+    }
+    .goback {
+            position: absolute; /* Positioning it absolutely */
+            top: 90px; /* Adjust distance from the top */
+            left: 20px; /* Adjust distance from the left */
+            background-color: #9f2c1d; /* Background color */
+            color: white; /* Text color */
+            padding-top: 20px;
+            padding: 10px ; /* Padding for the button */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* Remove underline */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+        .goback:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+</style>
+
+<div class="container">
+    <h2>Your Scheduled Class</h2>
+
+    {% if client_schedule.session_link %}
+        <div class="card">
+            <h3>Mental Health Advisor: {{ client_schedule.fm_name }}</h3>
+            <p><strong>Class Link:</strong> <a href="{{ client_schedule.session_link }}" target="_blank">Join Class</a></p>
+            <p><strong>Scheduled Time And Date: </strong> {{ client_schedule.class_time }} <br><br><strong>Session is For One Hour</strong></p>
+        </div>
+    {% else %}
+        <p class="no-class">No Session has been scheduled for you yet.</p>
+    {% endif %}
+    <a href="{% url 'mental_fitness' %}" class="goback">Go Back</a>
+
+</div> 
+
+{% endblock %}

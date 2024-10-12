@@ -68,15 +68,63 @@
         .schedule-button:hover {
             background-color: #0056b3; /* Darker shade on hover */
         }
+        .btn-group {
+    display: flex; /* Use flexbox for button group layout */
+    justify-content: center; /* Center the buttons */
+    margin: 20px 0; /* Space around the button group */
+}
+
+.btn-secondary {
+    background-color: #c57116; /* Default button color */
+    text-decoration: none;
+    border: none; /* Remove border */
+    color: white; /* Text color */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin: 0 5px; /* Space between buttons */
+    transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.btn-secondary:hover {
+    background-color: #c57116; /* Darker shade on hover */
+}
+
+.btn-primary {
+    background-color: #c57116; /* Primary button color */
+    border: none; /* Remove border */
+    color: white; /* Text color for button */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-top: 10px; /* Margin on top */
+}
+
+.btn-primary:hover {
+    background-color: #c57116; /* Darker shade on hover */
+}
+
     </style>
 </head>
 <body>
     <div class="container">
-
         <h2 class="mb-4">Choose Your Interests in Diet</h2>
         <center><p>Don't Forgot to Submit After Selecting the Diet Preferences</p></center>
+        <center><p>Click On the button to show the diets</p></center>
+    
+        <!-- Intake Time Filter -->
+        <div class="btn-group" role="group" aria-label="Intake Time">
+            <a href="?intake=1" class="btn btn-secondary">Breakfast</a>
+            <a href="?intake=2" class="btn btn-secondary">Lunch</a>
+            <a href="?intake=3" class="btn btn-secondary">Snack</a>
+            <a href="?intake=4" class="btn btn-secondary">Dinner</a>
+        </div>
+    
         <form method="post">
             {% csrf_token %}
+            
+            <input type="hidden" name="intake_no" value="{{ intake_no }}"> <!-- Include intake_no in the form -->
+        
             <div class="card-container">
                 {% if user_food_type == 'veg' %}
                     {% for habit in veg_habits %}
@@ -84,8 +132,8 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ habit.habit }}</h5>
                             <p class="card-text">Vegetarian</p>
-                            <input type="checkbox" name="selected_habits" value="{{ habit.habit_no }}" 
-                            {% if habit.habit_no in existing_habits %} checked{% endif %}> Select
+                            <!-- Do not retain the 'checked' state after form submission -->
+                            <input type="checkbox" name="selected_habits" value="{{ habit.habit_no }}"> Select
                         </div>
                     </div>
                     {% endfor %}
@@ -95,19 +143,19 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ habit.habit }}</h5>
                             <p class="card-text">Non-Vegetarian</p>
-                            <input type="checkbox" name="selected_habits" value="{{ habit.habit_no }}" 
-                            {% if habit.habit_no in existing_habits %} checked{% endif %}> Select
+                            <!-- Do not retain the 'checked' state after form submission -->
+                            <input type="checkbox" name="selected_habits" value="{{ habit.habit_no }}"> Select
                         </div>
                     </div>
                     {% endfor %}
                 {% endif %}
             </div>
-
+        
             <center><button type="submit" class="btn btn-primary">Submit</button></center>
-            <a href="{% url 'personal_nutrition' %}" class="schedule-button">Go Back</a>
         </form>
+        
+        
     </div>
-
     <footer>
         <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
     </footer>

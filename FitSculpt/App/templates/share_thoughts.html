@@ -1,0 +1,98 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Thoughts</title>
+    <style>
+        .content-wrapper {
+            padding: 40px 20px;
+            margin-top: 100px;
+            background-color: #ffffff;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .submit-button {
+            background-color: #b35138;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #9f2c1d;
+        }
+
+        /* Styling for the reply box */
+        .reply-box {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: left;
+        }
+
+        .reply-box p {
+            color: #555;
+            font-style: italic;
+        }
+
+        .reply-box h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="content-wrapper">
+    <h1>Share Your Thoughts</h1>
+    {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" id="current_mood" name="current_mood" placeholder="Describe your mood here...">
+        <button type="submit" class="submit-button">Submit</button>
+    </form>
+
+    {% if mha_selected and mha_selected.distribution %}
+    <div class="reply-box">
+        <h2>Your Mental Health Advisor's Reply:</h2>
+        <p>{{ mha_selected.distribution }}</p>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,300 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Live Session for Mental Fitness</title>
+    <style>
+        /* General container styling */
+        .main-content {
+            display: flex;
+        }
+
+        .container {
+            margin-left: 250px; /* Adjust according to sidebar width */
+            padding: 80px;
+            margin-top: -60px;
+            background-color: #f9f9f9;
+            max-width: 1200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            flex-grow: 1;
+        }
+
+        /* Page title styling */
+        .page-title {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Styling for the messages */
+        .message-container {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive table styling */
+        .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em; /* Smaller font size for the table */
+        text-align: left;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Button styling for "Reply to Thoughts" */
+    .btn.reply-to-thoughts {
+        padding: 8px 12px; /* Adjust padding */
+        background-color: #007BFF; /* Bootstrap primary color */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        font-size: 0.9em; /* Smaller font size */
+        transition: background-color 0.3s; /* Smooth transition */
+    }
+
+    .btn.reply-to-thoughts:hover {
+        background-color: #0056b3; /* Darker shade on hover */
+    }
+
+
+        .styled-table th, .styled-table td {
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+
+        .styled-table th {
+            background-color: #333;
+            color: white;
+        }
+
+        .styled-table tbody tr {
+            background-color: #f3f3f3;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Form styling inside the table */
+        input[type="text"], input[type="datetime-local"] {
+            width: 90%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Button styling */
+        .btn {
+            padding: 10px 15px;
+            background-color: #af654c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Styling for the reply to thoughts button */
+        .reply-btn {
+            padding: 10px 15px;
+            background-color: #d4823f; /* Blue background */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center; /* Center the text */
+            display: inline-block; /* Align properly */
+            text-decoration: none; /* Remove underline */
+        }
+
+        .reply-btn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Table form alignment */
+        td form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        td form input, td form button {
+            margin-bottom: 10px;
+        }
+
+        /* Adjust columns on smaller screens */
+        @media (max-width: 768px) {
+            .styled-table thead {
+                display: none;
+            }
+
+            .styled-table tr {
+                display: block;
+                margin-bottom: 15px;
+            }
+
+            .styled-table td {
+                display: block;
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+            .styled-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 15px;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fffcfc;
+            color: white;
+        }
+
+        .schedule-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-top: -20px;
+        }
+
+        .schedule-button:hover {
+            background-color: #45a049;
+        }
+
+        .client_details {
+            display: inline-block;
+            padding: 5px;
+            background-color: #ba733a;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: small;
+        }
+
+        .client_details:hover {
+            background-color: #9a552a;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <h1 class="page-title">Set Live Session For Mental Fitness {{ fitness_manager.fm_name }}</h1>
+
+            {% if messages %}
+                <div class="message-container">
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                                {{ message }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <a href="{% url 'join_mental_session' %}" class="schedule-button">Join Live Sessions</a>
+
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Class Timing (Mon to Sat) Client Preferred</th>
+                        <th>Class Time</th>
+                        <th>New Class Link and Time</th>
+                        <th>Class Status</th>
+                        <th>Current Mood</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td data-label="Client Name">{{ client.client_name }}
+                            <a href="{% url 'mental_client_details' client.client_id %}" class="client_details">View Details</a>
+                        </td>
+                        <td data-label="Class Timing">{{ client.timing }}</td>
+                        <td data-label="Class Time">{% if client.class_time %}{{ client.class_time }}{% else %}Not Set{% endif %}</td>
+                        <td data-label="New Class Link and Time">
+                            <form method="POST" action="{% url 'set_live_mental_session' %}">
+                                {% csrf_token %}
+                                <input type="text" name="class_link" placeholder="Enter new class link" required>
+                                <input type="hidden" name="client_id" value="{{ client.client_id }}">
+                                <input type="datetime-local" name="class_time" required>
+                                <button type="submit" class="btn">Update Link</button>
+                            </form>
+                        </td>
+                        <td data-label="Status">{% if client.status %} Updated {% else %}Not Set{% endif %}</td>
+                        <td data-label="Current Mood">
+                            <a href="{% url 'message_for_thoughts' client.client_id %}" class="btn reply-to-thoughts">Click here</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No clients found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+
+{% endblock %}

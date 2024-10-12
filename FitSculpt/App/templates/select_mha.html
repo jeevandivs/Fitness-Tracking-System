@@ -1,0 +1,145 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Mental Health Advisor</title>
+    <style>
+        /* Add your CSS styling here */
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 80px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .mha-info {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none; /* Hide initially */
+        }
+        .timing-dropdown {
+            display: none; /* Hide initially */
+        }
+        .submit-button {
+            background-color: #b35138;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Hide initially */
+        }
+        .submit-button:hover {
+            background-color: #9f2c1d;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fffcfc;
+            color: white;
+        }
+    </style>
+    <script>
+        function showmhaDetails() {
+            var select = document.getElementById('mhaSelect');
+            var mhaInfo = document.getElementById('mhaInfo');
+            var timingDropdown = document.getElementById('timingDropdown');
+            var submitButton = document.getElementById('submitButton');
+            
+            // Clear previous details
+            mhaInfo.innerHTML = '';
+            submitButton.style.display = 'none';
+            timingDropdown.style.display = 'none'; // Hide timing dropdown initially
+
+            // Get the selected trainer's data
+            var selectedIndex = select.selectedIndex;
+            if (selectedIndex > 0) {
+                var selectedmha = select.options[selectedIndex];
+
+                // Show trainer details
+                var mhaName = selectedmha.getAttribute('data-name');
+                var mhaDesignation = selectedmha.getAttribute('data-designation');
+                var mhaAvailableTimes = selectedmha.getAttribute('data-available-times').split(", ");
+
+                mhaInfo.innerHTML = `
+                    <strong>Name:</strong> ${mhaName} <br>
+                    <strong>Designation:</strong> ${mhaDesignation} <br>
+                    <strong>Available Times:</strong> ${mhaAvailableTimes.join(", ")}`;
+                mhaInfo.style.display = 'block';
+
+                // Populate timing dropdown
+                var timingSelect = document.getElementById('timing');
+                timingSelect.innerHTML = '<option value="">Select a Timing</option>'; // Reset options
+                for (var i = 0; i < mhaAvailableTimes.length; i++) {
+                    timingSelect.innerHTML += `<option value="${mhaAvailableTimes[i]}">${mhaAvailableTimes[i]}</option>`;
+                }
+
+                // Show timing dropdown
+                timingDropdown.style.display = 'block';
+                submitButton.style.display = 'inline-block'; // Show the select button
+            } else {
+                mhaInfo.style.display = 'none'; // Hide if no trainer is selected
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Select Mental Health Advisor</h1>
+    {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label for="mhaSelect">Choose a Mental Health Advisor :</label>
+        <select id="mhaSelect" name="mha_id" onchange="showmhaDetails()" required>
+            <option value="">Select a Mental Health Advisor</option>
+            {% for mha in mha_with_details %}
+                <option value="{{ mha.mha.user_id }}" 
+                        data-name="{{ mha.mha.name }}"
+                        data-designation="{{ mha.designation }}"
+                        data-available-times="{{ mha.available_times|join:', ' }}">
+                    {{ mha.mha.name }} - {{ mha.designation }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div class="mha-info" id="mhaInfo"></div>
+
+        <div class="timing-dropdown" id="timingDropdown">
+            <label for="timing">Select Timing: Training is For One Hour from Monday To Saturday</label>
+            <select id="timing" name="timing" required>
+                <option value="">Select a Timing</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitButton" class="submit-button">Select Mental Fitness Advisor</button>
+    </form>
+</div>
+
+</body>
+</html>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+{% endblock %}

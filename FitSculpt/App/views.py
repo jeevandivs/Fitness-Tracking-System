@@ -125,6 +125,32 @@ def fm_update_expired_classes(user_id):
 
     return updated_count  
 
+from django.utils import timezone
+from datetime import timedelta
+from .models import ClientFM 
+
+def update_expired_mental_classes(user_id):
+    now = timezone.now() 
+
+    threshold_time = now - timedelta(hours=1)
+
+    updated_count = MentalFitness.objects.filter(client_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
+
+    return updated_count  
+
+from django.utils import timezone
+from datetime import timedelta
+from .models import ClientFM 
+
+def fm_update_expired_mental_classes(user_id):
+    now = timezone.now() 
+
+    threshold_time = now - timedelta(hours=1)
+
+    updated_count = MentalFitness.objects.filter(fm_id=user_id,class_time__lt=threshold_time, status=1).update(status=0)
+
+    return updated_count 
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -138,7 +164,7 @@ def login_view(request):
                     print(user.age)
                     update_inactive_payments(user.user_id)
                     update_expired_classes(user.user_id)
-
+                    update_expired_mental_classes(user.user_id)
                     return redirect('user_home')  
                 else:
                     messages.error(request, 'Invalid username or password.')
@@ -531,7 +557,8 @@ def fm_login_view(request):
                 if user.password == password:  
                     request.session['fm_user_id'] = user.user_id 
                     request.session['username'] = user.username 
-                    fm_update_expired_classes(user.user_id) 
+                    fm_update_expired_classes(user.user_id)
+                    fm_update_expired_mental_classes(user.user_id) 
                     return redirect('fm_home')  
                 
                 else:
@@ -1927,50 +1954,60 @@ def eating_habits_view(request):
     user = Client.objects.get(user_id=client_id)
 
     user_food_type = user.food_type
-    print(user_food_type) 
-
-    # Fetch unique eating habits based on food type using distinct
-    veg_habits = EatingHabit.objects.filter(food_type='Vegetarian').values('habit', 'habit_no').distinct()
-    non_veg_habits = EatingHabit.objects.filter(food_type='Non-Vegetarian').values('habit', 'habit_no').distinct()
 
     # Get fm_id associated with the user
     fm_relation = ClientFM2.objects.filter(client_id=client_id).first()
     fm_id = fm_relation.fm_id if fm_relation else None
-    print(fm_id)
+
     existing_habits = EatingHabit2.objects.filter(client_id=client_id).values_list('habit_no', flat=True)
+
+    intake_no = request.GET.get('intake', 0)
+
+    veg_habits = EatingHabit.objects.filter(food_type='Vegetarian', intake_no=intake_no).values('habit', 'habit_no','intake_no').distinct()
+    non_veg_habits = EatingHabit.objects.filter(food_type='Non-Vegetarian', intake_no=intake_no).values('habit', 'habit_no','intake_no').distinct()
 
     context = {
         'veg_habits': veg_habits,
         'non_veg_habits': non_veg_habits,
         'user_food_type': user_food_type,
         'fm_id': fm_id,
-        'existing_habits': existing_habits  # Send existing habits to the template
+        'existing_habits': existing_habits,
+        'intake_no': intake_no,  # Pass the intake_no to the template for current filter
     }
 
     if request.method == 'POST':
         selected_habits = request.POST.getlist('selected_habits')
+        intake_no = request.POST.get('intake_no')
 
         selected_habits = [habit for habit in selected_habits if habit]
 
         for habit_no in selected_habits:
-            if habit_no not in existing_habits:
-                EatingHabit2.objects.create(client_id=client_id, fm_id=fm_id, habit_no=habit_no,status=0)
-        
+            existing_record = EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, intake_no=intake_no, habit_no=habit_no).first()
 
-        deselected_habits = [habit for habit in existing_habits if habit not in selected_habits]
-        for habit_no in deselected_habits:
-            EatingHabit2.objects.filter(client_id=client_id, habit_no=habit_no).delete()
-        messages.success(request, 'Selected the Preferences successfully')
-        return redirect('personal_nutrition') 
-  # Redirect after processing
+            if existing_record:
+                existing_record.status = 0  # Update other fields as necessary
+                existing_record.save()
+            else:
+                # If it doesn't exist, insert a new record
+                EatingHabit2.objects.create(client_id=client_id, fm_id=fm_id, habit_no=habit_no, intake_no=intake_no, status=0)
+
+        messages.success(request, 'Preferences updated successfully.')
+        return redirect('personal_nutrition')
 
     return render(request, 'eating_habits.html', context)
+
+
+
+
 
 
 
 @custom_login_required
 def track_foods_view(request):
     client_id = request.session.get('user_id')  # Get the logged-in client ID
+
+    # Get intake_no from GET parameters (default to None if not provided)
+    intake_no = request.GET.get('intake_no')
 
     # Fetch all EatingHabit2 records with status=1 for the logged-in client
     eating_habits = EatingHabit2.objects.filter(client_id=client_id, status=1)
@@ -1981,39 +2018,52 @@ def track_foods_view(request):
     # Fetch food items from EatingHabit based on habit_no
     food_details = EatingHabit.objects.filter(habit_no__in=habit_nos)
 
+    # If intake_no is specified, filter food_details based on it
+    if intake_no:
+        food_details = food_details.filter(intake_no=intake_no)
+
     return render(request, 'track_foods.html', {'food_details': food_details})
-
-
 
 
 
 from django.shortcuts import render, redirect
 from .models import EatingHabit2, EatingHabit
+from django.db.models import Q, OuterRef, Subquery
 
 @fm_custom_login_required
 def fm_nutrition_advice(request, client_id):
     fm_id = request.session.get('fm_user_id')
 
-    # Get the habit numbers for the client
     eating_habits = EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, status=0)
-    client=Client.objects.get(user_id=client_id)
-    print(client.email)
-    # Fetch the food habits based on habit_no
+    provided=EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, status=1)
+    client = Client.objects.get(user_id=client_id)
+    
     habit_nos = [habit.habit_no for habit in eating_habits]
     food_habits = EatingHabit.objects.filter(habit_no__in=habit_nos)
+    provided_habits=EatingHabit.objects.filter(habit_no__in=habit_nos)
+
+    intake_no = request.GET.get('intake_no')
+    
+    if intake_no:
+        food_habits = food_habits.filter(intake_no=intake_no)
+        provided_habits=provided_habits.filter(intake_no=intake_no)
 
     if request.method == 'POST':
-        # Mark the EatingHabit2 records as status=1 (Advice provided)
         EatingHabit2.objects.filter(client_id=client_id, fm_id=fm_id, status=0).update(status=1)
-        # Redirect to a success page or back to the nutrition advice page
         messages.success(request, 'Provided the Nutrition successfully')
-        return redirect('nutrition_advice')  # Redirect to the list of clients
+        return redirect('nutrition_advice')  
 
     return render(request, 'fm_nutrition_advice.html', {
         'client_id': client_id,
         'food_habits': food_habits,
-        'client':client,
+        'client': client,
+        'intake_no': intake_no,  
+        'provided_habits':provided_habits
     })
+
+
+
+
 
 @admin_custom_login_required
 def view_feedbacks(request):
@@ -2053,3 +2103,271 @@ def feedback(request):
             messages.error(request, "Please provide both feedback content and a star rating.")
     
     return render(request, 'feedback.html')
+
+
+@custom_login_required
+def mental_fitness(request):
+    user_id=request.session.get('user_id')
+    client_id = user_id  
+    selected_mha = MentalFitness.objects.filter(client_id=client_id).first()
+
+    if not selected_mha:
+        messages.error(request, "You have not selected a Mental Helth Advisor yet. Please select to continue.")
+        return redirect('select_mha')
+    
+    context = {
+        'mha_selected': selected_mha
+    }
+    return render(request,'mental_fitness.html',context)
+
+@custom_login_required
+def share_thoughts_view(request):
+    user_id = request.session.get('user_id')  
+    client_id = user_id  
+
+    if request.method == 'POST':
+        current_mood = request.POST.get('current_mood')
+        
+        if current_mood:
+            selected_mha = MentalFitness.objects.filter(client_id=client_id).first()
+
+            if selected_mha:
+                selected_mha.current_mood = current_mood
+                selected_mha.save()
+
+                messages.success(request, 'Your current mood has been updated.')
+                return redirect('share_thoughts')  # Stay on the same page to display the reply
+
+    mha_selected = MentalFitness.objects.filter(client_id=client_id).first()
+
+    return render(request, 'share_thoughts.html', {
+        'mha_selected': mha_selected 
+    })
+
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import MentalFitness
+@fm_custom_login_required
+def message_for_thoughts(request, client_id):
+    client = get_object_or_404(MentalFitness, client_id=client_id)
+    if request.method == 'POST':
+        reply = request.POST.get('reply')
+        client.distribution = reply
+        client.save()
+        messages.success(request, 'Your You have replied.')
+        return render(request, 'message_for_thoughts.html', {'client': client, 'success': True})
+    
+    return render(request, 'message_for_thoughts.html', {'client': client})
+
+
+
+from django.shortcuts import render
+from .models import FitnessManager, MentalFitness, Designations
+from django.db.models import Q
+
+@custom_login_required
+def select_mha_view(request):
+    user_id = request.session.get('user_id')
+    if user_id is None:
+        messages.error(request, "User not logged in.")
+        return redirect('login')  # Redirect to your login page
+
+    client_id = user_id  
+
+    try:
+        client = Client.objects.get(user_id=client_id)
+    except Client.DoesNotExist:
+        messages.error(request, "Client not found.")
+        return redirect('login')  # Redirect to an appropriate error page
+
+    if request.method == 'POST':
+        mha_id = request.POST.get('mha_id')
+        selected_time = request.POST.get('timing')
+
+        if not selected_time:
+            messages.error(request, "Timing cannot be empty.")
+            return redirect('select_mha')
+
+        # Update or create a new ClientFM record
+        selected_mha = MentalFitness.objects.filter(client_id=client_id).first()
+
+        try:
+            fitness_manager = FitnessManager.objects.get(user_id=mha_id)
+        except FitnessManager.DoesNotExist:
+            messages.error(request, "Selected Mental health Advisor does not exist.")
+            return redirect('select_mha')
+
+        if selected_mha:
+            selected_mha.fm_id = mha_id
+            selected_mha.timing = selected_time
+            selected_mha.client_name = client.name  # Ensure this field is updated
+            selected_mha.fm_name = fitness_manager.name
+            selected_mha.status = 0  # Ensure this field is updated
+            selected_mha.save()
+        else:
+            MentalFitness.objects.create(
+                client_id=client_id,
+                fm_id=mha_id,
+                timing=selected_time,
+                client_name=client.name, 
+                fm_name=fitness_manager.name,
+                class_time=datetime.now(),
+                status=0
+            )
+        messages.success(request, 'Selected Mental health Advisor successfully')
+
+        return redirect('mental_fitness')
+
+    # Get fitness managers with designation_id = 2 or 5 and status = 1
+    fitness_managers = FitnessManager.objects.filter(
+        Q(designation_id=4) | 
+        Q(designation_id=4),
+        status=1
+    )
+
+    # Fetch the designations with id 2 and 5
+    designations = Designations.objects.filter(designation_id__in=[4, 4])
+    designation_map = {designation.designation_id: designation.designation for designation in designations}
+
+    qualifications = Qualifications.objects.filter(qualification_id__in=[4, 4])
+    qualification_map = {qualification.qualification_id: qualification.qualification for qualification in qualifications}
+
+    predefined_times = ['4 AM', '5AM', '9 AM', '8 PM', '9 PM', '10 PM'] 
+    
+    # Determine assigned times for trainers
+    mha_with_details = []
+    for mha in fitness_managers:
+        assigned_sessions = MentalFitness.objects.filter(fm_id=mha.user_id).values_list('timing', flat=True)
+        assigned_times = set(assigned_sessions)  # Convert to set for efficient lookup
+
+        # Filter available times
+        available_times = [time for time in predefined_times if time not in assigned_times]
+
+        mha_with_details.append({
+            'mha': mha,
+            'available_times': available_times,  # Pass available times to the template
+            'designation': designation_map.get(mha.designation_id, 'Unknown') ,
+             'qualification': qualification_map.get(mha.qualification_id, 'Unknown') 
+              # Fetch corresponding designation name
+        })
+
+    context = {
+        'mha_with_details': mha_with_details,
+    }
+    return render(request, 'select_mha.html', context)
+
+
+@custom_login_required 
+def view_scheduled_class_mha(request):
+    user_id = request.session.get('user_id')
+
+    client_schedule = MentalFitness.objects.filter(client_id=user_id,status=1).first()
+
+    if client_schedule:
+        context = {
+            'client_schedule': client_schedule,
+        }
+        return render(request, 'view_scheduled_class_mha.html', context)
+    else:
+        return render(request, 'view_scheduled_class_mha.html', {'client_schedule': None})
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import MentalFitness, FitnessManager, Client
+
+@fm_custom_login_required
+def set_live_mental_session_view(request):
+    user_id = request.session.get('fm_user_id')
+    clients = Client.objects.all()
+
+    if not user_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+
+    try:
+        fitness_manager = FitnessManager.objects.get(user_id=user_id)
+    except FitnessManager.DoesNotExist:
+        messages.error(request, "Fitness Manager does not exist. Please contact support.")
+        return redirect('set_live_mental_session')
+
+    if request.method == 'POST':
+        class_link = request.POST.get('class_link')
+        selected_client_id = request.POST.get('client_id')
+        class_time_str = request.POST.get('class_time')
+        if class_time_str:
+            try:
+                class_time_naive = datetime.strptime(class_time_str, '%Y-%m-%dT%H:%M')
+
+                class_time = timezone.make_aware(class_time_naive, timezone.get_current_timezone())
+
+                if class_time < timezone.now():
+                    messages.error(request, "Class time cannot be set in the past. Please select a future date and time.")
+                    return redirect('set_live_mental_session_view')
+            except ValueError:
+                messages.error(request, "Invalid date and time format. Please select a valid date and time.")
+                return redirect('set_live_mental_session')
+        else:
+            messages.error(request, "Class time is required.")
+            return redirect('set_live_mental_session')
+        try:
+            mentalfitness = MentalFitness.objects.get(client_id=selected_client_id, fm_id=fitness_manager.user_id)
+            mentalfitness.session_link = class_link
+            mentalfitness.class_time = class_time
+            mentalfitness.status=1
+            mentalfitness.save()
+            messages.success(request, "Class link updated successfully.")
+        except MentalFitness.DoesNotExist:
+            messages.error(request, "Client not found or not assigned to you.")
+        except ValueError:
+            messages.error(request, "Invalid class time format.")
+        
+        return redirect('set_live_mental_session')
+
+    # Get ClientFM entries for this fitness manager
+    clients = MentalFitness.objects.filter(fm_id=fitness_manager.user_id)
+
+    if not clients.exists():
+        messages.info(request, "No clients have selected you as their fitness manager.")
+
+    context = {
+        'fitness_manager': fitness_manager,
+        'clients': clients,
+    }
+    return render(request, 'set_live_mental_session.html', context)
+
+@fm_custom_login_required
+def join_mental_session(request):
+    fm_id = request.session.get('fm_user_id')
+
+    if not fm_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+
+    active_sessions = MentalFitness.objects.filter(fm_id=fm_id, status=1)
+
+    context = {
+        'active_sessions': active_sessions,
+    }
+
+    return render(request, 'join_mental_session.html', context)
+
+
+from django.shortcuts import render, get_object_or_404
+
+
+@fm_custom_login_required
+def mental_client_details(request, client_id):
+    user_id = request.session.get('fm_user_id')
+    
+    if not user_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+    
+    # Retrieve the client based on the provided client_id
+    client = get_object_or_404(Client, user_id=client_id)
+
+    context = {
+        'client': client,
+    }
+    return render(request, 'mental_client_details.html', context)

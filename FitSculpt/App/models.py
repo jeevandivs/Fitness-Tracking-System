@@ -83,7 +83,7 @@ class FitnessManager(models.Model):
 class Qualifications(models.Model):
     qualification_id=models.AutoField(primary_key=True)
     qualification=models.CharField(max_length=50)
-    certification=models.CharField(max_length=50)
+    certification=models.CharField(max_length=100)
     class Meta:
         managed = False
         db_table = 'tbl_qualifications'
@@ -253,6 +253,26 @@ class Feedback(models.Model):
     class Meta:
         managed=False
         db_table='tbl_feedback'
+
+    def __str__(self):
+        return self.id
+    
+class MentalFitness(models.Model):
+    id = models.AutoField(primary_key=True)
+    client_id=models.IntegerField()
+    fm_id=models.IntegerField()
+    client_name=models.CharField(max_length=50)
+    fm_name=models.CharField(max_length=50)
+    current_mood=models.CharField(max_length=1000)
+    distribution=models.CharField(max_length=1000)
+    session_link=models.CharField(max_length=500)
+    timing=models.CharField(max_length=50)
+    class_time=models.DateTimeField()
+    status=models.IntegerField()
+    
+    class Meta:
+        managed=False
+        db_table='tbl_mental_fitness'
 
     def __str__(self):
         return self.id

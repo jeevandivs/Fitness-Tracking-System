@@ -191,7 +191,13 @@
 
                                 </ul>
                             </li>
-                            <li class="scroll-to-section"><a href="#" class="">MENTAL FITNESS</a></li>
+                            <li class="scroll-to-section dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mental Fitness<span class="dropdown-arrow">▼</span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'mental_fitness' %}" class=""><b>View Mental Fitness Page</b></a></li>
+                                        <li><a href="{% url 'view_scheduled_class_mha' %}" class=""><b>Live Session</b></a></li>
+                                </ul>
+                            </li>
                             <li class="scroll-to-section"><a href="#" class="">GOAL</a></li>
                             <li class="scroll-to-section"><a href="#" class="">PROGRESS</a></li>
                             <li class="scroll-to-section"><a href="{% url 'feedback' %}" class="">Feedback</a></li>

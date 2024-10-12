@@ -28,6 +28,10 @@ urlpatterns = [
     path('eating_habits/', views.eating_habits_view, name='eating_habits'),
     path('track_foods/', views.track_foods_view, name='track_foods'),
     path('feedback/', views.feedback, name='feedback'),
+    path('mental_fitness/', views.mental_fitness, name='mental_fitness'),
+    path('share_thoughts/', views.share_thoughts_view, name='share_thoughts'),
+    path('select_mha/', views.select_mha_view, name='select_mha'),
+    path('view_scheduled_class_mha/', views.view_scheduled_class_mha, name='view_scheduled_class_mha'),
 
 
 
@@ -64,8 +68,10 @@ urlpatterns = [
     path('set_live_session/', views.set_live_session_view, name='set_live_session'),        
     path('client/<int:client_id>/', view_client_details, name='view_client_details'),
     path('join_session/', views.join_session, name='join_session'),
-
-
+    path('set_live_mental_session/', views.set_live_mental_session_view, name='set_live_mental_session'),        
+    path('mental_client/<int:client_id>/', views.mental_client_details, name='mental_client_details'),
+    path('join_mental_session/', views.join_mental_session, name='join_mental_session'),
+    path('reply-to-thoughts/<int:client_id>/', views.message_for_thoughts, name='message_for_thoughts'),
 
 
     path('admin_home/', views.admin_home_view, name='admin_home'),

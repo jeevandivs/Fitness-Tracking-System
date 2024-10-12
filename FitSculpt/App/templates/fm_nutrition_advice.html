@@ -19,27 +19,50 @@
             display: flex;
         }
 
-        /* Sidebar alignment and content area styling */
         .content-area {
             flex: 1;
-            padding-left: 240px; /* Adjust to the width of your sidebar */
-            padding-top: 70px; /* Adjust to align content below the header */
-            padding-right: 20px; /* Spacing for the right side */
+            margin-top:-80px;
+            padding: 70px 20px 20px 240px; /* Top, Right, Bottom, Left */
         }
 
         .container {
+            margin-top: 10px;
             max-width: 1000px;
             margin: 0 auto;
             background-color: #fff;
             padding: 40px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
 
-        h1 {
+        h1, h3 {
             text-align: center;
             color: #333;
+            margin-bottom: 20px;
         }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .btn, .confirm-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover, .confirm-button:hover {
+            background-color: #0056b3;
+        }
+
 
         table {
             width: 100%;
@@ -64,41 +87,12 @@
             background-color: #f2f2f2;
         }
 
-        .confirm-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .confirm-button:hover {
-            background-color: #218838;
-        }
-
-        .schedule-button {
-            position: absolute; 
-            top: 100px; /* Adjust based on your header height */
-            left: 340px; /* Adjust based on sidebar width */
-            background-color: #b06c34; 
-            color: white; 
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none; 
-            transition: background-color 0.3s; 
-        }
-
-        .schedule-button:hover {
-            background-color: #b06c34; 
-        }
         footer {
-            text-align: center;
-            margin-top: 40px;margin-left: 240px;
-            font-size: 14px;
-            color: #666;
+            text-align: center; /* Center footer text */
+            margin-top: 20px; /* Space above footer */
+            color: #6c757d; /* Light gray color for footer text */
         }
+        
     </style>
 </head>
 <body>
@@ -106,8 +100,8 @@
     <div class="content-wrapper">
         <div class="content-area">
             <div class="container">
-                <a href="{% url 'nutrition_advice' %}" class="schedule-button">Go Back</a>
-
+                <a href="{% url 'nutrition_advice' %}" class="btn">Go Back</a>
+    
                 <h3>Client Details</h3>
                 <table>
                     <tr>
@@ -143,11 +137,20 @@
                         <td>{{ client.food_type }}</td>
                     </tr>
                 </table>
-
-                <h1>Nutrition Advice for Client {{ client_id }}</h1>
-
+    
+                <h1>Nutrition Advice for Client</h1>
+    
+                <div class="btn-group">
+                    <form method="get" action="{% url 'fm_nutrition_advice' client_id %}">
+                        <button type="submit" name="intake_no" value="1" class="btn">Breakfast</button>
+                        <button type="submit" name="intake_no" value="2" class="btn">Lunch</button>
+                        <button type="submit" name="intake_no" value="3" class="btn">Snack</button>
+                        <button type="submit" name="intake_no" value="4" class="btn">Dinner</button>
+                    </form>
+                </div>
+    
                 {% if food_habits %}
-                <h3>Food Habits</h3>
+                <h3>Food Habits Based On The Client Preferences</h3>
                 <table>
                     <thead>
                         <tr>
@@ -166,22 +169,24 @@
                         {% endfor %}
                     </tbody>
                 </table>
-
+    
                 <form method="post" action="{% url 'fm_nutrition_advice' client_id %}">
                     {% csrf_token %}
                     <input type="hidden" name="client_id" value="{{ client_id }}">
                     <button type="submit" class="confirm-button">Confirm and Provide Advice</button>
                 </form>
+                
                 {% else %}
-                <p>No habits found for this client..OR..You Have Already Provided the Diet..</p>
+                <p style="text-align: center; color: #666;">No habits found for this client..OR..You Have Already Provided the Diet..</p>
                 {% endif %}
+                
             </div>
         </div>
     </div>
-
+    
+    <footer>
+        <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+    </footer>
 </body>
 </html>
-<footer>
-    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer>
 {% endblock %}

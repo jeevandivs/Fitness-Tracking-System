@@ -1,0 +1,89 @@
+{% load static %}
+{% block content %}
+{% include 'fm_header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reply to Client's Thoughts</title>
+    <style>
+        .content-wrapper {
+            padding: 40px 20px;
+            margin-top: 100px;
+            background-color: #ffffff;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .submit-button {
+            background-color: #b35138;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #9f2c1d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="content-wrapper">
+    <h1>Reply to Client's Thoughts</h1>
+    {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="current_mood">Client's Current Mood:</label>
+            <input type="text" id="current_mood" name="current_mood" value="{{ client.current_mood }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="reply">Your Reply to Client:</label>
+            <textarea id="reply" name="reply" rows="5" placeholder="Write your response here..." required></textarea>
+        </div>
+
+        <input type="hidden" name="client_id" value="{{ client.client_id }}">
+        <button type="submit" class="submit-button">Send Reply</button>
+    </form>
+</div>
+
+</body>
+</html>
+
+{% endblock %}

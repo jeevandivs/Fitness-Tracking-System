@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Nutrition</title>
+    <title>Mental Fitness</title>
     <style>
         /* General body styling */
         body {
@@ -80,11 +80,11 @@
                 padding: 20px;
             }
         }
-        .schedule-button {
+        .goback {
             position: absolute; /* Positioning it absolutely */
             top: 90px; /* Adjust distance from the top */
             left: 20px; /* Adjust distance from the left */
-            background-color: #007bff; /* Background color */
+            background-color: #9f2c1d; /* Background color */
             color: white; /* Text color */
             padding-top: 20px;
             padding: 10px ; /* Padding for the button */
@@ -92,7 +92,7 @@
             text-decoration: none; /* Remove underline */
             transition: background-color 0.3s; /* Smooth background color transition */
         }
-        .schedule-button:hover {
+        .goback:hover {
             background-color: #0056b3; /* Darker shade on hover */
         }
     </style>
@@ -100,30 +100,32 @@
 <body>
 
 <div class="content-wrapper">
-    <h1>Personal Nutrition</h1>
+    <h1>Mental Fitness</h1>
     {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<a href="{% url 'eating_habits' %}" class="trainer-button">Select Your Diet Preference</a>
-<a href="{% url 'track_foods' %}" class="trainer-button">Track Your Diet</a>
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <a href="{% url 'view_scheduled_class_mha' %}" class="schedule-button">See Live Schedule</a>
+        <a href="{% url 'share_thoughts' %}" class="schedule-button">Share Your Thoughts</a>
+    
     <!-- Show selected trainer or prompt to select -->
-    {% if dietitian_selected %}
-        <p>You have selected Dietitian: <strong>{{ dietitian_selected.fm_name }}</strong></p>
-        <p>If You Want You Can Change The Dietitian</p>
-        <a href="{% url 'select_dietitian' %}" class="trainer-button">Change Dietitian</a>
+    {% if mha_selected %}
+        <p>You have selected Your Mental Health Advisor: <strong>{{ mha_selected.fm_name }}</strong></p>
+        <p>If You Want You Can Change Your Mental Health Advisor</p>
+        <a href="{% url 'select_mha' %}" class="trainer-button">Change Mental Health Advisor</a>
     {% else %}
-        <p>Select a personal Dietitian to start your diet plan</p>
-        <a href="{% url 'select_dietitian' %}" class="trainer-button">Select a Dietitian</a>
+        <p>Select your personal trainer to start your workout plan</p>
+        <a href="{% url 'select_mha' %}" class="trainer-button">Select Your Mental Health Advisor</a>
     {% endif %}
-   
+
 </div>
-<a href="{% url 'nutrition' %}" class="schedule-button">Go Back</a>
+<a href="{% url 'mental_fitness' %}" class="goback">Go Back</a>
 
 
 <footer>
