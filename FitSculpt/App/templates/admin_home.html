@@ -1,85 +1,126 @@
 {% load static %}
 {% block content %}
 {% include 'admin_header.html' %}
+
+<!-- Content -->
 <style>
-    /* General Styling */
     body {
-        background-color: rgb(203, 234, 209);
-        font-family: Arial, sans-serif;
+        background-image: url("{% static 'assets/images/admin_dashboard.jpg' %}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        min-height: 100vh; /* Ensure full page height for the background image */
         margin: 0;
         padding: 0;
-        background-image: url("{% static 'assets/images/onemore.jpeg' %}");
+        display: flex;
+        flex-direction: column;
     }
 
-    .container {
-        display: flex; /* Flexbox layout for sidebar and main content */
-    }
-
-    /* Sidebar Styles */
-    .sidebar {
-        width: 230px; /* Reduced width for the sidebar */
-        background: #fff;
+    .content-area {
+        flex-grow: 1;
         padding: 20px;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        height: 100vh; /* Full height for the sidebar */
-        margin-left: -200px; /* Negative margin to shift left */
+        margin-left: 291px; /* Same width as sidebar */
+        background-color: rgba(255, 255, 255, 0.5); /* Make content area slightly transparent */
+        min-height: calc(100vh - 100px); /* Full height minus the header */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .sidebar a {
-        display: block;
-        padding: 15px;
-        color: #333;
-        text-decoration: none;
+    .content-area h1 {
+        font-size: 30px;
+        font-weight: bold;
+        color: #070000;
+    }
+
+    .content-area p {
+        font-size: 20px;
+        color: #020000;
+    }
+
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .messages li {
+        padding: 10px;
         margin-bottom: 10px;
-        border-radius: 5px;
-        transition: background 0.3s;
+        border-radius: 4px;
     }
 
-    .sidebar a:hover {
-        background: #f0f0f0; /* Highlight effect on hover */
+    .alert {
+        color: #fff;
+        background-color: #ff5722;
     }
 
-    /* Main Content Styles */
-    .main-content {
-        flex-grow: 1; /* Allows the main content to fill the remaining space */
+    .button-container {
+        margin-top: 80px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
         padding: 20px;
     }
 
-    h1, h2 {
-        color: #343a40;
-        margin-bottom: 20px; /* Added spacing for headings */
+    .btn-image {
+        position: relative;
+        margin: 0px;
+        border: none;
+        padding: 0;
+        background: none;
+        cursor: pointer;
+        transition: transform 0.2s;
     }
 
-    /* Footer Spacing */
-    footer {
-        margin-top: 40px;
-        text-align: center;
-        font-size: 14px;
-        color: #666;
+    .btn-image a {
+        display: block; /* Make the anchor tag block to cover the entire button area */
+        text-decoration: none; /* Remove underline */
     }
+
+    .btn-image img {
+        max-width: 350px; 
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-image:hover {
+        transform: scale(1.1); 
+    }
+
+    .btn-text {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgb(255, 254, 254);
+        font-weight: 1000;
+        text-shadow: 0px 0px 6px rgba(3, 0, 0, 0.5);
+    }
+
+    footer {
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+    }
+
 </style>
 
-<!-- Container for Sidebar and Main Content -->
-<div class="container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Admin Dashboard</h2>
-        <a href="{% url 'admin_fm' %}">Manage Trainers</a>
-        <a href="{% url 'admin_users' %}">Manage Users</a>
-        <a href="{% url 'admin_payment' %}">View Payments</a>
-        <a href="{% url 'view_sessions' %}">View Sessions</a>
-        <a href="{% url 'view_feedbacks' %}">View Feedbacks</a>
-        <a href="reports">Reports</a>
-        <a href="{% url 'admin_plans' %}">Manage Plans</a>
-        <a href="adminviewfeedback">Update Services</a>
-    </div>
+<div class="content-area">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-    <!-- Main Content -->
-    <div class="main-content">        
-    </div>
+    <b><h1>Welcome To Admin Dashboard</h1></b>
 </div>
 
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer>
+</footer>  
+
 {% endblock %}

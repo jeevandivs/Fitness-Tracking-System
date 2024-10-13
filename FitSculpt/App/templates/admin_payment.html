@@ -5,6 +5,7 @@
 <style>
     body {
         background-color: #f8f9fa;
+        font-family: Arial, sans-serif; /* Adding a font for better readability */
     }
 
     table {
@@ -60,16 +61,18 @@
         margin: 20px 0;
         font-size: 24px;
         color: #343a40;
+        text-align: left; /* Align title to the left */
     }
 
     .container {
         padding: 20px;
+        margin-left: 300px; /* Set left margin to 300px */
     }
 </style>
 
-<div class="container"></div>
+<div class="container">
     <div class="section-title">Active User Payments</div>
-      <table>
+    <table>
         <thead>
             <tr>
                 <th>Id</th>
@@ -103,7 +106,7 @@
 
 <div class="container">
     <div class="section-title">User Inactive Payments</div>
-      <table>
+    <table>
         <thead>
             <tr>
                 <th>Id</th>
@@ -134,7 +137,5 @@
         </tbody>
     </table>
 </div>
-
-
 
 {% endblock %}

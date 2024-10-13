@@ -64,6 +64,7 @@
 
     .container {
         padding: 20px;
+        margin-left: 290px;
     }
 </style>
 
@@ -125,7 +126,7 @@
                 <td>{{ fm.qualification_id }}</td>
                 <td>{{ fm.designation_id }}</td>
                 <td>
-                    <a href="{% url 'view_certificate' fm.user_id %}">View Certificate</a>
+                    <a href="{% url 'view_certificate' fm.user_id %}">Download Certificate</a>
                 </td>
                 <td>
                     <form action="{% url 'delete_fm' fm.user_id %}" method="post">
@@ -159,7 +160,7 @@
                 <td>{{ fm.qualification_id }}</td>
                 <td>{{ fm.designation_id }}</td>
                 <td>
-                    <a href="{% url 'view_certificate' fm.user_id %}">View Certificate</a>
+                    <a href="{% url 'view_certificate' fm.user_id %}">Download Certificate</a>
                 </td>
                 
             </tr>

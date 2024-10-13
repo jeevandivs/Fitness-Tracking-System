@@ -1,3 +1,4 @@
+import os
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -951,29 +952,31 @@ def view_certificate(request, user_id):
     
     certificate_url = settings.MEDIA_URL + certificate_proof
     print(certificate_url)
+    file_extension = os.path.splitext(certificate_proof)[1]
     
     return render(request, 'media.html', {'certificate_url': certificate_url})
 @custom_login_required
 def view_workout_img(request, workout_id):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT workout_image, reference_video FROM tbl_workouts WHERE workout_id = %s", [workout_id])
+        cursor.execute("SELECT workout_image, reference_video,workout_name FROM tbl_workouts WHERE workout_id = %s", [workout_id])
 
         result = cursor.fetchone()
 
         if result:
-            workout_image, reference_video = result
+            workout_image, reference_video,workout_name = result
         else:
-            workout_image, reference_video = None, None
+            workout_image, reference_video,workout_name = None, None, None
 
     context = {
     'workout_image': workout_image,
     'reference_video': reference_video,
+    'workout_name':workout_name,
 }
 
     workout_url = settings.MEDIA_URL + workout_image
     print(workout_url)
     
-    return render(request, 'workout_media.html', {'workout_url': workout_url, 'reference_video': reference_video})
+    return render(request, 'workout_media.html', {'workout_url': workout_url, 'reference_video': reference_video,'workout_name':workout_name})
 
 from django.shortcuts import render, redirect
 from .models import Workout
@@ -1516,9 +1519,13 @@ def select_trainer_view(request):
 
 @admin_custom_login_required
 def view_sessions_view(request):
-    sessions = ClientFM.objects.all()
-    
-    return render(request, 'view_sessions.html', {'sessions': sessions})
+    sessions = ClientFM.objects.filter(status=1)
+    mental_fitness_sessions = MentalFitness.objects.filter(status=1) 
+    return render(request, 'view_sessions.html', {
+        'sessions': sessions,
+        'mental_fitness_sessions': mental_fitness_sessions
+    })
+
 
 
 from django.shortcuts import render, redirect

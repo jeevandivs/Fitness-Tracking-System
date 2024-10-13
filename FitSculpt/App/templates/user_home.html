@@ -55,9 +55,9 @@
         bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
-        color: white;
-        font-weight:bolder;
-        text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+        color: rgb(255, 254, 254);
+        font-weight:1000;
+        text-shadow: 0px 0px 6px rgba(3, 0, 0, 0.5);
     }
 
     footer {
@@ -110,6 +110,13 @@
                         <a href="{% url 'nutrition' %}">
                             <img src="{% static 'assets/images/track_nutrition.jpg' %}" alt="Track Your Nutrition">
                             <span class="btn-text">Track Your Nutrition</span>
+                        </a>
+                    </button>
+
+                    <button class="btn-image">
+                        <a href="{% url 'mental_fitness' %}">
+                            <img src="{% static 'assets/images/mental_fitness.jpg' %}" alt="Track Your Mental Fitness">
+                            <span class="btn-text">Your Mental Health</span>
                         </a>
                     </button>
                 </div>

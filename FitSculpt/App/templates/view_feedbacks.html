@@ -12,7 +12,6 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
-            padding: 20px;
         }
         
         h1 {
@@ -34,7 +33,7 @@
         }
         
         th {
-            background-color: #4CAF50;
+            background-color: #000b01;
             color: white;
             text-transform: uppercase;
         }
@@ -57,9 +56,13 @@
         p {
             margin: 0;
         }
+        .container{
+            margin-left: 300px;
+        }
     </style>
 </head>
 <body>
+    <div class="container">
     <h1>Client Feedbacks</h1>
 
     <table border="1" cellpadding="10">
@@ -86,6 +89,7 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </body>
 <footer>
     <p>&copy; 2024 My Fitness Site. All rights reserved.</p>

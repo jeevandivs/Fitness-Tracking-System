@@ -93,6 +93,9 @@
             color: red;
             margin: 15px 0;
         }
+        .plan_container{
+            margin-left: 270px;
+        }
     </style>
     <script>
         // Function to validate input fields
@@ -132,7 +135,8 @@
     </script>
 </head>
 <body>
-    <h1>Add Plans</h1>
+    <div class="plan_container">
+    <h1>Add Plan</h1>
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="plan_name">Plan Name:</label>
@@ -160,6 +164,7 @@
     <footer>
         <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
     </footer>
+</div>
 </body>
 </html>
 {% endblock %}

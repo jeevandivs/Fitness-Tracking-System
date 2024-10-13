@@ -38,7 +38,8 @@
 
 <div class="content-container">
     {% if workout_url %}
-        <img src="{{ workout_url }}" width="100%" height="600px"/>
+    <h1>{{ workout_name }}</h1>
+    <img src="{{ workout_url }}" width="100%" height="600px"/>
         <a href="{{ reference_video }}" class="reference-link" target="_blank">Watch Reference Video</a>
     {% else %}
         <p>No Image available.</p>

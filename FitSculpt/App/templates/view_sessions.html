@@ -17,6 +17,7 @@
             background-color: #f9f9f9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            margin-left: 350px;
         }
 
         /* Page title styling */
@@ -60,13 +61,13 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="page-title">All Live Sessions</h1>
+        <h1 class="page-title">Active Workout Training Live Sessions</h1>
 
         <table class="styled-table">
             <thead>
                 <tr>
-                    <th>Client Name</th>
-                    <th>Fitness Manager Name</th>
+                    <th>Client</th>
+                    <th>Fitness Manager</th>
                     <th>Class Link</th>
                     <th>Timing</th>
                 </tr>
@@ -76,12 +77,39 @@
                 <tr>
                     <td>{{ session.client_name }}</td>
                     <td>{{ session.fm_name }}</td>
-                    <td>{% if session.class_link %}{{ session.class_link }}{% else %}Not Set{% endif %}</td>
-                    <td>{{ session.timing }}</td>
+                    <td>{{ session.class_link }}</td>
+                    <td>{{ session.class_time }}</td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="4">No sessions available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h1 class="page-title">Active Mental Fitness Sessions</h1> <!-- New title for mental fitness sessions -->
+
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Mental Health Advisor</th>
+                    <th>Session Link</th>
+                    <th>Class Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mf_session in mental_fitness_sessions %}
+                <tr>
+                    <td>{{ mf_session.client_name }}</td>
+                    <td>{{ mf_session.fm_name }}</td>
+                    <td>{{ mf_session.session_link }}</td>
+                    <td>{{ mf_session.class_time }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No mental fitness sessions available.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -53,12 +53,56 @@
         background-color: #ff5722;
     }
 
+    .button-container {
+        margin-top: 80px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .btn-image {
+        position: relative;
+        margin: 0px;
+        border: none;
+        padding: 0;
+        background: none;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .btn-image a {
+        display: block; /* Make the anchor tag block to cover the entire button area */
+        text-decoration: none; /* Remove underline */
+    }
+
+    .btn-image img {
+        max-width: 350px; 
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-image:hover {
+        transform: scale(1.1); 
+    }
+
+    .btn-text {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgb(255, 254, 254);
+        font-weight: 1000;
+        text-shadow: 0px 0px 6px rgba(3, 0, 0, 0.5);
+    }
+
     footer {
         text-align: center;
         padding: 10px;
         background-color: rgba(0, 0, 0, 0.7);
         color: #fff;
     }
+
 </style>
 
 <div class="content-area">
@@ -74,9 +118,34 @@
 
     <b><h1>Welcome to Fitness Manager Dashboard</h1></b>
     <b><p>This is your fitness management system where you can manage clients, workouts, nutrition plans, and more.</p></b>
+    <div class="row justify-content-center">
+        <div class="button-container col-lg-6 col-md-6 col-xs-12">
+            <button class="btn-image">
+                <a href="{% url 'set_live_session' %}">
+                    <img src="{% static 'assets/images/track_workouts.jpg' %}" alt="Track Your Workouts">
+                    <span class="btn-text">Personal Workout Training</span>
+                </a>
+            </button>
+    
+            <button class="btn-image">
+                <a href="{% url 'nutrition_advice' %}">
+                    <img src="{% static 'assets/images/track_nutrition.jpg' %}" alt="Track Your Nutrition">
+                    <span class="btn-text">Personal Nutrition</span>
+                </a>
+            </button>
+    
+            <button class="btn-image">
+                <a href="{% url 'set_live_mental_session' %}">
+                    <img src="{% static 'assets/images/mental_fitness.jpg' %}" alt="Track Your Mental Fitness">
+                    <span class="btn-text">Mental Health Advice</span>
+                </a>
+            </button>
+        </div>
+    </div>
 </div>
 
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
 </footer>  
+
 {% endblock %}
