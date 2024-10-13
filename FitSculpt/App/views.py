@@ -257,12 +257,24 @@ def reset_password_view(request, uidb64, token):
 def fm_home_view(request):
     return render(request, 'fm_home.html')
 
+from django.shortcuts import render
+from django.db import connection
+
 @fm_custom_login_required
 def fm_users(request):
+    fm_id = request.session.get('fm_user_id')  # Assuming the logged-in user has an `fm_id`
+
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT user_id, name, email, phone,dob, username,gender,age,height,weight,date_joined
-            FROM client where status=1 """)
+            SELECT c.user_id, c.name, c.email, c.phone, c.dob, c.username, c.gender, c.age, c.height, c.weight, c.date_joined
+            FROM client c
+            LEFT JOIN tbl_client_fm cf ON c.user_id = cf.client_id AND cf.fm_id = %s
+            LEFT JOIN tbl_clientfm2 cf2 ON c.user_id = cf2.client_id AND cf2.fm_id = %s
+            LEFT JOIN tbl_mental_fitness mf ON c.user_id = mf.client_id AND mf.fm_id = %s
+            WHERE c.status = 1
+            AND (cf.fm_id IS NOT NULL OR cf2.fm_id IS NOT NULL OR mf.fm_id IS NOT NULL)
+        """, [fm_id, fm_id, fm_id])
+        
         clients = cursor.fetchall()
         clients = [
             {
@@ -277,29 +289,36 @@ def fm_users(request):
                 'height': row[8],
                 'weight': row[9],
                 'date_joined': row[10],
-            } 
+            }
             for row in clients
         ]
 
-        
-        context = {
+    context = {
         'clients': clients,
     }
-    return render(request, 'fm_users.html',context)
+    return render(request, 'fm_users.html', context)
+
 
 from django.shortcuts import render
 from django.db import connection
 
 @fm_custom_login_required
 def fm_payment(request):
+    fm_id = request.session.get('fm_user_id')  # Get the fitness manager user ID from the session
+
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT p.payment_id, p.plan_id, pl.plan_name,pl.amount,p.user_id,c.name, p.payment_date, p.mode, p.status 
+            SELECT p.payment_id, p.plan_id, pl.plan_name, pl.amount, p.user_id, c.name, p.payment_date, p.mode, p.status 
             FROM tbl_payment p
             JOIN client c ON p.user_id = c.user_id
             JOIN tbl_plans pl ON p.plan_id = pl.plan_id
-            where active=1
-        """)
+            WHERE p.active = 1 AND (
+                EXISTS (SELECT 1 FROM tbl_client_fm cf WHERE cf.client_id = p.user_id AND cf.fm_id = %s) OR
+                EXISTS (SELECT 1 FROM tbl_clientfm2 cf2 WHERE cf2.client_id = p.user_id AND cf2.fm_id = %s) OR
+                EXISTS (SELECT 1 FROM tbl_mental_fitness mf WHERE mf.client_id = p.user_id AND mf.fm_id = %s)
+            )
+        """, [fm_id, fm_id, fm_id])
+
         payments = cursor.fetchall()
         payments = [
             {
@@ -312,8 +331,6 @@ def fm_payment(request):
                 'payment_date': row[6],
                 'mode': row[7],
                 'status': row[8],
-                  
-                
             } 
             for row in payments
         ]
@@ -322,6 +339,7 @@ def fm_payment(request):
         'payments': payments,
     }
     return render(request, 'fm_payment.html', context)
+
 
 
 
@@ -1598,10 +1616,12 @@ def view_client_details(request, client_id):
     # Retrieve the client based on the provided client_id
     client = get_object_or_404(Client, user_id=client_id)
     goals = Goal.objects.filter(user_id=client_id)
+    progress=Progress.objects.filter(user_id=client_id)
 
     context = {
         'client': client,
         'goals': goals,
+        'progress':progress
     }
     return render(request, 'view_client_details.html', context)
 
@@ -1671,17 +1691,24 @@ def select_dietitian_view(request):
     for fm in fitness_managers:
         designation = Designations.objects.get(designation_id=fm.designation_id)
         qualification = Qualifications.objects.get(qualification_id=fm.qualification_id)
-        fm_details.append({
-            'fm': fm,
-            'designation': designation.designation,
-            'qualification': qualification.qualification
-        })
+        client_count = ClientFM2.objects.filter(fm_id=fm.user_id).count()
+        if client_count < 4:
+            fm_details.append({
+                'fm': fm,
+                'designation': designation.designation,
+                'qualification': qualification.qualification,
+                'client_count': client_count,  # Add client count for display if needed
+            })
 
     if request.method == 'POST':
         selected_fm_id = request.POST.get('fitness_manager')
         if selected_fm_id:
+            selected_fm_client_count = ClientFM2.objects.filter(fm_id=selected_fm_id).count()
+            if selected_fm_client_count >= 4:
+                messages.error(request, 'This Dietitian has already reached the maximum number of clients.')
             # Create a new entry in ClientFM2
-            ClientFM2.objects.create(
+            else:
+                ClientFM2.objects.create(
                 client_id=user_id,
                 fm_id=selected_fm_id,
                 client_name=client_name,
@@ -1689,6 +1716,7 @@ def select_dietitian_view(request):
             )
             messages.success(request, 'Selected the Dietitian successfully')
             return redirect('personal_nutrition')  # Redirect to a success page or wherever you want
+            
 
     return render(request, 'select_dietitian.html', {
         'fitness_managers': fm_details,  # Pass the detailed fitness manager list
@@ -2091,6 +2119,41 @@ def view_feedbacks(request):
     
     return render(request, 'view_feedbacks.html', context)
 
+@fm_custom_login_required
+def fm_view_feedbacks(request):
+    fm_id = request.session.get('fm_user_id')  # Assuming the fitness manager is logged in with an `fm_id`
+
+    # Query feedbacks for clients associated with this fitness manager
+    with connection.cursor() as cursor:
+        cursor.execute('''
+            SELECT f.id, f.content, f.star_rating, c.name 
+            FROM tbl_feedback f
+            JOIN client c ON f.user_id = c.user_id
+            LEFT JOIN tbl_client_fm cf ON c.user_id = cf.client_id AND cf.fm_id = %s
+            LEFT JOIN tbl_clientfm2 cf2 ON c.user_id = cf2.client_id AND cf2.fm_id = %s
+            LEFT JOIN tbl_mental_fitness mf ON c.user_id = mf.client_id AND mf.fm_id = %s
+            WHERE (cf.fm_id IS NOT NULL OR cf2.fm_id IS NOT NULL OR mf.fm_id IS NOT NULL)
+        ''', [fm_id, fm_id, fm_id])
+
+        feedbacks = cursor.fetchall()
+        feedbacks = [
+            {
+                'id': row[0],
+                'content': row[1],
+                'star_rating': row[2],
+                'name': row[3],
+            }
+            for row in feedbacks
+        ]
+
+    # Pass the feedbacks to the template
+    context = {
+        'feedbacks': feedbacks
+    }
+
+    return render(request, 'fm_view_feedbacks.html', context)
+
+
 
 from django.shortcuts import render, redirect
 from .models import Feedback
@@ -2442,3 +2505,140 @@ def delete_goal(request, goal_id):
     goal.delete()
     messages.success(request, 'Goal deleted successfully.')
     return redirect('goal')
+
+@custom_login_required
+def progress(request):
+    user_id = request.session.get('user_id')
+
+    # Fetch all progress records for the user
+    progress_records = Progress.objects.filter(user_id=user_id).order_by('-current_bmi_date')
+
+    # Initialize starting_bmi
+    starting_bmi = None
+
+    # Check if there are any records for the user
+    if progress_records.exists():
+        starting_bmi = progress_records.first().starting_bmi  # Get the starting BMI from the first record
+
+    if request.method == 'POST':
+        try:
+            height = float(request.POST.get('height'))
+            weight = float(request.POST.get('weight'))
+            current_bmi_date = request.POST.get('current_bmi_date')
+
+            if timezone.datetime.strptime(current_bmi_date, '%Y-%m-%d').date() < timezone.now().date():
+                messages.error(request, 'Date cannot be in the past.')
+                return redirect('progress')
+
+        # Check if the date has already been selected (Assuming you have a model for Progress)
+            existing_progress = Progress.objects.filter(current_bmi_date=current_bmi_date, user_id=user_id)
+            if existing_progress.exists():
+                messages.error(request, 'You have already selected this date for BMI tracking.')
+                return redirect('progress')
+
+            height_in_meters = height / 100
+            current_bmi = (weight / height_in_meters ** 2)
+
+            # Check if a record already exists for the date
+            if not Progress.objects.filter(user_id=user_id, current_bmi_date=current_bmi_date).exists():
+                # If no starting BMI has been set, use the current BMI as the starting BMI
+                if starting_bmi is None:
+                    starting_bmi = current_bmi
+                
+                Progress.objects.create(
+                    user_id=user_id,
+                    starting_bmi=starting_bmi,
+                    current_bmi=current_bmi,
+                    current_bmi_date=current_bmi_date,
+                    target_bmi='18.5 to 24.9'  # Set a target BMI if required
+                )
+                return redirect('progress')  # Refresh the page after saving
+            else:
+                # Handle case where the record already exists
+                print(f"Record already exists for date: {current_bmi_date}")
+                # Set an error message to show to the user
+
+        except (ValueError, TypeError) as e:
+            print(f"Error in BMI calculation: {e}")
+            # Set an error message to show to the user
+
+    # Prepare data for the chart
+    bmi_dates = [record.current_bmi_date for record in progress_records]
+    starting_bmis = [record.starting_bmi for record in progress_records]
+    current_bmis = [record.current_bmi for record in progress_records]
+
+    context = {
+        'starting_bmi': starting_bmi,  # Use the starting BMI calculated above
+        'target_bmi': '18.5 to 24.9',  # Update based on your logic
+        'current_bmi': progress_records.first().current_bmi if progress_records else None,
+        'current_bmi_date': progress_records.first().current_bmi_date if progress_records else None,
+        'bmi_dates': bmi_dates,
+        'starting_bmis': starting_bmis,
+        'current_bmis': current_bmis,
+    }
+
+    return render(request, 'progress.html', context)
+
+
+from django.http import JsonResponse
+from django.utils.dateparse import parse_date
+
+@custom_login_required
+def get_bmi_data(request, selected_date):
+    user_id = request.session.get('user_id')
+    # Ensure the date format is parsed correctly
+    selected_date = parse_date(selected_date)
+    
+    try:
+        progress_record = Progress.objects.get(user_id=user_id, current_bmi_date=selected_date)
+        data = {
+            'starting_bmi': progress_record.starting_bmi,
+            'current_bmi': progress_record.current_bmi,
+            'target_bmi': '18.5 to 24.9'  # Update based on your logic
+        }
+        return JsonResponse(data)
+    except Progress.DoesNotExist:
+        return JsonResponse({'starting_bmi': None, 'current_bmi': None, 'target_bmi': '18.5 to 24.9'})
+
+
+@custom_login_required
+def goal_progress(request):
+    user_id = request.session.get('user_id')
+
+    # Fetch the goal record for the user
+    try:
+        goal = Goal.objects.get(user_id=user_id)
+    except Goal.DoesNotExist:
+        # Handle case where no goal is found for the user
+        messages.error(request, 'No goal found for your account.')
+        return redirect('some_view')  # Redirect to a suitable view
+
+    context = {
+        'goal': goal,
+    }
+
+    return render(request, 'goal_progress.html', context)
+
+
+
+@fm_custom_login_required
+def view_goal_progress(request, client_id, goal_id):
+    user_id = request.session.get('fm_user_id')
+    
+    if not user_id:
+        messages.error(request, "User not authenticated.")
+        return redirect('fm_login')
+
+    # Retrieve the goal based on the provided goal_id
+    goal = get_object_or_404(Goal, id=goal_id, user_id=client_id)
+
+    context = {
+        'goal': goal,
+    }
+    return render(request, 'view_goal_progress.html', context)
+
+
+
+
+
+

@@ -378,27 +378,35 @@
             </div>
             <div class="card">
                 <div class="card-body">
+                    <div class="stat-text">
+                        <a href="#">View Goals<span class="arrow">▼</span></a>
+                        <div class="dropdown-content">
+                            <a href="{% url 'set_live_session' %}">Select Client-View Details</a>
+                    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="stat-text">
+                        <a href="#">View Progress<span class="arrow">▼</span></a>
+                        <div class="dropdown-content">
+                            <a href="{% url 'set_live_session' %}">Select Client-View Details</a>
+                    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
                         <div class="stat-text"><a href="{% url 'fm_payment' %}">View Payments</a></div>
                 </div>
             </div>
+
             <div class="card">
                 <div class="card-body">
-                        <div class="stat-text"><a href="{% url 'fm_plans' %}">View Plans</a></div>
-                    </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                        <div class="stat-text"><a href="#">View Goals</a></div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                        <div class="stat-text"><a href="#">View Progress</a></div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                        <div class="stat-text"><a href="#">View Feedback</a></div>
+                        <div class="stat-text"><a href="{% url 'fm_view_feedbacks' %}">View Feedback</a></div>
                 </div>
             </div>
         </div>

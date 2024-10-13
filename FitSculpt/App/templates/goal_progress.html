@@ -1,0 +1,114 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Goal Progress</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .progress-container {
+            width: 60%;
+            margin: 90px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .bmi-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+        }
+
+        .bmi-info p {
+            margin: 5px 0;
+        }
+
+        #goalChart {
+            margin-top: 30px;
+        }
+        .progress {
+            display: inline-block;
+            background-color: #e27037;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+
+        .progress:hover {
+            background-color: #e27037;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="progress-container">
+        <h1>Track Your Goal Progress</h1>
+        <a href="{% url 'goal' %}" class="progress">Back to Goals</a>
+        
+        <!-- Display Goal Information -->
+        <div class="bmi-info">
+            <p><strong>Target Type:</strong> <span id="target-type">{{ goal.target_type }}</span></p>
+            <p><strong>Starting Value:</strong> <span id="starting-value">{{ goal.starting_value }}</span></p>
+            <p><strong>Target Value:</strong> <span id="target-value">{{ goal.target_value }}</span></p>
+            <p><strong>Current Value:</strong> <span id="current-value">{{ goal.current_value }}</span></p>
+            <p><strong>Description:</strong> <span id="goal-description">{{ goal.description }}</span></p>
+        </div>
+
+        <!-- Goal Chart -->
+        <canvas id="goalChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('goalChart').getContext('2d');
+        const goalData = {
+            labels: ['Starting Value', 'Current Value', 'Target Value'],
+            datasets: [{
+                label: 'Goal Progress',
+                data: [{{ goal.starting_value }}, {{ goal.current_value }}, {{ goal.target_value }}],
+                backgroundColor: ['rgba(52, 152, 219, 0.5)', 'rgba(46, 204, 113, 0.5)', 'rgba(241, 196, 15, 0.5)'],
+                borderColor: ['rgba(52, 152, 219, 1)', 'rgba(46, 204, 113, 1)', 'rgba(241, 196, 15, 1)'],
+                borderWidth: 1
+            }]
+        };
+
+        const goalChart = new Chart(ctx, {
+            type: 'bar',
+            data: goalData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

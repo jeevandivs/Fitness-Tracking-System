@@ -295,3 +295,18 @@ class Goal(models.Model):
 
     def __str__(self):
         return self.id
+
+class Progress(models.Model):
+    id = models.AutoField(primary_key=True)
+    user_id=models.IntegerField()
+    starting_bmi=models.FloatField()
+    target_bmi=models.CharField(max_length=50)
+    current_bmi=models.FloatField()
+    current_bmi_date=models.DateField()
+
+    class Meta:
+        managed=False
+        db_table='tbl_progress'
+
+    def __str__(self):
+        return self.id

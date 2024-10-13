@@ -159,9 +159,9 @@
 
     <form method="POST">
         {% csrf_token %}
-        <label for="fitness_manager">Select Fitness Manager:</label>
+        <label for="fitness_manager">Select Dietitian :</label>
         <select name="fitness_manager" id="fitness_manager" required>
-            <option value="">--Select a Fitness Manager--</option>
+            <option value="">--Select a Dietitian--</option>
             {% for fm_detail in fitness_managers %}
                 <option value="{{ fm_detail.fm.user_id }}">
                     {{ fm_detail.fm.name }} - {{ fm_detail.fm.email }} - {{ fm_detail.fm.phone }}

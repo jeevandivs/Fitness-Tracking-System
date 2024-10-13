@@ -1,0 +1,215 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Progress</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .progress-container {
+            width: 60%;
+            margin: 90px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"], input[type="date"] {
+            padding: 8px;
+            font-size: 1rem;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .bmi-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+        }
+
+        .bmi-info p {
+            margin: 5px 0;
+        }
+
+        #bmiChart {
+            margin-top: 30px;
+        }
+
+        #calendar {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .messages {
+    margin: 20px 0;
+}
+
+.alert {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #f5c6cb;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 5px;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <div class="progress-container">
+        <h1>Track Your BMI Progress</h1>
+        {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>  <!-- Bootstrap styling -->
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <!-- BMI Form -->
+        <form method="POST" action="{% url 'progress' %}">
+            {% csrf_token %}
+            
+            <label for="height">Enter Your Height (in centimeters):</label>
+            <input type="number" name="height" id="height" step="0.01" minlength="2" maxlength="3" min="50" max="250" required>
+
+            <label for="weight">Enter Your Weight (in kg):</label>
+            <input type="number" name="weight" id="weight" step="0.1" minlength="2" maxlength="3" min="15" max="250" required>
+
+            <label for="current_bmi_date">Select Date:</label>
+            <input type="date" name="current_bmi_date" id="current_bmi_date" required>
+
+            <button type="submit">Calculate and Update BMI</button>
+        </form>
+
+        <!-- Display BMI Information -->
+        <div class="bmi-info">
+            <p><strong>Starting BMI:</strong> <span id="starting-bmi">{{ starting_bmi }}</span></p>
+            <p><strong>Target BMI:</strong> <span id="target-bmi">{{ target_bmi }}</span></p>
+            <p><strong>Current BMI:</strong> <span id="current-bmi">{{ current_bmi }}</span></p>
+            <p><strong>Current BMI Date:</strong> <span id="current-bmi-date">{{ current_bmi_date }}</span></p>
+            {% if current_bmi %}
+                <p class="bmi-description">
+                    <strong>Current BMI Description:</strong>
+                    {% if current_bmi < 18.5 %}
+                        Underweight
+                    {% elif current_bmi >= 18.5 and current_bmi < 24.9 %}
+                        Normal weight
+                    {% elif current_bmi >= 25 and current_bmi < 29.9 %}
+                        Overweight
+                    {% else %}
+                        Obesity
+                    {% endif %}
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- BMI Chart -->
+        <canvas id="bmiChart" width="400" height="200"></canvas>
+
+        <!-- Calendar -->
+        <div id="calendar">
+            <input type="text" id="datepicker" placeholder="Select Date">
+        </div>
+    </div>
+
+    <script>
+
+
+
+
+        const ctx = document.getElementById('bmiChart').getContext('2d');
+        const bmiData = {
+            labels: ["Starting BMI", "Current BMI", "Target BMI"],
+            datasets: [{
+                label: 'BMI Progress',
+                data: [{{ starting_bmi|default:0 }}, {{ current_bmi|default:0 }}, 22], // Assuming a fixed target BMI of 22
+                backgroundColor: ['rgba(52, 152, 219, 0.5)', 'rgba(46, 204, 113, 0.5)', 'rgba(241, 196, 15, 0.5)'],
+                borderColor: ['rgba(52, 152, 219, 1)', 'rgba(46, 204, 113, 1)', 'rgba(241, 196, 15, 1)'],
+                borderWidth: 1
+            }]
+        };
+
+        const bmiChart = new Chart(ctx, {
+            type: 'bar',
+            data: bmiData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        flatpickr("#datepicker", {
+    onChange: function(selectedDates, dateStr, instance) {
+        fetch(`/get_bmi_data/${dateStr}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                bmiChart.data.datasets[0].data = [data.starting_bmi || 0, data.current_bmi || 0, 22]; // Assuming a fixed target BMI of 22
+                bmiChart.update();
+
+                document.getElementById('starting-bmi').textContent = data.starting_bmi || 'No data available';
+                document.getElementById('current-bmi').textContent = data.current_bmi || 'No data available';
+                document.getElementById('current-bmi-date').textContent = dateStr;
+            })
+            .catch(error => console.error('Error fetching BMI data:', error));
+    }
+});
+
+
+    </script>
+</body>
+</html>
+
+{% endblock %}

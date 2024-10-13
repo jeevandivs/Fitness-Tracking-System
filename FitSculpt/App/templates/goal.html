@@ -10,32 +10,40 @@
     <style>
         /* General Page Styles */
         body {
-            margin-top: 70px;
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 0;
+            color: #333;
         }
 
         h1, h2 {
             text-align: center;
             margin-top: 100px;
-            color: #333;
+            color: #2c3e50;
         }
 
-        form {
-            background-color: #fff;
+        /* Centering content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 20px auto;
+        }
+
+        /* Form Styling */
+        form {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
         }
 
         label {
             font-weight: bold;
             display: block;
-            margin: 10px 0 5px;
+            margin-bottom: 5px;
+            color: #34495e;
         }
 
         input[type="text"],
@@ -43,11 +51,20 @@
         input[type="date"],
         select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
             font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            border-color: #3498db;
+            outline: none;
         }
 
         p {
@@ -57,35 +74,38 @@
         }
 
         /* Button Styles */
-        button {
+        button,
+        .progress {
             display: inline-block;
-            background-color: #a56c17;
+            background-color: #e27037;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            text-decoration: none;
             margin: 10px 0;
+            transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: #a56c17;
+        button:hover,
+        .progress:hover {
+            background-color: #e27037;
         }
 
         button[style*="red"] {
-            background-color: #dc3545;
+            background-color: #e27037;
         }
 
         button[style*="red"]:hover {
-            background-color: #c82333;
+            background-color: #e27037;
         }
 
         /* Visibility Toggling */
         #new-goal-form,
         #view-goal-form {
             display: none;
-            margin: 0 auto;
         }
 
         /* Footer Styling */
@@ -93,8 +113,11 @@
             margin-top: 50px;
             text-align: center;
             padding: 20px;
-            background-color: #fffcfc;
-            color: white;
+            background-color: #fafbfc;
+            color: rgb(4, 0, 0);
+            position: relative;
+            bottom: 0;
+            width: 100%;
         }
 
         /* Additional Styling */
@@ -104,9 +127,10 @@
             margin: 20px 0;
         }
 
-        .toggle-buttons button {
+        .toggle-buttons button,
+        .toggle-buttons .progress {
             margin: 0 10px;
-            padding: 10px 20px;
+            flex: 1;
         }
 
         @media (max-width: 600px) {
@@ -114,30 +138,34 @@
                 width: 90%;
             }
 
-            .toggle-buttons button {
+            .toggle-buttons button,
+            .toggle-buttons .progress {
                 width: 100%;
                 margin-bottom: 10px;
             }
         }
+
         .back {
             display: inline-block;
-            margin-top: -50px;
             padding: 10px 15px;
-            background-color: #3498db;
+            background-color: #e27037;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            align-items: center;
+            margin: 20px auto;
+            transition: background-color 0.3s;
         }
 
         .back:hover {
-            background-color: #2980b9;
+            background-color: #e27037;
         }
     </style>
 </head>
 <body>
-    <h1>Manage Your Fitness Goal</h1>
-    {% if messages %}
+    <div class="container">
+        <h1>Manage Your Fitness Goal</h1>
+        
+        {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
                     <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
@@ -147,102 +175,102 @@
             </ul>
         {% endif %}
 
-    <div class="toggle-buttons">
-        <button onclick="document.getElementById('new-goal-form').style.display='block'">Set New Goal</button>
-        <button onclick="document.getElementById('view-goal-form').style.display='block'">View Goal</button>
-    </div>
+        <div class="toggle-buttons">
+            <button onclick="document.getElementById('new-goal-form').style.display='block'">Set New Goal</button>
+            <button onclick="document.getElementById('view-goal-form').style.display='block'">View Goal</button>
+            <a href="{% url 'goal_progress' %}" class="progress">View Goals Progress</a>
+        </div>
 
-    <!-- New Goal Form -->
-    <div id="new-goal-form">
-        <center><a href="{% url 'goal' %}" class="back">Back to Goals</a></center>
-        <h2>Set a New Goal</h2>
-        <form method="POST" action="{% url 'set_goal' %}">
-            {% csrf_token %}
-            <label for="target_type">Target Type:</label>
-            <select name="target_type" id="target_type">
-                <option value="">Select</option>
-                <option value="weight gain">Weight Gain</option>
-                <option value="weight loss">Weight Loss</option>
-                <option value="muscle gain">Muscle Gain</option>
-                <option value="bulking">Bulking</option>
-                <option value="cutting">Cutting</option>
-                <option value="body shaping">Body Shaping</option>
-                <option value="custom">Custom</option>
-            </select><br>
+        <!-- New Goal Form -->
+        <div id="new-goal-form">
+            <center><a href="{% url 'goal' %}" class="back">Back to Goals</a></center>
+            <h2>Set a New Goal</h2>
+            <form method="POST" action="{% url 'set_goal' %}">
+                {% csrf_token %}
+                <label for="target_type">Target Type:</label>
+                <select name="target_type" id="target_type" required>
+                    <option value="">Select</option>
+                    <option value="weight gain">Weight Gain</option>
+                    <option value="weight loss">Weight Loss</option>
+                    <option value="muscle gain">Muscle Gain</option>
+                    <option value="bulking">Bulking</option>
+                    <option value="cutting">Cutting</option>
+                    <option value="body shaping">Body Shaping</option>
+                    <option value="custom">Custom</option>
+                </select>
 
-            <label for="starting_value">Starting Value:</label>
-            <input type="number" name="starting_value" id="starting_value" required><br>
+                <label for="starting_value">Starting Value:</label>
+                <input type="number" name="starting_value" id="starting_value" required>
 
-            <label for="target_value">Target Value:</label>
-            <input type="number" name="target_value" id="target_value" required><br>
+                <label for="target_value">Target Value:</label>
+                <input type="number" name="target_value" id="target_value" required>
 
-            <label for="start_date">Start Date:</label>
-            <input type="date" name="start_date" id="start_date" required><br>
+                <label for="start_date">Start Date:</label>
+                <input type="date" name="start_date" id="start_date" required>
 
-            <label for="no_of_days">Number of Days:</label>
-            <input type="number" name="no_of_days" id="no_of_days" required><br>
+                <label for="no_of_days">Number of Days:</label>
+                <input type="number" name="no_of_days" id="no_of_days" required>
 
-            <label for="description">A Brief Description About Your Goal:</label>
-            <input type="text" name="description" id="description" required><br>
+                <label for="description">A Brief Description About Your Goal:</label>
+                <input type="text" name="description" id="description" required>
 
-            <button type="submit">Submit Goal</button>
+                <button type="submit">Submit Goal</button>
+            </form>
+        </div>
 
-        </form>
-    </div>
+        <!-- View and Update Goal Form -->
+        <div id="view-goal-form">
+            {% if goal %}
+            <center><a href="{% url 'goal' %}" class="back">Back to Goals</a></center>
+            <h2>View or Update Your Goal</h2>
+            <form method="POST" action="{% url 'update_goal' goal.id %}">
+                {% csrf_token %}
+                <label for="target_type">Target Type:</label>
+                <input type="text" name="target_type" id="target_type" value="{{ goal.target_type }}" readonly>
 
-    <!-- View and Update Goal Form -->
-    <div id="view-goal-form">
-        {% if goal %}
-        <center><a href="{% url 'goal' %}" class="back">Back to Goals</a></center>
-        <h2>View or Update Your Goal</h2>
-        <form method="POST" action="{% url 'update_goal' goal.id %}">
-            {% csrf_token %}
-            <label for="target_type">Target Type:</label>
-            <input type="text" name="target_type" id="target_type" value="{{ goal.target_type }}" readonly><br>
-        
-            <label for="starting_value">Starting Value (Based on the Target):</label>
-            <input type="number" name="starting_value" id="starting_value" value="{{ goal.starting_value }}" readonly><br>
-        
-            <label for="current_value">Current Value:</label>
-            <input type="number" name="current_value" id="current_value" value="{{ goal.current_value }}" required><br>
-        
-            <label for="target_value">Target Value:</label>
-            <input type="number" name="target_value" id="target_value" value="{{ goal.target_value }}" required><br>
-        
-            <label for="start_date">Start Date:</label>
-            <p>{{ goal.start_date|date:"d-m-Y" }}</p>
-        
-            <label for="end_date">End Date:</label>
-            <p>{{ goal.end_date|date:"d-m-Y" }}</p>
-        
-            <label for="no_of_days">Number of Days:</label>
-            <input type="number" name="no_of_days" id="no_of_days" value="{{ goal.no_of_days }}" required><br>
-        
-            <label for="remaining_days">Remaining Days:</label>
-            {% if remaining_days is not None %}
-                <p>{{ remaining_days }} days remaining</p>
+                <label for="starting_value">Starting Value (Based on the Target):</label>
+                <input type="number" name="starting_value" id="starting_value" value="{{ goal.starting_value }}" readonly>
+
+                <label for="current_value">Current Value:</label>
+                <input type="number" name="current_value" id="current_value" value="{{ goal.current_value }}" required>
+
+                <label for="target_value">Target Value:</label>
+                <input type="number" name="target_value" id="target_value" value="{{ goal.target_value }}" required>
+
+                <label for="start_date">Start Date:</label>
+                <p>{{ goal.start_date|date:"d-m-Y" }}</p>
+
+                <label for="end_date">End Date:</label>
+                <p>{{ goal.end_date|date:"d-m-Y" }}</p>
+
+                <label for="no_of_days">Number of Days:</label>
+                <input type="number" name="no_of_days" id="no_of_days" value="{{ goal.no_of_days }}" required>
+
+                <label for="remaining_days">Remaining Days:</label>
+                {% if remaining_days is not None %}
+                    <p>{{ remaining_days }} days remaining</p>
+                {% else %}
+                    <p>No goal set or goal has ended.</p>
+                {% endif %}
+
+                <label for="description">Brief Description About Your Goal:</label>
+                <input type="text" name="description" id="description" value="{{ goal.description }}" readonly>
+
+                <button type="submit">Update Goal</button>
+            </form>
+
+            <form method="POST" action="{% url 'delete_goal' goal.id %}">
+                {% csrf_token %}
+                <button type="submit" style="background-color: red; color: white;">Delete Goal</button>
+            </form>
             {% else %}
-                <p>No goal set or goal has ended.</p>
+            <p>You have not set any goal yet.</p>
             {% endif %}
-        
-            <label for="description">Brief Description About Your Goal:</label>
-            <input type="text" name="description" id="description" value="{{ goal.description }}" readonly><br>
-        
-            <button type="submit">Update Goal</button>
-
-        </form>
-
-        <form method="POST" action="{% url 'delete_goal' goal.id %}">
-            {% csrf_token %}
-            <button type="submit" style="background-color: red; color: white;">Delete Goal</button>
-        </form>
-        {% else %}
-        <p>You have not set any goal yet.</p>
-        {% endif %}
+        </div>
     </div>
 </body>
 <footer>
-    <center><p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p></center>
+    <p>&copy; {{ 2024 }} My Fitness Site. All Rights Reserved.</p>
 </footer>
 </html>
 {% endblock %}

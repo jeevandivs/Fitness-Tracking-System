@@ -124,14 +124,13 @@
 <div class="content-wrapper">
     <div class="content-area">
         <div class="container">
-            <center><h1>Active Plans</h1></center>
+            <center><h1>Active Plans of Your Clients</h1></center>
             <table>
                 <thead>
                     <tr>
-                        <th>Plan Name</th>
-                        <th>Paid Amount</th>
-                        <th>User_ID</th>
                         <th>User Name</th>
+                        <th>Paid Amount</th>
+                        <th>Plan Name</th>
                         <th>Payment Date</th>
                         <th>Mode</th>
                         <th>Status</th>
@@ -140,10 +139,9 @@
                 <tbody>
                     {% for payment in payments %}
                     <tr>
-                        <td data-label="Plan Name">{{ payment.plan_name }}</td>
+                        <td data-label="Plan Name">{{ payment.name }}</td>
                         <td data-label="Paid Amount">{{ payment.amount }}</td>
-                        <td data-label="User_ID">{{ payment.user_id }}</td>
-                        <td data-label="User Name">{{ payment.name }}</td>
+                        <td data-label="User Name">{{ payment.plan_name }}</td>
                         <td data-label="Payment Date">{{ payment.payment_date }}</td>
                         <td data-label="Mode">{{ payment.mode }}</td>
                         <td data-label="Status">{{ payment.status }}</td>

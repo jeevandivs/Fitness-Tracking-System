@@ -36,6 +36,10 @@ urlpatterns = [
     path('set_goal/', views.set_goal, name='set_goal'),
     path('update_goal/<int:goal_id>/', views.update_goal, name='update_goal'),
     path('delete_goal/<int:goal_id>/', views.delete_goal, name='delete_goal'),
+    path('progress/', views.progress, name='progress'),
+    path('get_bmi_data/<str:selected_date>/', get_bmi_data, name='get_bmi_data'),
+    path('goal_progress/', goal_progress, name='goal_progress'),
+
 
 
 
@@ -76,6 +80,9 @@ urlpatterns = [
     path('mental_client/<int:client_id>/', views.mental_client_details, name='mental_client_details'),
     path('join_mental_session/', views.join_mental_session, name='join_mental_session'),
     path('reply-to-thoughts/<int:client_id>/', views.message_for_thoughts, name='message_for_thoughts'),
+    path('goal-progress/<int:client_id>/<int:goal_id>/', views.view_goal_progress, name='view_goal_progress'),
+    path('fm_view_feedbacks/', views.fm_view_feedbacks, name='fm_view_feedbacks'),
+
 
 
     path('admin_home/', views.admin_home_view, name='admin_home'),
