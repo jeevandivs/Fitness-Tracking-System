@@ -45,6 +45,8 @@ urlpatterns = [
 
 
     path('fm_home/', views.fm_home_view, name='fm_home'),
+    path('fm_home2/', views.fm_home_view2, name='fm_home2'),
+    path('fm_home3/', views.fm_home_view3, name='fm_home3'),
     path('fm_register/', views.fm_register_view, name='fm_register'),
     path('fm_forgot/', views.fm_forgot_view, name='fm_forgot'),
     path('fm_reset/<uidb64>/<token>/', views.fm_reset_password_view, name='fm_reset_password'),
@@ -91,6 +93,7 @@ urlpatterns = [
     path('admin_users/', views.admin_users_view, name='admin_users'),
     path('admin_fm/', views.admin_fm_view, name='admin_fm'),
     path('accept_fm/<int:user_id>/', views.accept_fm_view, name='accept_fm'),
+    path('interview_fm/<int:user_id>/', interview_fm_view, name='interview_fm'),
     path('delete_fm/<int:user_id>/', views.delete_fm, name='delete_fm'),
     path('delete_client/<int:user_id>/', views.delete_client, name='delete_client'),
     path('view_certificate/<int:user_id>/', views.view_certificate, name='view_certificate'),

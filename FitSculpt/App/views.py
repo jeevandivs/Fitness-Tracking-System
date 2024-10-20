@@ -258,6 +258,14 @@ def reset_password_view(request, uidb64, token):
 def fm_home_view(request):
     return render(request, 'fm_home.html')
 
+@fm_custom_login_required
+def fm_home_view2(request):
+    return render(request, 'fm_home2.html')
+
+@fm_custom_login_required
+def fm_home_view3(request):
+    return render(request, 'fm_home3.html')
+
 from django.shortcuts import render
 from django.db import connection
 
@@ -570,6 +578,10 @@ def fm_reset_password_view(request, uidb64, token):
 
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import FitnessManager
+
 def fm_login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -590,6 +602,7 @@ def fm_login_view(request):
             messages.error(request, 'Invalid username or password.')
 
     return render(request, 'fm_login.html')
+
 from django.utils import timezone
 from datetime import timedelta
 
@@ -842,63 +855,71 @@ def admin_fm_view(request):
     with connection.cursor() as cursor:
         # Fetch fitness managers without a username and password
         cursor.execute("""
-            SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof 
-            FROM tbl_fitness_manager 
-            WHERE username='' AND password=''
+            SELECT fm.user_id, fm.name, fm.email, fm.phone, q.qualification, d.designation, fm.certificate_proof 
+    FROM tbl_fitness_manager fm
+    JOIN tbl_qualifications q ON fm.qualification_id = q.qualification_id
+    JOIN tbl_designations d ON fm.designation_id = d.designation_id
+    WHERE fm.username = '' AND fm.password = ''
         """)
         applicants = cursor.fetchall()
         applicants = [
             {
                 'user_id': row[0],
-                'name': row[1],
-                'email': row[2],
-                'phone': row[3],
-                'qualification_id': row[4],
-                'designation_id': row[5],
-                'certificate_proof': row[6],
+        'name': row[1],
+        'email': row[2],
+        'phone': row[3],
+        'qualification': row[4],
+        'designation': row[5],
+        'certificate_proof': row[6],
             } 
             for row in applicants
         ]
         
         # Fetch fitness managers with a username and password
         cursor.execute("""
-            SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof, username, password
-            FROM tbl_fitness_manager 
-            WHERE username != '' AND password != '' && status=1
+            SELECT fm.user_id, fm.name, fm.email, fm.phone, q.qualification, d.designation, 
+           fm.certificate_proof, fm.username, fm.password
+    FROM tbl_fitness_manager fm
+    JOIN tbl_qualifications q ON fm.qualification_id = q.qualification_id
+    JOIN tbl_designations d ON fm.designation_id = d.designation_id
+    WHERE fm.username != '' AND fm.password != '' AND fm.status = 1
         """)
         complete_fms = cursor.fetchall()
         complete_fms = [
             {
                 'user_id': row[0],
-                'name': row[1],
-                'email': row[2],
-                'phone': row[3],
-                'qualification_id': row[4],
-                'designation_id': row[5],
-                'certificate_proof': row[6],
-                'username': row[7],
-                'password': row[8],
+        'name': row[1],
+        'email': row[2],
+        'phone': row[3],
+        'qualification': row[4],  # Updated to qualification_name
+        'designation': row[5],    # Updated to designation_name
+        'certificate_proof': row[6],
+        'username': row[7],
+        'password': row[8],
             }
             for row in complete_fms
         ]
         
         cursor.execute("""
-            SELECT user_id, name, email, phone, qualification_id, designation_id, certificate_proof, username, password
-            FROM tbl_fitness_manager 
-            WHERE status=0
+            SELECT fm.user_id, fm.name, fm.email, fm.phone, q.qualification, d.designation, 
+           fm.certificate_proof, fm.username, fm.password
+    FROM tbl_fitness_manager fm
+    JOIN tbl_qualifications q ON fm.qualification_id = q.qualification_id
+    JOIN tbl_designations d ON fm.designation_id = d.designation_id
+    WHERE fm.status = 0
         """)
         removed_fms = cursor.fetchall()
         removed_fms = [
             {
                 'user_id': row[0],
-                'name': row[1],
-                'email': row[2],
-                'phone': row[3],
-                'qualification_id': row[4],
-                'designation_id': row[5],
-                'certificate_proof': row[6],
-                'username': row[7],
-                'password': row[8],
+        'name': row[1],
+        'email': row[2],
+        'phone': row[3],
+        'qualification': row[4],  # Updated to qualification_name
+        'designation': row[5],    # Updated to designation_name
+        'certificate_proof': row[6],
+        'username': row[7],
+        'password': row[8],
             }
             for row in removed_fms
         ]
@@ -942,8 +963,95 @@ def accept_fm_view(request, user_id):
             [email],
             fail_silently=False,
         )
+    messages.success(request, "The credentials has been sent.")
 
     return redirect('admin_fm')  
+
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import redirect, render
+from django.db import connection
+from django.contrib import messages
+from datetime import datetime, timedelta
+
+def interview_fm_view(request, user_id):
+    if request.method == 'POST':
+        action = request.POST.get('action')  # Get the action (accept or reject)
+        meet_link = request.POST.get('meet_link')
+        interview_time=request.POST.get('interview_time')  # Get the Google Meet link if provided
+
+        with connection.cursor() as cursor:
+            # Fetch the email, date_joined, and interview_status from the database
+            cursor.execute("SELECT email, date_joined, interview_status FROM tbl_fitness_manager WHERE user_id = %s", [user_id])
+            result = cursor.fetchone()
+            print(result)
+            if result:
+                email, date_joined, interview_status = result
+
+                if interview_status == 'scheduled':
+                    messages.info(request, "Interview already scheduled.")
+                    return redirect('admin_fm')
+
+                if interview_status == 'rejected':
+                    messages.info(request, "Registration already rejected.")
+                    return redirect('admin_fm')
+
+                if action == 'accept':
+                    if not meet_link:
+                        messages.error(request, "Please provide a Google Meet link.")
+                        return redirect('interview_fm', user_id=user_id)
+                if action == 'accept':
+                    if not interview_time:
+                        messages.error(request, "Please provide Interview Date & Time.")
+                        return redirect('interview_fm', user_id=user_id)
+
+                    # Calculate the interview date (two days after date_joined at 10:00 AM)
+                    interview_date = datetime.strptime(interview_time, '%Y-%m-%dT%H:%M')
+
+
+                    # Format the interview date as a readable string
+                    interview_datetime_str = interview_date.strftime('%Y-%m-%d %H:%M:%S')
+                    print(interview_datetime_str)
+
+                    # Send acceptance email with the Google Meet link and interview date
+                    send_mail(
+                        subject='Your Interview has been scheduled From FITSCULPT',
+                        message=f'Greeting from FITSCULPT .Dear candidate, your interview has been scheduled for {interview_datetime_str}. Please join the meeting using the following link: {meet_link}',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[email],
+                        fail_silently=False,
+                    )
+
+                    # Update the interview status to 'scheduled'
+                    cursor.execute("UPDATE tbl_fitness_manager SET interview_status = 'scheduled', interview_time=%s  WHERE user_id = %s", [interview_datetime_str,user_id])
+
+                    messages.success(request, "Interview scheduled and email sent.")
+                elif action == 'reject':
+                    # Send rejection email
+                    send_mail(
+                        subject='Registration Rejected',
+                        message='Dear candidate, your registration has been rejected.Thank You . From FITSCULPT',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[email],
+                        fail_silently=False,
+                    )
+
+                    # Update the interview status to 'rejected'
+                    cursor.execute("UPDATE tbl_fitness_manager SET interview_status = 'rejected' WHERE user_id = %s", [user_id])
+
+                    messages.success(request, "Registration rejected and email sent.")
+            else:
+                messages.error(request, "Mail id not found")
+
+        return redirect('admin_fm')  # Redirect to the appropriate page after processing
+    else:
+        return redirect('admin_fm')  # Handle non-POST requests appropriately
+
+
+
+
+ 
+ 
 @admin_custom_login_required
 def view_certificate(request, user_id):
     with connection.cursor() as cursor:
@@ -2408,7 +2516,7 @@ def set_live_mental_session_view(request):
     clients = MentalFitness.objects.filter(fm_id=fitness_manager.user_id)
 
     if not clients.exists():
-        messages.info(request, "No clients have selected you as their fitness manager.")
+        messages.info(request, "No clients have selected you as their mental health advisor.")
 
     context = {
         'fitness_manager': fitness_manager,
@@ -2464,6 +2572,10 @@ from datetime import date
 @custom_login_required
 def goal(request):
     user_id = request.session.get('user_id')
+    user=Client.objects.filter(user_id=user_id).first()
+    if user:
+        weight=user.weight
+        print(weight)
     goal = Goal.objects.filter(user_id=user_id).first()
 
     if goal and goal.end_date:
@@ -2472,18 +2584,36 @@ def goal(request):
     else:
         remaining_days = None
 
-    return render(request, 'goal.html', {'goal': goal, 'remaining_days': remaining_days})
+    return render(request, 'goal.html', {'goal': goal, 'remaining_days': remaining_days,'weight': weight})
 
+
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils import timezone
+from .models import Goal  # Ensure the Goal model is correctly imported
 
 @custom_login_required
 def set_goal(request):
     if request.method == 'POST':
         user_id = request.session.get('user_id')
+        user=Client.objects.filter(user_id=user_id).first()
+        if user:
+            weight=user.weight
+            print(weight)
+
+        # Check if a goal already exists for the user
+        existing_goal = Goal.objects.filter(user_id=user_id).first()
+        
+        if existing_goal:
+            messages.error(request, 'You have already set a goal.')
+            return redirect('goal')  # Redirect back to the goal page
+
+        # Create a new goal since no existing goal was found
         Goal.objects.create(
             target_type=request.POST['target_type'],
-            starting_value=request.POST['starting_value'],
+            starting_value=user.weight,
             target_value=request.POST['target_value'],
-            current_value=request.POST['starting_value'],  # Initially set current_value to starting_value
+            current_value=user.weight,  # Initially set current_value to starting_value
             user_id=user_id,
             no_of_days=request.POST['no_of_days'],
             description=request.POST['description'],
@@ -2491,7 +2621,10 @@ def set_goal(request):
             end_date=timezone.now() + timezone.timedelta(days=int(request.POST['no_of_days']))
         )
         messages.success(request, 'Goal set successfully.')
-    return redirect('goal')
+        return redirect('goal')  # Redirect to the goal page after successful creation
+
+    return redirect('goal')  # Redirect to the goal page for non-POST requests
+
 
 @custom_login_required
 def update_goal(request, goal_id):
@@ -2516,6 +2649,11 @@ def delete_goal(request, goal_id):
 @custom_login_required
 def progress(request):
     user_id = request.session.get('user_id')
+    user=Client.objects.filter(user_id=user_id).first()
+    if user:
+        weight=user.weight
+        height=user.height
+        print(weight)
 
     # Fetch all progress records for the user
     progress_records = Progress.objects.filter(user_id=user_id).order_by('-current_bmi_date')
@@ -2529,8 +2667,8 @@ def progress(request):
 
     if request.method == 'POST':
         try:
-            height = float(request.POST.get('height'))
-            weight = float(request.POST.get('weight'))
+            height =height
+            weight = weight
             current_bmi_date = request.POST.get('current_bmi_date')
 
             if timezone.datetime.strptime(current_bmi_date, '%Y-%m-%d').date() < timezone.now().date():
@@ -2582,6 +2720,8 @@ def progress(request):
         'bmi_dates': bmi_dates,
         'starting_bmis': starting_bmis,
         'current_bmis': current_bmis,
+        'height': height,
+        'weight' : weight,
     }
 
     return render(request, 'progress.html', context)

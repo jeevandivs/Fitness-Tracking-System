@@ -86,23 +86,22 @@ td {
             <p><strong>Username:</strong> {{ client.username }}</p>
             <p><strong>Email:</strong> {{ client.email }}</p>
             <p><strong>Phone:</strong> {{ client.phone }}</p>
-            <p><strong>Date of Birth:</strong> {{ client.dob }}</p>
             <p><strong>Gender:</strong> {{ client.gender }}</p>
-            <p><strong>Age:</strong> {{ client.age }}</p>
-            <p><strong>Height:</strong> {{ client.height }}</p>
-            <p><strong>Weight:</strong> {{ client.weight }}</p>
+            <p><strong>Age(Years):</strong> {{ client.age }}</p>
+            <p><strong>Height(cm):</strong> {{ client.height }}</p>
+            <p><strong>Weight(kg):</strong> {{ client.weight }}</p>
             <p><strong>Food Type:</strong> {{ client.food_type }}</p>
 
             <a href="{% url 'set_live_session' %}" class="back">Back to Session Details</a>
             <div class="goal-list">
-                <h2>Goals</h2>
+                <h1>Goals</h1>
                 {% if goals %}
                     {% for goal in goals %}
                         <div class="goal-item">
-                            <h3>Goal  - {{ goal.target_type }}</h3>
-                            <p><strong>Start Value:</strong> {{ goal.starting_value }}</p>
-                            <p><strong>Target Value:</strong> {{ goal.target_value }}</p>
-                            <p><strong>Current Value:</strong> {{ goal.current_value }}</p>
+                            <h3>Goal Type - {{ goal.target_type }}</h3>
+                            <p><strong>Start Value:Weight in k.g:</strong> {{ goal.starting_value }}</p>
+                            <p><strong>Target Value:Weight in k.g:</strong> {{ goal.target_value }}</p>
+                            <p><strong>Current Value:Weight in k.g:</strong> {{ goal.current_value }}</p>
                             <p><strong>Number of Days:</strong> {{ goal.no_of_days }}</p>
                             <p><strong>Start Date:</strong> {{ goal.start_date }}</p>
                             <p><strong>End Date:</strong> {{ goal.end_date }}</p>
@@ -120,18 +119,18 @@ td {
                     <thead>
                         <tr>
                             <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Starting BMI</th>
+                            <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">BMI Updated Date</th>
+                            <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">BMI  Based on the Updated Date</th>
                             <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Target BMI</th>
-                            <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Current BMI</th>
-                            <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for progress in progress %}
                             <tr>
                                 <td style="border: 1px solid #ccc; padding: 10px;">{{ progress.starting_bmi }}</td>
-                                <td style="border: 1px solid #ccc; padding: 10px;">{{ progress.target_bmi }}</td>
-                                <td style="border: 1px solid #ccc; padding: 10px;">{{ progress.current_bmi }}</td>
                                 <td style="border: 1px solid #ccc; padding: 10px;">{{ progress.current_bmi_date }}</td>
+                                <td style="border: 1px solid #ccc; padding: 10px;">{{ progress.current_bmi }}</td>
+                                <td style="border: 1px solid #ccc; padding: 10px;">{{ progress.target_bmi }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

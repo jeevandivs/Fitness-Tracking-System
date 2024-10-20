@@ -187,15 +187,8 @@
                 <div id="descriptionMessage" class="error-message"></div>
 
                 <label for="body_part">Body Part:</label>
-                <select id="body_part" name="body_part" required>
-                    <option value="" disabled>Select a body part</option>
-                    <option value="Chest" {% if workout.body_part == 'Chest' %}selected{% endif %}>Chest</option>
-                    <option value="Back" {% if workout.body_part == 'Back' %}selected{% endif %}>Back</option>
-                    <option value="Biceps" {% if workout.body_part == 'Biceps' %}selected{% endif %}>Biceps</option>
-                    <option value="Triceps" {% if workout.body_part == 'Triceps' %}selected{% endif %}>Triceps</option>
-                    <option value="Shoulder" {% if workout.body_part == 'Shoulder' %}selected{% endif %}>Shoulder</option>
-                    <option value="Leg" {% if workout.body_part == 'Leg' %}selected{% endif %}>Leg</option>
-                </select>
+                <input type="text" id="body_part" name="body_part" value="{{ workout.body_part }}"  disabled>
+
                 <div id="bodyPartMessage" class="error-message"></div>
 
                 <label for="duration">Duration (in minutes):</label>

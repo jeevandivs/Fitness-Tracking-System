@@ -66,12 +66,10 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Username</th>
                     <th>Gender</th>
-                    <th>Age</th>
-                    <th>Height</th>
-                    <th>Weight</th>
-                    <th>Joined Date</th>
+                    <th>Age(Years)</th>
+                    <th>Height(cm)</th>
+                    <th>Weight(kg)</th>
                 </tr>
             </thead>
             <tbody>
@@ -80,12 +78,10 @@
                     <td>{{ client.name }}</td>
                     <td>{{ client.email }}</td>
                     <td>{{ client.phone }}</td>
-                    <td>{{ client.username }}</td>
                     <td>{{ client.gender }}</td>
                     <td>{{ client.age }}</td>
                     <td>{{ client.height }}</td>
                     <td>{{ client.weight }}</td>
-                    <td>{{ client.date_joined }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

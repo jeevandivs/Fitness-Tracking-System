@@ -72,6 +72,7 @@ class FitnessManager(models.Model):
     certificate_proof = models.FileField(upload_to='certificates/', blank=True, null=True)
     date_joined=models.DateField(auto_now_add=True) 
     status=models.IntegerField()
+    interview_time=models.DateTimeField()
 
 
     class Meta:

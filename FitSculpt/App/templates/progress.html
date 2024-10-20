@@ -113,14 +113,14 @@
         <form method="POST" action="{% url 'progress' %}">
             {% csrf_token %}
             
-            <label for="height">Enter Your Height (in centimeters):</label>
-            <input type="number" name="height" id="height" step="0.01" minlength="2" maxlength="3" min="50" max="250" required>
+            <label for="height">Your Current Height (in centimeters):</label>
+            <input type="number" name="height" id="height" step="0.01" value="{{ height }}" readonly>
 
-            <label for="weight">Enter Your Weight (in kg):</label>
-            <input type="number" name="weight" id="weight" step="0.1" minlength="2" maxlength="3" min="15" max="250" required>
+            <label for="weight">Your Current Weight (in kg):</label>
+            <input type="number" name="weight" id="weight" step="0.1" value="{{ weight }}" readonly>
 
             <label for="current_bmi_date">Select Date:</label>
-            <input type="date" name="current_bmi_date" id="current_bmi_date" required>
+            <input type="date" name="current_bmi_date" id="current_bmi_date"  required>
 
             <button type="submit">Calculate and Update BMI</button>
         </form>
