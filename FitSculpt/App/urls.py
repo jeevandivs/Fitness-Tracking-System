@@ -21,6 +21,7 @@ urlpatterns = [
     path('nutrition/', views.nutrition_view, name='nutrition'),
     path('personal_workout', views.personal_workout_view, name='personal_workout'),
     path('select_trainer/', views.select_trainer_view, name='select_trainer'),
+    path('fm-skills/<int:fm_id>/', fm_skills_view2, name='fm_skills_view'),  # Add this line
     path('view-scheduled-class/', views.view_scheduled_class, name='view_scheduled_class'),
     path('personal_nutrition/', views.personal_nutrition_view, name='personal_nutrition'),
     path('select_dietitian/', views.select_dietitian_view, name='select_dietitian'),
@@ -84,6 +85,7 @@ urlpatterns = [
     path('reply-to-thoughts/<int:client_id>/', views.message_for_thoughts, name='message_for_thoughts'),
     path('goal-progress/<int:client_id>/<int:goal_id>/', views.view_goal_progress, name='view_goal_progress'),
     path('fm_view_feedbacks/', views.fm_view_feedbacks, name='fm_view_feedbacks'),
+    path('fm_skills/', views.fm_skills_view, name='fm_skills'),
 
 
 

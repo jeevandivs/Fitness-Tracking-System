@@ -138,6 +138,37 @@
 .alert:hover {
     opacity: 0.9; /* Slightly dim on hover */
 }
+.scroll-to-enhance {
+    background-color: #b35138;
+    color: white; /* Ensures text stays white */
+    text-decoration: none; /* Removes underline from text */
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: inline-block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+.scroll-to-enhance:hover {
+    background-color: #9f4632; /* Darken the button on hover */
+    color: white; /* Keep text white on hover */
+    text-decoration: none; /* Ensure no underline on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: translateY(-3px); /* Slight lift on hover */
+}
+
+.scroll-to-enhance:active {
+    transform: translateY(1px); /* Button press effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Lessen the shadow on click */
+    color: white; /* Ensure text stays white on active click */
+    text-decoration: none; /* Ensure no underline on active click */
+}
+
+
 
 </style>
 <div class="background">
@@ -146,6 +177,7 @@
         <div class="profile-card">
 
             <h2>{{ tbl_fitness_manager.name }}</h2>
+            <a class="scroll-to-enhance" href="{% url 'fm_skills' %}">Enhanced Profile</a>
             <p><strong>User Name:</strong> {{ tbl_fitness_manager.username }}</p>
             <p><strong>Date Joined:</strong> {{ tbl_fitness_manager.date_joined }}</p>
             

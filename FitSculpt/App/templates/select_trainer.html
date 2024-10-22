@@ -49,8 +49,16 @@
             background-color: #fffcfc;
             color: white;
         }
-        /* General styles for the message list */
-.messages {
+        .btn{
+            background-color: #b35138;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: none; /* 
+            .messages {
     list-style-type: none; /* Remove default list styling */
     padding: 0; /* Remove default padding */
     margin: 20px 0; /* Margin for spacing */
@@ -101,11 +109,13 @@
             var trainerInfo = document.getElementById('trainerInfo');
             var timingDropdown = document.getElementById('timingDropdown');
             var submitButton = document.getElementById('submitButton');
+            var viewDetailsButton = document.getElementById('viewDetailsButton'); // Added for view button
             
             // Clear previous details
             trainerInfo.innerHTML = '';
             submitButton.style.display = 'none';
             timingDropdown.style.display = 'none'; // Hide timing dropdown initially
+            viewDetailsButton.style.display = 'none'; // Hide view details button initially
 
             // Get the selected trainer's data
             var selectedIndex = select.selectedIndex;
@@ -133,6 +143,11 @@
                 // Show timing dropdown
                 timingDropdown.style.display = 'block';
                 submitButton.style.display = 'inline-block'; // Show the select button
+
+                // Show the view details button with the correct link
+                viewDetailsButton.style.display = 'inline-block';
+                var trainerId = selectedTrainer.value; // Get selected trainer's ID
+                viewDetailsButton.setAttribute('href', '/fm-skills/' + trainerId + '/'); // Set the correct URL
             } else {
                 trainerInfo.style.display = 'none'; // Hide if no trainer is selected
             }
@@ -143,6 +158,15 @@
 
 <div class="container">
     <h1>Select Trainer</h1>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
     <form method="POST">
         {% csrf_token %}
@@ -155,7 +179,9 @@
                         data-name="{{ trainer.trainer.name }}"
                         data-designation="{{ trainer.designation }}"
                         data-available-times="{{ trainer.available_times|join:', ' }}">
+
                     {{ trainer.trainer.name }} - {{ trainer.designation }}
+
                 </option>
             {% endfor %}
         </select>
@@ -170,6 +196,7 @@
         </div>
 
         <button type="submit" id="submitButton" class="submit-button">Select Trainer</button>
+        <a id="viewDetailsButton" class="btn" style="display: none;">View Additional Details</a> <!-- Hidden by default -->
     </form>
 </div>
 

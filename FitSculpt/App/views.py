@@ -1610,12 +1610,15 @@ def select_trainer_view(request):
 
         # Filter available times
         available_times = [time for time in predefined_times if time not in assigned_times]
+        fm_skills = FMSkills.objects.filter(fm_id=trainer.user_id).first()
+        print(fm_skills)
 
         trainers_with_details.append({
             'trainer': trainer,
             'available_times': available_times,  # Pass available times to the template
             'designation': designation_map.get(trainer.designation_id, 'Unknown') ,
-             'qualification': qualification_map.get(trainer.qualification_id, 'Unknown') 
+             'qualification': qualification_map.get(trainer.qualification_id, 'Unknown'),
+             'fm_skills': fm_skills 
               # Fetch corresponding designation name
         })
 
@@ -1623,6 +1626,28 @@ def select_trainer_view(request):
         'trainers_with_details': trainers_with_details,
     }
     return render(request, 'select_trainer.html', context)
+
+from django.shortcuts import render, get_object_or_404
+from .models import FMSkills
+from django.http import Http404
+
+@custom_login_required
+def fm_skills_view2(request, fm_id):
+    try:
+        # Fetch the FMSkills for the selected fitness manager
+        fm_skills = FMSkills.objects.get(fm_id=fm_id)
+    except FMSkills.DoesNotExist:
+        # Handle the case where no FMSkills exists for the given fm_id
+        return render(request, 'fm_skills_detail.html', {
+            'error_message': f"No Additional details found for the fitness manager."
+        })
+
+    context = {
+        'fm_skills': fm_skills
+    }
+    return render(request, 'fm_skills_detail.html', context)
+
+
 
 
 @admin_custom_login_required
@@ -2783,6 +2808,59 @@ def view_goal_progress(request, client_id, goal_id):
         'goal': goal,
     }
     return render(request, 'view_goal_progress.html', context)
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import FMSkills
+from django.core.files.storage import FileSystemStorage
+
+@fm_custom_login_required
+def fm_skills_view(request):
+    fm_id = request.session.get('fm_user_id')
+
+    # Check if FMSkills already exists for the logged-in Fitness Manager
+    try:
+        fm_skills = FMSkills.objects.get(fm_id=fm_id)
+    except FMSkills.DoesNotExist:
+        fm_skills = None
+
+    if request.method == 'POST':
+        # Handle form submission for either insert or update
+        skills = request.POST.get('skills')
+        achievements = request.POST.get('achievements')
+        gym_pic = request.FILES.get('gym_pic')
+        achievement_proof = request.FILES.get('achievement_proof')
+
+        # Create or update the FMSkills instance
+        if fm_skills:
+            # Update existing record
+            fm_skills.skills = skills
+            fm_skills.achievements = achievements
+            if gym_pic:
+                fm_skills.gym_pic = gym_pic
+            if achievement_proof:
+                fm_skills.achievement_proof = achievement_proof
+            fm_skills.save()
+            messages.success(request, 'Your skills and achievements have been updated.')
+        else:
+            # Create new record
+            new_fm_skill = FMSkills(
+                fm_id=fm_id,
+                skills=skills,
+                achievements=achievements
+            )
+            if gym_pic:
+                new_fm_skill.gym_pic = gym_pic
+            if achievement_proof:
+                new_fm_skill.achievement_proof = achievement_proof
+            new_fm_skill.save()
+            messages.success(request, 'Your skills and achievements have been added.')
+
+        return redirect('fm_skills')
+
+    return render(request, 'fm_skills.html', {'fm_skills': fm_skills})
 
 
 

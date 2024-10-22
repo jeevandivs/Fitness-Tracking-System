@@ -1,0 +1,143 @@
+{% load static %}
+{% include 'fm_header.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Manager Profile</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            margin-left: 420px;
+        }
+        .container h2 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group img {
+            max-width: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-secondary {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background-color: #0056b3;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Fitness Manager Profile</h2>
+
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if fm_skills %}
+        <!-- Display the details if the record exists -->
+        <h3>Your Enhanced Profile:</h3>
+
+        <p><strong>Profile Picture:</strong></p>
+        {% if fm_skills.gym_pic %}
+            <img src="{{ fm_skills.gym_pic.url }}" alt="Gym Picture">
+        {% else %}
+            <p>No profile picture uploaded.</p>
+        {% endif %}
+
+        <p><strong>Skills:</strong> {{ fm_skills.skills }}</p>
+
+        <p><strong>Achievements:</strong> {{ fm_skills.achievements }}</p>
+
+        <p><strong>Achievement Proof:</strong></p>
+        {% if fm_skills.achievement_proof %}
+            <a href="{{ fm_skills.achievement_proof.url }}" download>Download Proof</a>
+        {% else %}
+            <p>No achievement proof uploaded.</p>
+        {% endif %}
+
+        <a href="#" class="btn" onclick="document.getElementById('skills-form').style.display='block'">Update Skills</a>
+
+        {% else %}
+        <p>No enhanced profile data found. Please add your profile below.</p>
+        {% endif %}
+
+        <div id="skills-form" style="{% if not fm_skills %}display:block{% else %}display:none{% endif %}; margin-top: 20px;">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="gym_pic">Profile Picture:</label>
+                    <input type="file" id="gym_pic" name="gym_pic" accept=".png,.jpg,.jpeg" >
+                </div>
+
+                <div class="form-group">
+                    <label for="skills">Skills:</label>
+                    <textarea id="skills" name="skills" rows="4" maxlength="500" ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="achievements">Achievements:</label>
+                    <textarea id="achievements" name="achievements" rows="4" maxlength="500"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement_proof">Upload Achievement Proof:</label>
+                    <input type="file" id="achievement_proof" name="achievement_proof" accept=".pdf">
+                </div>
+
+                <button type="submit" class="btn">Submit</button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('skills-form').style.display='none'">Cancel</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

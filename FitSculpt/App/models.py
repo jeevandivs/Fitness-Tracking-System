@@ -311,3 +311,18 @@ class Progress(models.Model):
 
     def __str__(self):
         return self.id
+
+class FMSkills(models.Model):
+    id = models.AutoField(primary_key=True)
+    fm_id=models.IntegerField()
+    gym_pic=models.FileField(upload_to='gym_pic/', blank=True, null=True)
+    skills=models.CharField(max_length=500)
+    achievements=models.CharField(max_length=500)
+    achievement_proof=models.FileField(upload_to='achievement_proof/', blank=True, null=True)
+    rating=models.IntegerField(default=0)
+    class Meta:
+        managed=False
+        db_table='tbl_fm_skills'
+
+    def __str__(self):
+        return self.skills

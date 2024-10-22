@@ -1,0 +1,77 @@
+{% load static %}
+{% block content %}
+{% include 'header1.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Manager Skills Details</title>
+    <style>
+        /* Add your CSS styling here */
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            margin-top: 90px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        img {
+            max-width: 100%; /* Responsive image */
+            height: auto; 
+        }
+        .back{
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            margin-left: 0px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Fitness Manager Additional Profile Details</h1>
+    {% if error_message %}
+    <div class="alert alert-warning">{{ error_message }}</div>
+{% endif %}
+
+<!-- Rest of your template code -->
+
+
+    <p><strong>Skills:</strong> {{ fm_skills.skills }}</p>
+    <p><strong>Achievements:</strong> {{ fm_skills.achievements }}</p>
+    <p><strong>Rating:</strong> {{ fm_skills.rating }}</p>
+
+
+    {% if fm_skills.gym_pic %}
+        <p><strong>Profile Picture:</strong></p>
+        <img src="{{ fm_skills.gym_pic.url }}" alt="Gym Picture">
+    {% else %}
+        <p>No profile picture uploaded.</p>
+    {% endif %}
+
+    {% if fm_skills.achievement_proof %}
+        <p><strong>Achievement Proof:</strong></p>
+        <a href="{{ fm_skills.achievement_proof.url }}" download>Download Proof</a>
+    {% else %}
+        <p>No achievement proof uploaded.</p>
+    {% endif %}
+    <br><br><a href="{% url 'select_trainer' %}" class="back">Go Back</a>
+
+</div>
+</body>
+<footer>
+    <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
+</footer>
+{% endblock %}
