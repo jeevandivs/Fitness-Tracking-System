@@ -51,7 +51,7 @@
 
     <p><strong>Skills:</strong> {{ fm_skills.skills }}</p>
     <p><strong>Achievements:</strong> {{ fm_skills.achievements }}</p>
-    <p><strong>Rating:</strong> {{ fm_skills.rating }}</p>
+    <p><strong>Rating:</strong> {{ fm_skills.rating }}/5</p>
 
 
     {% if fm_skills.gym_pic %}
@@ -59,13 +59,6 @@
         <img src="{{ fm_skills.gym_pic.url }}" alt="Gym Picture">
     {% else %}
         <p>No profile picture uploaded.</p>
-    {% endif %}
-
-    {% if fm_skills.achievement_proof %}
-        <p><strong>Achievement Proof:</strong></p>
-        <a href="{{ fm_skills.achievement_proof.url }}" download>Download Proof</a>
-    {% else %}
-        <p>No achievement proof uploaded.</p>
     {% endif %}
     <br><br><a href="{% url 'select_trainer' %}" class="back">Go Back</a>
 

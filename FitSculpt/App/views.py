@@ -625,7 +625,7 @@ def user_profile_view(request):
         client = Client.objects.get(user_id=user_id)  
 
         if request.method == 'POST':
-            form = ClientUpdateForm(request.POST, instance=client)
+            form = ClientUpdateForm(request.POST,request.FILES, instance=client)
             
             new_username = request.POST.get('username')
             
@@ -1520,11 +1520,44 @@ def personal_workout_view(request):
     if not selected_trainer:
         messages.error(request, "You have not selected a trainer yet. Please select a trainer to continue.")
         return redirect('select_trainer')
-    
+    fm_skills = FMSkills.objects.filter(fm_id=selected_trainer.fm_id).first()
+
     context = {
-        'trainer_selected': selected_trainer
+        'trainer_selected': selected_trainer,
+        'fm_skills': fm_skills
     }
     return render(request, 'personal_workout.html', context)
+from django.db.models import F
+from django.shortcuts import redirect
+from django.contrib import messages
+
+@custom_login_required
+def rate_trainer_view(request):
+    if request.method == 'POST':
+        fm_id = request.POST.get('fm_id')
+        new_rating = int(request.POST.get('rating'))
+
+        # Fetch the FMSkills for the selected trainer
+        fm_skills = FMSkills.objects.filter(fm_id=fm_id).first()
+
+        if fm_skills:
+            # Update the rating by calculating the new average
+            existing_rating = fm_skills.rating
+            rating_count = fm_skills.rating_count if fm_skills.rating_count else 1  # Assuming `rating_count` field exists to track number of ratings
+
+            # Calculate the new average rating
+            updated_rating = (existing_rating * rating_count + new_rating) / (rating_count + 1)
+
+            # Update the FMSkills record with new rating and increment rating_count
+            fm_skills.rating = round(updated_rating, 1)  # Rounding to 1 decimal place
+            fm_skills.rating_count = F('rating_count') + 1
+            fm_skills.save()
+
+            messages.success(request, f'Thank you! You rated this trainer {new_rating}/5. The average rating is now {fm_skills.rating}/5.')
+        else:
+            messages.error(request, "Trainer not found or invalid ID.")
+
+    return redirect('personal_workout')
 
 
 from django.shortcuts import render
@@ -1545,8 +1578,15 @@ def select_trainer_view(request):
     except Client.DoesNotExist:
         messages.error(request, "Client not found.")
         return redirect('login')  # Redirect to an appropriate error page
+    
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND active=1", [user_id])
+        result = cursor.fetchone()
+        plan_id = result[0] if result else None
 
-    if request.method == 'POST':
+    has_active_plan = plan_id is not None
+
+    if request.method == 'POST' and has_active_plan:
         trainer_id = request.POST.get('trainer_id')
         selected_time = request.POST.get('timing')
 
@@ -1624,6 +1664,7 @@ def select_trainer_view(request):
 
     context = {
         'trainers_with_details': trainers_with_details,
+        'has_active_plan': has_active_plan,
     }
     return render(request, 'select_trainer.html', context)
 
@@ -1816,6 +1857,17 @@ from .models import FitnessManager, ClientFM2, Client, Designations, Qualificati
 def select_dietitian_view(request):
     user_id = request.session.get('user_id')
 
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT plan_id FROM tbl_payment WHERE user_id = %s AND active=1", [user_id])
+        result = cursor.fetchone()
+        plan_id = result[0] if result else None
+
+    # If there's no active plan, set a flag to prevent selection
+    plan = None
+    workouts = []
+    if plan_id:
+        plan = Plan.objects.get(plan_id=plan_id)
+
     # Fetch the client's name based on the logged-in user's ID
     try:
         client = Client.objects.get(user_id=user_id)
@@ -1861,6 +1913,7 @@ def select_dietitian_view(request):
     return render(request, 'select_dietitian.html', {
         'fitness_managers': fm_details,  # Pass the detailed fitness manager list
         'client_name': client_name,
+         'has_plan': plan_id is not None,
     })
 
 
@@ -2616,15 +2669,18 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
 from .models import Goal  # Ensure the Goal model is correctly imported
+from datetime import datetime
 
 @custom_login_required
 def set_goal(request):
     if request.method == 'POST':
         user_id = request.session.get('user_id')
-        user=Client.objects.filter(user_id=user_id).first()
+        user = Client.objects.filter(user_id=user_id).first()
+        
         if user:
-            weight=user.weight
-            print(weight)
+            weight = user.weight
+            target_value = int(request.POST['target_value'])
+            target_type = request.POST['target_type']
 
         # Check if a goal already exists for the user
         existing_goal = Goal.objects.filter(user_id=user_id).first()
@@ -2633,18 +2689,39 @@ def set_goal(request):
             messages.error(request, 'You have already set a goal.')
             return redirect('goal')  # Redirect back to the goal page
 
-        # Create a new goal since no existing goal was found
+        # Validate that the target value is within ±30 kg of the starting value
+        if abs(target_value - weight) > 30:
+            messages.error(request, 'Target value must be within ±30 kg of the starting value.')
+            return redirect('set_goal')
+
+        # Validate that the target value is not less than the starting value for specific target types
+        if target_type in ["weight gain", "muscle gain", "bulking"] and target_value < weight:
+            messages.error(request, f'Target value for {target_type} should not be less than the starting value.')
+            return redirect('set_goal')
+        if target_type in ["weight loss", "cutting"] and target_value > weight:
+            messages.error(request, f'Target value for {target_type} should not be greater than the starting value.')
+            return redirect('set_goal')
+
+        # Validate that the start date is not in the past
+        start_date_str = request.POST['start_date']
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        if start_date < timezone.now().date():
+            messages.error(request, 'Start date cannot be in the past.')
+            return redirect('set_goal')
+
+        # Create a new goal since no existing goal was found and validation passed
         Goal.objects.create(
-            target_type=request.POST['target_type'],
-            starting_value=user.weight,
-            target_value=request.POST['target_value'],
-            current_value=user.weight,  # Initially set current_value to starting_value
+            target_type=target_type,
+            starting_value=weight,
+            target_value=target_value,
+            current_value=weight,  # Initially set current_value to starting_value
             user_id=user_id,
             no_of_days=request.POST['no_of_days'],
             description=request.POST['description'],
-            start_date=request.POST['start_date'],
+            start_date=start_date,
             end_date=timezone.now() + timezone.timedelta(days=int(request.POST['no_of_days']))
         )
+
         messages.success(request, 'Goal set successfully.')
         return redirect('goal')  # Redirect to the goal page after successful creation
 
@@ -2653,13 +2730,29 @@ def set_goal(request):
 
 @custom_login_required
 def update_goal(request, goal_id):
+    user_id = request.session.get('user_id')
+    user=Client.objects.filter(user_id=user_id).first()
+    if user:
+        weight=user.weight
+        print(weight)
     if request.method == 'POST':
         goal = Goal.objects.get(id=goal_id)
-        goal.current_value = request.POST['current_value']
-        goal.target_value = request.POST['target_value']
+        goal.current_value = int(request.POST['current_value'])
+        goal.target_value = int(request.POST['target_value'])
         goal.no_of_days = request.POST['no_of_days']
+        if goal.target_type in ["weight gain", "muscle gain", "bulking"]:
+            if goal.target_value < goal.starting_value:
+                messages.error(request, 'For weight gain, muscle gain, or bulking, the target value must not be less than the starting value.')
+                return redirect('goal')
 
+        elif goal.target_type in ["weight loss", "cutting"]:
+            if goal.target_value > goal.starting_value:
+                messages.error(request, 'For weight loss or cutting, the target value must not be greater than the starting value.')
+                return redirect('goal')
         goal.save()
+        user.weight=goal.current_value
+        user.save()
+        print(user.weight)
         messages.success(request, 'Goal updated successfully.')
     return redirect('goal')
 

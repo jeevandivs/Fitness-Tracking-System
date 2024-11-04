@@ -15,6 +15,7 @@ class Client(models.Model):
     food_type=models.CharField(max_length=20)
     date_joined=models.DateField(auto_now_add=True) 
     status=models.IntegerField()
+    profile_picture=models.FileField(upload_to='client_profile/', blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'client'
@@ -319,7 +320,8 @@ class FMSkills(models.Model):
     skills=models.CharField(max_length=500)
     achievements=models.CharField(max_length=500)
     achievement_proof=models.FileField(upload_to='achievement_proof/', blank=True, null=True)
-    rating=models.IntegerField(default=0)
+    rating=models.FloatField(default=0)
+    rating_count = models.IntegerField(default=0)
     class Meta:
         managed=False
         db_table='tbl_fm_skills'

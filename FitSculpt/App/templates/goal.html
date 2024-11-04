@@ -247,13 +247,13 @@
                 <input type="number" name="starting_value" id="starting_value" value="{{ weight }}" readonly>
 
                 <label for="target_value">Target Value:Weight in k.g:</label>
-                <input type="number" name="target_value" id="target_value" required>
+                <input type="number" name="target_value" id="target_value" required min="10"  max="250">
 
                 <label for="start_date">Start Date:</label>
                 <input type="date" name="start_date" id="start_date" required>
 
                 <label for="no_of_days">Number of Days:</label>
-                <input type="number" name="no_of_days" id="no_of_days" required>
+                <input type="number" name="no_of_days" id="no_of_days" min="20" max="150" required>
 
                 <label for="description">A Brief Description About Your Goal:</label>
                 <input type="text" name="description" id="description" required>
@@ -276,10 +276,10 @@
                 <input type="number" name="starting_value" id="starting_value" value="{{ goal.starting_value }}" readonly>
 
                 <label for="current_value">Current Value:Weight in k.g:</label>
-                <input type="number" name="current_value" id="current_value" value="{{ goal.current_value }}" required>
+                <input type="number" name="current_value" id="current_value" value="{{ goal.current_value }}" min="10"  max="250" required>
 
                 <label for="target_value">Target Value:Weight in k.g:</label>
-                <input type="number" name="target_value" id="target_value" value="{{ goal.target_value }}" required>
+                <input type="number" name="target_value" id="target_value" value="{{ goal.target_value }}" min="10"  max="250" required>
 
                 <label for="start_date">Start Date:</label>
                 <p>{{ goal.start_date|date:"d-m-Y" }}</p>

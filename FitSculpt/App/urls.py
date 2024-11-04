@@ -20,6 +20,7 @@ urlpatterns = [
     path('view_workout_img/<int:workout_id>/', views.view_workout_img, name='view_workout_img'),
     path('nutrition/', views.nutrition_view, name='nutrition'),
     path('personal_workout', views.personal_workout_view, name='personal_workout'),
+    path('rate_trainer/', rate_trainer_view, name='rate_trainer'),  # Add this line for rating functionality
     path('select_trainer/', views.select_trainer_view, name='select_trainer'),
     path('fm-skills/<int:fm_id>/', fm_skills_view2, name='fm_skills_view'),  # Add this line
     path('view-scheduled-class/', views.view_scheduled_class, name='view_scheduled_class'),

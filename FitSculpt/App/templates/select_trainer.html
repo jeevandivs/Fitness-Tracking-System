@@ -101,6 +101,28 @@
 .alert:hover {
     opacity: 0.9; /* Slightly dim on hover */
 }
+.alert-warning {
+    background-color: #fff3cd; /* Light yellow background */
+    color: #856404; /* Dark yellow text */
+    border: 1px solid #ffeeba; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Padding inside the alert */
+    margin: 20px 0; /* Spacing around the alert */
+    font-size: 16px; /* Font size for readability */
+    text-align: center; /* Center align text */
+}
+
+.alert-warning a {
+    color: #856404; /* Match link color to text */
+    font-weight: bold; /* Make link stand out */
+    text-decoration: underline; /* Underline for emphasis */
+}
+
+.alert-warning a:hover {
+    color: #533f02; /* Darker yellow on hover */
+    text-decoration: none; /* Remove underline on hover */
+}
+
 
     </style>
     <script>
@@ -152,21 +174,14 @@
                 trainerInfo.style.display = 'none'; // Hide if no trainer is selected
             }
         }
+        
     </script>
 </head>
 <body>
 
 <div class="container">
     <h1>Select Trainer</h1>
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
+{% if has_active_plan %}
 
     <form method="POST">
         {% csrf_token %}
@@ -196,10 +211,24 @@
         </div>
 
         <button type="submit" id="submitButton" class="submit-button">Select Trainer</button>
-        <a id="viewDetailsButton" class="btn" style="display: none;">View Additional Details</a> <!-- Hidden by default -->
+        <a id="viewDetailsButton" class="btn" style="display: none;">View Additional Details</a> 
     </form>
-</div>
 
+</div>
+{% else %}
+<div class="alert alert-warning">
+    You do not have an active plan. Please select a  <a href="{% url 'select_plan' %}">Standard Plan or Premium Plan</a> to proceed.
+</div>
+{% endif %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
 </body>
 </html>
 <footer>

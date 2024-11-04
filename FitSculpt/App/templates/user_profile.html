@@ -10,19 +10,21 @@
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
+        margin-top: 90px;
     }
     .profile-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        text-align: center;
-        position: relative;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Gradient background for depth */
+    border-radius: 15px; /* Slightly more rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Deeper shadow for a floating effect */
+    padding: 30px; /* More padding for spaciousness */
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s; 
     }
     .profile-card img {
         border-radius: 50%;
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
         object-fit: cover;
         margin-bottom: 20px;
     }
@@ -51,6 +53,38 @@
     .profile-card .btn:hover {
         background-color: #b35138;
     }
+    .profile-info {
+    text-align: left; /* Align text to the left */
+    padding: 10px 0px;
+    padding-left: 270px;
+    padding-right: 160px; /* Optional: add some vertical padding */
+}
+
+.profile-info h2 {
+    margin-bottom: 15px; /* Space between the title and the first field */
+    font-size: 24px; /* Optional: adjust font size */
+    color: #333; /* Optional: adjust color */
+}
+
+.profile-info p {
+    margin: 5px 0; /* Space between paragraphs */
+    color: #666; /* Optional: adjust color for readability */
+}
+.profile-item {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between label and data */
+    margin: 5px 0; /* Space between paragraphs */
+}
+
+.profile-item strong {
+    flex: 1; /* Allow label to take up available space */
+    color: #333; /* Optional: adjust color */
+}
+
+.profile-item span {
+    flex: 2; /* Allow data to take more space */
+    color: #666; /* Optional: adjust color for readability */
+}
     .edit-form {
         display: none;
         margin-top: 20px;
@@ -132,8 +166,9 @@
     <div class="container">
         <div class="profile-card">
             <!-- Example profile image -->
-            <img src="{% static 'images/profile-placeholder.png' %}" alt="Profile Picture">
-
+            {% if client.profile_picture %}
+            <img src="{{ client.profile_picture.url }}" alt="Profile Picture">
+        {% endif %}
             <!-- Profile Information -->
             {% if messages %}
             <ul class="messages">
@@ -144,13 +179,16 @@
                 {% endfor %}
             </ul>
         {% endif %}
-            <h2>{{ client.name }}</h2>
-            <p><strong>User Name:</strong> {{ client.username }}</p>
-            <p><strong>Email:</strong> {{ client.email }}</p>
-            <p><strong>Phone:</strong> {{ client.phone }}</p>
-            <p><strong>Date of Birth:</strong> {{ client.dob }}</p>
-            <p><strong>Age:</strong> {{ client.age }}</p>
-            <p><strong>Date Joined:</strong> {{ client.date_joined }}</p>
+        <h2>{{ client.name }}</h2>
+        <div class="profile-info">
+            <p class="profile-item"><strong>User Name</strong> <span>: {{ client.username }}</span></p>
+            <p class="profile-item"><strong>Email</strong> <span>: {{ client.email }}</span></p>
+            <p class="profile-item"><strong>Phone</strong> <span>: {{ client.phone }}</span></p>
+            <p class="profile-item"><strong>Date of Birth</strong> <span>: {{ client.dob }}</span></p>
+            <p class="profile-item"><strong>Age</strong> <span>: {{ client.age }}</span></p>
+            <p class="profile-item"><strong>Date Joined</strong> <span>: {{ client.date_joined }}</span></p>
+        </div>
+        
             <a href="#" class="btn" id="edit-btn">Edit Profile</a>
 
             <div class="bmi-box"></div>
@@ -173,7 +211,7 @@
             
 
             <div class="edit-form" id="edit-form">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
                     <center><button type="submit">Update Profile</button></center>

@@ -24,11 +24,13 @@ class ClientUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Client
-        fields = ['username', 'gender', 'height', 'weight', 'food_type']
+        fields = ['username', 'gender', 'height', 'weight', 'food_type','profile_picture']
         widgets = {
             'username': forms.TextInput(attrs={'placeholder': 'Enter your username', 'class': 'form-control'}),
             'height': forms.NumberInput(attrs={'placeholder': 'Enter your height in Centimeters', 'class': 'form-control'}),
             'weight': forms.NumberInput(attrs={'placeholder': 'Enter your weight in Kilograms', 'class': 'form-control'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+
         }
 
     def clean_username(self):

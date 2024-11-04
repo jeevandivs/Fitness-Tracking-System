@@ -183,6 +183,28 @@
 .alert:hover {
     opacity: 0.9; /* Slightly dim on hover */
 }
+.alert-warning {
+    background-color: #fff3cd; /* Light yellow background */
+    color: #856404; /* Dark yellow text */
+    border: 1px solid #ffeeba; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Padding inside the alert */
+    margin: 20px 0; /* Spacing around the alert */
+    font-size: 16px; /* Font size for readability */
+    text-align: center; /* Center align text */
+}
+
+.alert-warning a {
+    color: #856404; /* Match link color to text */
+    font-weight: bold; /* Make link stand out */
+    text-decoration: underline; /* Underline for emphasis */
+}
+
+.alert-warning a:hover {
+    color: #533f02; /* Darker yellow on hover */
+    text-decoration: none; /* Remove underline on hover */
+}
+
 
     </style>
 </head>
@@ -201,7 +223,7 @@
     <a href="{% url 'personal_nutrition' %}" class="goback">Go Back</a>
 
     <h2>Client: {{ client_name }}</h2>
-
+    {% if has_plan %}
     <form method="POST">
         {% csrf_token %}
         <label for="fitness_manager">Select Dietitian :</label>
@@ -212,13 +234,18 @@
                     {{ fm_detail.fm.name }} - {{ fm_detail.fm.email }} - {{ fm_detail.fm.phone }}
                     - {{ fm_detail.designation }} - {{ fm_detail.qualification }}
                 </option>
+                <h3>Details of the Selected Fitness Manager</h3>
             {% endfor %}
         </select>
         
         <button type="submit">Select</button>
     </form>
+    {% else %}
+        <div class="alert alert-warning">
+            You do not have an active plan. Please select <a href="{% url 'select_plan' %}">Premium Plan or Child Plan</a>(If accessable) to proceed.
+        </div>
+    {% endif %}
 
-    <h3>Details of the Selected Fitness Manager</h3>
     <div id="fm-details">
         <!-- Details will be displayed here upon selection -->
     </div>

@@ -139,6 +139,33 @@
 .alert:hover {
     opacity: 0.9; /* Slightly dim on hover */
 }
+    /* Style for the star rating system */
+    .star-rating {
+        direction: rtl; /* Right to left to position highest star first */
+        font-size: 2rem; /* Increase star size */
+        display: inline-flex; /* Align stars in a row */
+    }
+
+    .star-rating input[type="radio"] {
+        display: none; /* Hide radio buttons */
+    }
+
+    .star-rating label {
+        color: #ccc; /* Default color for unselected stars */
+        cursor: pointer; /* Show pointer on hover */
+        transition: color 0.2s; /* Smooth transition for color change */
+    }
+
+    /* Change star color when selected */
+    .star-rating input[type="radio"]:checked ~ label {
+        color: #FFD700; /* Gold color for selected stars */
+    }
+
+    /* Change star color on hover */
+    .star-rating label:hover, .star-rating label:hover ~ label {
+        color: #FFD700; /* Gold color for hovered stars */
+    }
+
 
     </style>
 </head>
@@ -162,6 +189,43 @@
     <!-- Show selected trainer or prompt to select -->
     {% if trainer_selected %}
         <p>You have selected The Trainer: <strong>{{ trainer_selected.fm_name }}</strong></p>
+
+
+    <!-- Star rating form -->
+    <form method="POST" action="{% url 'rate_trainer' %}">
+        {% csrf_token %}
+        <input type="hidden" name="fm_id" value="{{ trainer_selected.fm_id }}">
+        <label for="rating">Rate this Trainer:</label>
+        
+        <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5" required>
+            <label for="star5" title="5 stars">★</label>
+        
+            <input type="radio" id="star4" name="rating" value="4" required>
+            <label for="star4" title="4 stars">★</label>
+        
+            <input type="radio" id="star3" name="rating" value="3" required>
+            <label for="star3" title="3 stars">★</label>
+        
+            <input type="radio" id="star2" name="rating" value="2" required>
+            <label for="star2" title="2 stars">★</label>
+        
+            <input type="radio" id="star1" name="rating" value="1" required>
+            <label for="star1" title="1 star">★</label>
+        </div>
+        
+        
+
+        <button type="submit">Submit Rating</button>
+        {% if fm_skills %}
+    <p>Average Rating: {{ fm_skills.rating }}/5</p>
+{% else %}
+    <p>No rating available for this trainer.</p>
+{% endif %}
+
+
+    </form>
+
         <p>If You Want You Can Change The Trainer</p>
         <a href="{% url 'select_trainer' %}" class="trainer-button">Change Trainer</a>
     {% else %}

@@ -50,8 +50,9 @@
 
         .star-rating {
             display: flex;
-            direction: row-reverse;
+            direction: rtl;
             justify-content: flex-start;
+            display: inline-flex;
         }
 
         .star-rating input {
@@ -62,6 +63,7 @@
             font-size: 2rem;
             color: #ddd;
             cursor: pointer;
+            transition: color 0.2s;
         }
 
         .star-rating input:checked ~ label {

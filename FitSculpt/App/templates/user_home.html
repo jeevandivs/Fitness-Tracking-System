@@ -2,64 +2,78 @@
 {% block content %}
 {% include 'header1.html' %}
 <style>
+    /* Background and Overlay */
     .background-image {
         background-image: url("{% static 'assets/images/bestronger.jpg' %}");
         background-size: cover;
         background-attachment: fixed;
         background-position: center;
-        height: 100vh; 
+        height: 100vh;
         width: 100%;
         position: absolute;
         top: 0;
         left: 0;
-        z-index: -1; 
+        z-index: -1;
+    }
+    .background-image::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: -1;
     }
 
-
+    /* Content Overlay */
     .content-overlay {
         position: relative;
         z-index: 1;
-        padding-top: 250px; 
-        min-height: 100vh; 
+        padding-top: 250px;
+        min-height: 100vh;
     }
 
-    /* Button Styles */
+    /* Button Container */
     .button-container {
         display: flex;
-        justify-content: space-around;
-        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 20px;
     }
 
-    .btn-image {
+    /* Button Item */
+    .button-item {
         position: relative;
-        margin: 0px;
-        border: none;
-        padding: 0;
-        background: none;
-        cursor: pointer;
-        transition: transform 0.2s;
+        width: 300px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+        text-align: center;
+    }
+    .button-item:hover {
+        transform: scale(1.05);
     }
 
-    .btn-image img {
-        max-width: 350px; 
-        border-radius: 30px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Button Text Above Image */
+    .button-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 10px;
     }
 
-    .btn-image:hover {
-        transform: scale(1.1); 
+    /* Button Image */
+    .button-image {
+        width: 100%;
+        height: auto;
+        border-radius: 15px;
+        display: block;
     }
 
-    .btn-text {
-        position: absolute;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: rgb(255, 254, 254);
-        font-weight:1000;
-        text-shadow: 0px 0px 6px rgba(3, 0, 0, 0.5);
-    }
-
+    /* Footer */
     footer {
         text-align: center;
         padding: 20px;
@@ -75,63 +89,16 @@
         display: flex;
         flex-direction: column;
     }
-    h1 {
-    margin-top: 0; /* Remove extra top margin to align it directly under the header */
-    color: white;  /* Set the text color to white */
-    padding-top: 10px; /* Adjust padding to position it under the header */
-    text-align: center; /* Center the text */
-}
 
+    h1 {
+        color: white;
+        padding-top: 10px;
+        text-align: center;
+    }
 
     main {
         flex: 1;
     }
-    /* General styles for the message list */
-.messages {
-    list-style-type: none; /* Remove default list styling */
-    padding: 0; /* Remove default padding */
-    margin: 20px 0; /* Margin for spacing */
-}
-
-/* Style for each alert message */
-.alert {
-    padding: 15px; /* Add padding inside the alert */
-    margin-bottom: 10px; /* Space between alerts */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 16px; /* Font size */
-}
-
-/* Specific styles for different alert types */
-.alert-success {
-    background-color: #d4edda; /* Light green background */
-    color: #155724; /* Dark green text */
-    border: 1px solid #c3e6cb; /* Border color */
-}
-
-.alert-error, .alert-danger {
-    background-color: #f8d7da; /* Light red background */
-    color: #721c24; /* Dark red text */
-    border: 1px solid #f5c6cb; /* Border color */
-}
-
-.alert-warning {
-    background-color: #fff3cd; /* Light yellow background */
-    color: #856404; /* Dark yellow text */
-    border: 1px solid #ffeeba; /* Border color */
-}
-
-.alert-info {
-    background-color: #d1ecf1; /* Light blue background */
-    color: #0c5460; /* Dark blue text */
-    border: 1px solid #bee5eb; /* Border color */
-}
-
-/* Additional hover effect for better UX */
-.alert:hover {
-    opacity: 0.9; /* Slightly dim on hover */
-}
-
-
 </style>
 
 <main>
@@ -147,32 +114,22 @@
         {% endif %}
         
         <div class="container-fluid content-overlay">
-            <b><h1>Welcome to User Dashboard</h1></b>
-
             <div class="background-image"></div>
 
             <div class="row justify-content-center">
-                <div class="button-container col-lg-6 col-md-6 col-xs-12">
-                    <button class="btn-image">
-                        <a href="{% url 'workouts' %}">
-                            <img src="{% static 'assets/images/track_workouts.jpg' %}" alt="Track Your Workouts">
-                            <span class="btn-text">Track Your Workouts</span>
-                        </a>
-                    </button>
-
-                    <button class="btn-image">
-                        <a href="{% url 'nutrition' %}">
-                            <img src="{% static 'assets/images/track_nutrition.jpg' %}" alt="Track Your Nutrition">
-                            <span class="btn-text">Track Your Nutrition</span>
-                        </a>
-                    </button>
-
-                    <button class="btn-image">
-                        <a href="{% url 'mental_fitness' %}">
-                            <img src="{% static 'assets/images/mental_fitness.jpg' %}" alt="Track Your Mental Fitness">
-                            <span class="btn-text">Your Mental Health</span>
-                        </a>
-                    </button>
+                <div class="button-container col-lg-6 col-md-8 col-xs-12">
+                    <a href="{% url 'workouts' %}" class="button-item">
+                        <h2 class="button-text">Track Your Workouts</h2>
+                        <img src="{% static 'assets/images/track_workouts.jpg' %}" alt="Track Your Workouts" class="button-image">
+                    </a>
+                    <a href="{% url 'nutrition' %}" class="button-item">
+                        <h2 class="button-text">Track Your Nutrition</h2>
+                        <img src="{% static 'assets/images/track_nutrition.jpg' %}" alt="Track Your Nutrition" class="button-image">
+                    </a>
+                    <a href="{% url 'mental_fitness' %}" class="button-item">
+                        <h2 class="button-text">Your Mental Health</h2>
+                        <img src="{% static 'assets/images/mental_fitness.jpg' %}" alt="Your Mental Health" class="button-image">
+                    </a>
                 </div>
             </div>
         </div>
