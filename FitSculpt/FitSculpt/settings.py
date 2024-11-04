@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 
 ]
 
@@ -91,14 +92,25 @@ WSGI_APPLICATION = 'FitSculpt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'fitsculpt',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fitsculpt',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': 'fitsculpt_doorblack',
+        'USER': 'fitsculpt_doorblack',
+        'PASSWORD': '8118999a7836e512c93c9218431f0e6348f60a14',
+        'HOST': '1v1ft.h.filess.io',
+        'PORT': '3307',
     }
 }
 AUTHENTICATION_BACKENDS = (
@@ -154,6 +166,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER ='jeevandominic2025@mca.ajce.in'
 EMAIL_HOST_PASSWORD = '####'
 DEFAULT_FROM_EMAIL = 'jeevandominic2025@mca.ajce.in'
+
+
 
 #google signin
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # To disable email verification for testing
