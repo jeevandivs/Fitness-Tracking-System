@@ -52,7 +52,7 @@ termcolor==2.4.0
 typing_extensions==4.5.0
 tzdata==2023.4
 urllib3==2.2.2
-vboxapi==1.0
+# vboxapi==1.0
 Werkzeug==3.0.6
 wrapt==1.16.0
 zipp==3.20.2
