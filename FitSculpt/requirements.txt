@@ -3,7 +3,6 @@ asgiref==3.7.2
 astunparse==1.6.3
 backports.zoneinfo==0.2.1
 cachetools==5.5.0
-certifi==2024.7.4
 cffi==1.17.0
 charset-normalizer==3.3.2
 cryptography==43.0.0
