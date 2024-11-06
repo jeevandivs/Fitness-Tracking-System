@@ -108,10 +108,10 @@ WSGI_APPLICATION = 'FitSculpt.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fitsculpt_successfog',
-        'USER': 'fitsculpt_successfog',
-        'PASSWORD': 'abbe16027592ac85786ff996a936087ea55390d7',
-        'HOST': '8f0rn.h.filess.io',
+        'NAME': 'fitsculpt_ifvertical',
+        'USER': 'fitsculpt_ifvertical',
+        'PASSWORD': 'd493cc17d9898d347118ae59722a34c40543551d',
+        'HOST': '37lub.h.filess.io',
         'PORT': '3307',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
