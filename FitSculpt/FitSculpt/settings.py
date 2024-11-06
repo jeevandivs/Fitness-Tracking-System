@@ -108,10 +108,10 @@ WSGI_APPLICATION = 'FitSculpt.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fitsculpt_doorblack',
-        'USER': 'fitsculpt_doorblack',
-        'PASSWORD': '8118999a7836e512c93c9218431f0e6348f60a14',
-        'HOST': '1v1ft.h.filess.io',
+        'NAME': 'fitsculpt_aboutcrop',
+        'USER': 'fitsculpt_aboutcrop',
+        'PASSWORD': '16f9d85cdd3c08e3635bc838e51fe1c951e58e11',
+        'HOST': 'rb51n.h.filess.io',
         'PORT': '3307',
     }
 }
