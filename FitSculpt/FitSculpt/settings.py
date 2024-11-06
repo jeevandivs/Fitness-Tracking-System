@@ -113,6 +113,9 @@ DATABASES = {
         'PASSWORD': '16f9d85cdd3c08e3635bc838e51fe1c951e58e11',
         'HOST': 'rb51n.h.filess.io',
         'PORT': '3307',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 AUTHENTICATION_BACKENDS = (
