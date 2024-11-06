@@ -110,7 +110,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'fitsculpt_successfog',
         'USER': 'fitsculpt_successfog',
-        'PASSWORD': '16f9d85cdd3c08e3635bc838e51fe1c951e58e11',
+        'PASSWORD': 'abbe16027592ac85786ff996a936087ea55390d7',
         'HOST': '8f0rn.h.filess.io',
         'PORT': '3307',
         'OPTIONS': {

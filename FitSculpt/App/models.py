@@ -16,9 +16,9 @@ class Client(models.Model):
     date_joined=models.DateField(auto_now_add=True) 
     status=models.IntegerField()
     profile_picture=models.FileField(upload_to='client_profile/', blank=True, null=True)
-    class Meta:
-        managed = False
-        db_table = 'client'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'client'
     def __str__(self):
         return self.username
     @property
@@ -36,9 +36,9 @@ class Plan(models.Model):
     description = models.TextField()  # Description of the plan
     service_no = models.IntegerField()  # Assuming service_id relates to some service in your application
     
-    class Meta:
-        managed = False
-        db_table = 'tbl_plans'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_plans'
     def __str__(self):
         return self.plan_name
 
@@ -54,9 +54,9 @@ class Payment(models.Model):
     mode = models.CharField(max_length=50) 
     status = models.CharField(max_length=50)  
     active=models.IntegerField()
-    class Meta:
-        managed = False
-        db_table = 'tbl_payment'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_payment'
     def __str__(self):
         return f"Payment {self.payment_id} - {self.status}"
 
@@ -76,9 +76,9 @@ class FitnessManager(models.Model):
     interview_time=models.DateTimeField()
 
 
-    class Meta:
-        managed = False
-        db_table = 'tbl_fitness_manager'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_fitness_manager'
     def __str__(self):
         return self.name
     
@@ -86,17 +86,17 @@ class Qualifications(models.Model):
     qualification_id=models.AutoField(primary_key=True)
     qualification=models.CharField(max_length=50)
     certification=models.CharField(max_length=100)
-    class Meta:
-        managed = False
-        db_table = 'tbl_qualifications'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_qualifications'
 
 class Designations(models.Model):
     designation_id=models.AutoField(primary_key=True)
     designation=models.CharField(max_length=50)
 
-    class Meta:
-        managed = False
-        db_table = 'tbl_designations'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_designations'
     
 
 class Service(models.Model):
@@ -108,9 +108,9 @@ class Service(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100)
     day=models.IntegerField()
-    class Meta:
-        managed = False
-        db_table = 'tbl_services'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_services'
 
     def __str__(self):
         return self.description
@@ -124,9 +124,9 @@ class Workout(models.Model):
     workout_image = models.FileField(upload_to='workout_img/', blank=True, null=True)
     reference_video=models.CharField(max_length=200)
 
-    class Meta:
-        managed = False
-        db_table = 'tbl_workouts'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_workouts'
 
     def __str__(self):
         return self.workout_name
@@ -142,9 +142,9 @@ class FoodDatabase(models.Model):
     fats = models.FloatField()
     food_type = models.CharField(max_length=50)  
 
-    class Meta:
-        managed = False
-        db_table = 'tbl_food_database'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_food_database'
 
     def __str__(self):
         return self.food_name
@@ -155,9 +155,9 @@ class Nutrition(models.Model):
     food = models.ForeignKey(FoodDatabase, on_delete=models.CASCADE, related_name='nutritions')
     description = models.TextField()
 
-    class Meta:
-        managed = False
-        db_table = 'tbl_nutritions'
+    # class Meta:
+    #     managed = False
+    #     db_table = 'tbl_nutritions'
 
     def __str__(self):
         return self.nutrition_no
@@ -174,9 +174,9 @@ class ClientFM(models.Model):
     status = models.IntegerField()
     class_time=models.DateTimeField()
 
-    class Meta:
-        managed=False
-        db_table= 'tbl_client_fm'
+    # class Meta:
+    #     managed=False
+    #     db_table= 'tbl_client_fm'
 
     def __str__(self):
         return f"{self.client_name} with {self.fm_name}"
@@ -189,9 +189,9 @@ class ClientFM2(models.Model):
     client_name=models.CharField(max_length=50)
     fm_name=models.CharField(max_length=50)
  
-    class Meta:
-        managed=False
-        db_table= 'tbl_clientfm2'
+    # class Meta:
+    #     managed=False
+    #     db_table= 'tbl_clientfm2'
 
     def __str__(self):
         return f"{self.client_name} with {self.fm_name}"
@@ -205,9 +205,9 @@ class Message(models.Model):
     message_reply = models.CharField(max_length=1000)
 
 
-    class Meta:
-        managed=False
-        db_table = 'tbl_messages'
+    # class Meta:
+    #     managed=False
+    #     db_table = 'tbl_messages'
 
     def __str__(self):
         return f"Message from {self.sender_id} to {self.receiver_id}"
@@ -224,9 +224,9 @@ class EatingHabit(models.Model):
     intake_no=models.IntegerField()
 
 
-    class Meta:
-        managed=False
-        db_table='tbl_food_habits'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_food_habits'
 
     def __str__(self):
         return f"{self.habit} - {self.food_item} ({self.food_type})"
@@ -239,9 +239,9 @@ class EatingHabit2(models.Model):
     status=models.IntegerField()
     intake_no=models.IntegerField()
 
-    class Meta:
-        managed=False
-        db_table='tbl_eating_habit'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_eating_habit'
 
     def __str__(self):
         return self.habit_no
@@ -252,9 +252,9 @@ class Feedback(models.Model):
     content=models.CharField(max_length=1000)
     star_rating=models.IntegerField(default=0)
     
-    class Meta:
-        managed=False
-        db_table='tbl_feedback'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_feedback'
 
     def __str__(self):
         return self.id
@@ -272,9 +272,9 @@ class MentalFitness(models.Model):
     class_time=models.DateTimeField()
     status=models.IntegerField()
     
-    class Meta:
-        managed=False
-        db_table='tbl_mental_fitness'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_mental_fitness'
 
     def __str__(self):
         return self.id
@@ -291,9 +291,9 @@ class Goal(models.Model):
     end_date=models.DateField()
     description=models.CharField(max_length=500)
 
-    class Meta:
-        managed=False
-        db_table='tbl_goal'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_goal'
 
     def __str__(self):
         return self.id
@@ -306,9 +306,9 @@ class Progress(models.Model):
     current_bmi=models.FloatField()
     current_bmi_date=models.DateField()
 
-    class Meta:
-        managed=False
-        db_table='tbl_progress'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_progress'
 
     def __str__(self):
         return self.id
@@ -322,9 +322,9 @@ class FMSkills(models.Model):
     achievement_proof=models.FileField(upload_to='achievement_proof/', blank=True, null=True)
     rating=models.FloatField(default=0)
     rating_count = models.IntegerField(default=0)
-    class Meta:
-        managed=False
-        db_table='tbl_fm_skills'
+    # class Meta:
+    #     managed=False
+    #     db_table='tbl_fm_skills'
 
     def __str__(self):
         return self.skills
