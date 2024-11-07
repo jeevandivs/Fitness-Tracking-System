@@ -49,20 +49,17 @@
             background-color: #fffcfc;
             color: white;
         }
-        .btn{
-            background-color: #b35138;
-            color: white;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: none; /* 
-            .messages {
-    list-style-type: none; /* Remove default list styling */
-    padding: 0; /* Remove default padding */
-    margin: 20px 0; /* Margin for spacing */
+        .btn {
+    background-color: #b35138;
+    color: white;
+    padding: 10px 15px; /* Adjusted padding for smaller width */
+    width: auto; /* Set width to auto, or specify a value like 150px */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
 }
+
 
 /* Style for each alert message */
 .alert {
@@ -180,6 +177,15 @@
 <body>
 
 <div class="container">
+    {% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
     <h1>Select Trainer</h1>
 {% if has_active_plan %}
 
@@ -200,8 +206,11 @@
                 </option>
             {% endfor %}
         </select>
+        <a id="viewDetailsButton" class="btn" style="display: none;">View Trainer Details</a> 
 
-        <div class="trainer-info" id="trainerInfo"></div>
+        <div class="trainer-info" id="trainerInfo">
+
+        </div>
 
         <div class="timing-dropdown" id="timingDropdown">
             <label for="timing">Select Timing: Training is For One Hour from Monday To Saturday</label>
@@ -211,7 +220,6 @@
         </div>
 
         <button type="submit" id="submitButton" class="submit-button">Select Trainer</button>
-        <a id="viewDetailsButton" class="btn" style="display: none;">View Additional Details</a> 
     </form>
 
 </div>
@@ -220,15 +228,7 @@
     You do not have an active plan. Please select a  <a href="{% url 'select_plan' %}">Standard Plan or Premium Plan</a> to proceed.
 </div>
 {% endif %}
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </li>
-    {% endfor %}
-</ul>
-{% endif %}
+
 </body>
 </html>
 <footer>

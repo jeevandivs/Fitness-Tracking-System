@@ -44,8 +44,7 @@ urlpatterns = [
 
 
 
-
-
+    path('fm_header/', views.fm_header, name='fm_header'),
     path('fm_home/', views.fm_home_view, name='fm_home'),
     path('fm_home2/', views.fm_home_view2, name='fm_home2'),
     path('fm_home3/', views.fm_home_view3, name='fm_home3'),

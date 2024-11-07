@@ -57,7 +57,7 @@
     text-align: left; /* Align text to the left */
     padding: 10px 0px;
     padding-left: 270px;
-    padding-right: 160px; /* Optional: add some vertical padding */
+    padding-right: 120px; /* Optional: add some vertical padding */
 }
 
 .profile-info h2 {
@@ -189,7 +189,7 @@
             <p class="profile-item"><strong>Date Joined</strong> <span>: {{ client.date_joined }}</span></p>
         </div>
         
-            <a href="#" class="btn" id="edit-btn">Edit Profile</a>
+            <a href="#" class="btn" id="edit-btn">Update Your Profile</a>
 
             <div class="bmi-box"></div>
                 {% if bmi %}
@@ -204,7 +204,7 @@
                         <p>You are obese.</p>
                     {% endif %}
                 {% else %}
-                    <p>Update your height and weight to calculate BMI.</p>
+                    <p>Update your profile  to proceed.</p>
                 {% endif %}
             </div>
             

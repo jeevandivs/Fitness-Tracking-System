@@ -222,7 +222,6 @@
         {% endif %}
     <a href="{% url 'personal_nutrition' %}" class="goback">Go Back</a>
 
-    <h2>Client: {{ client_name }}</h2>
     {% if has_plan %}
     <form method="POST">
         {% csrf_token %}

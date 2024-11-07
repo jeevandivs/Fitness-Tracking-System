@@ -170,7 +170,7 @@ def login_view(request):
                     update_inactive_payments(user.user_id)
                     update_expired_classes(user.user_id)
                     update_expired_mental_classes(user.user_id)
-                    return redirect('user_home')  
+                    return redirect('user_profile')  
                 else:
                     messages.error(request, 'Invalid username or password.')
         except Client.DoesNotExist:
@@ -935,7 +935,8 @@ def admin_fm_view(request):
 def delete_fm(request, user_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE tbl_fitness_manager SET status=0 WHERE user_id = %s", [user_id])
-    return redirect('admin_fm')
+    messages.success(request, "Deleted...!")
+    return redirect('admin_fm' )
 def delete_client(request, user_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE client SET status=0 WHERE user_id = %s", [user_id])
@@ -1037,7 +1038,7 @@ def interview_fm_view(request, user_id):
                     )
 
                     # Update the interview status to 'rejected'
-                    cursor.execute("UPDATE tbl_fitness_manager SET interview_status = 'rejected' WHERE user_id = %s", [user_id])
+                    cursor.execute("UPDATE tbl_fitness_manager SET status = 0 WHERE user_id = %s", [user_id])
 
                     messages.success(request, "Registration rejected and email sent.")
             else:
@@ -1130,6 +1131,8 @@ def add_workout(request):
         )
         workout.save()  # This saves the workout and assigns the workout_id
         workout_id = workout.workout_id  # Get the auto-incremented workout_id
+        messages.success(request, "Workout Added")
+
 
         # Get the selected plans from the form
         selected_plans = request.POST.getlist('plans')
@@ -1209,6 +1212,8 @@ def update_workout(request, workout_id):
             workout.workout_image = request.FILES['workout_image']
 
         workout.save()  # Save updated workout details
+        messages.success(request, "Workout Updated")
+
 
         # Delete existing services for this workout
         Service.objects.filter(workout_id=workout_id).delete()
@@ -1281,9 +1286,11 @@ def delete_workout(request, workout_id):
     workout = Workout.objects.get(workout_id=workout_id)
     if request.method == 'POST':
         workout.delete()
+        messages.success(request, "Workout Deleted...!")
+
         return redirect('see_all_workouts')
 
-    return render(request, 'delete_workout.html', {'workout': workout})  # Confirm delete
+    return redirect(request, 'delete_workout', {'workout': workout})  # Confirm delete
 
 
 
@@ -1375,6 +1382,7 @@ def add_food(request):
             fats=fats
         )
         food.save()  # Save the food entry
+        messages.success(request, "Food Added")
 
         food_id = food.food_id  # Get the newly created food_id
         print(food_id)
@@ -1418,6 +1426,8 @@ def update_food(request, food_id):
         food.carbs = request.POST['carbs']
         food.fats = request.POST['fats']
         food.save()
+        messages.success(request, "Food Updated")
+
         return redirect('see_all_food')
 
     return render(request, 'update_food.html', {'food': food})  # Render form with workout details
@@ -1426,6 +1436,8 @@ def delete_food(request, food_id):
     food = FoodDatabase.objects.get(food_id=food_id)
     if request.method == 'POST':
         food.delete()
+        messages.success(request, "Food Deleted")
+
         return redirect('see_all_food')
 
     return render(request, 'delete_food.html', {'food': food})  # Confirm delete
@@ -2095,7 +2107,7 @@ def client_message_view(request, fm_id):
 
     # Fetch conversation history
     messages = (Message.objects.filter(sender_id=client_id, receiver_id=fm_id) | 
-               Message.objects.filter(sender_id=fm_id, receiver_id=client_id)).order_by('-id')
+               Message.objects.filter(sender_id=fm_id, receiver_id=client_id)).order_by('id')
     
     return render(request, 'client_message.html', {'messages': messages, 'fm_id': fm_id})
 
@@ -2876,7 +2888,7 @@ def goal_progress(request):
     except Goal.DoesNotExist:
         # Handle case where no goal is found for the user
         messages.error(request, 'No goal found for your account.')
-        return redirect('some_view')  # Redirect to a suitable view
+        return redirect('goal')  # Redirect to a suitable view
 
     context = {
         'goal': goal,
@@ -2955,6 +2967,29 @@ def fm_skills_view(request):
 
     return render(request, 'fm_skills.html', {'fm_skills': fm_skills})
 
+
+
+from django.shortcuts import render
+from .models import FitnessManager, Designations
+
+@fm_custom_login_required
+def fm_header(request):
+    fm_id = request.session.get('fm_user_id')
+    print(fm_id)
+    
+    fitness_manager = FitnessManager.objects.filter(user_id=fm_id).first()
+    designation_id = fitness_manager.designation_id if fitness_manager else None
+    print(designation_id)
+    
+    workout_trainer = designation_id in [2, 5]
+    dietitian = designation_id == 3
+    mental_fm = designation_id == 4
+
+    return render(request, 'fm_header.html', {
+        'workout_trainer': workout_trainer,
+        'dietitian': dietitian,
+        'mental_fm': mental_fm
+    })
 
 
 

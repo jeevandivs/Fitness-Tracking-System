@@ -6,212 +6,179 @@
 <head>
     <style>
         /* Button Styles */
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px; /* Spacing below the buttons */
-}
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px; /* Spacing below the buttons */
+        }
 
-.day-button {
-    background-color: #b35138; /* Bootstrap primary color */
-    color: white;
-    padding: 10px 20px;
-    margin: 0 10px; /* Spacing between buttons */
-    border: none;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: background-color 0.3s, transform 0.3s;
-}
+        .day-button {
+            background-color: #b35138; /* Bootstrap primary color */
+            color: white;
+            padding: 10px 20px;
+            margin: 0 10px; /* Spacing between buttons */
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.3s;
+        }
 
-.day-button:hover {
-    background-color: #b35138; /* Darker shade on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-}
+        .plan-button {
+            background-color: #b35138; /* Bootstrap primary color */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.3s;
+        }
 
-/* Paragraph Styles */
-.plan-description {
-    text-align: center;
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    color: #666;
-}
+        .plan-button:hover {
+            background-color: #b35138; /* Darker shade on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
 
-.error-message {
-    text-align: center;
-    font-size: 1.1rem;
-    color: red;
-    margin-top: 20px;
-}
+        .day-button:hover {
+            background-color: #b35138; /* Darker shade on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
 
-    .content-wrapper {
+        .plan-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 250px; /* Increase this value to move the button further down */
+        }
+
+        .content-wrapper {
             padding-top: 80px;
         }
+
         header {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background-color: #333;
-    color: white;
-    z-index: 1000;  /* Ensure header is on top */
-    text-align: center;
-}
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            z-index: 1000;  /* Ensure header is on top */
+            text-align: center;
+        }
 
-h1 {
-    text-align: center;
-    margin: 20px 0;
-    font-size: 2.5rem;
-    color: #333;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
 
-.container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 100px 20px 20px;  
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2.5rem;
+            color: #333;
+        }
 
-.plan-description {
-    text-align: center;
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-    color: #666;
-}
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 100px 20px 20px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
 
-.error-message {
-    text-align: center;
-    font-size: 1.2rem;
-    color: red;
-    margin-top: 20px;
-}
+        .workout-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
 
-/* Workout List Styling */
-.workout-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-}
+        .workout-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
 
-.workout-item {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    transition: transform 0.3s ease;
-}
+        .workout-item:hover {
+            transform: translateY(-5px);
+        }
 
-.workout-item:hover {
-    transform: translateY(-5px);
-}
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #f6f4f4;
+            color: rgb(4, 0, 0);
+            width: 100%;
+            margin-bottom: 0px;
+        }
 
-.workout-image img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-}
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
 
-.workout-details {
-    text-align: center;
-    margin-top: 15px;
-}
+            h1 {
+                font-size: 2rem;
+            }
 
-.workout-details h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.workout-details p {
-    font-size: 1rem;
-    color: #555;
-}
-
-.workout-details strong {
-    color: #000;
-}
-
-/* Footer Styling */
-footer {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #f6f4f4;
-    color: rgb(4, 0, 0);
-    width: 100%;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        width: 95%;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    .workout-details h2 {
-        font-size: 1.3rem;
-    }
-}
-
+            .workout-details h2 {
+                font-size: 1.3rem;
+            }
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workouts</title>
 </head>
 <body>
-
-    <div class="container">
-        <div class="button-container">
-            <a href="{% url 'workouts_by_day' 1 %}" class="day-button">Day 1- Chest</a>
-            <a href="{% url 'workouts_by_day' 6 %}" class="day-button">Day 2- Back</a>
-            <a href="{% url 'workouts_by_day' 4 %}" class="day-button">Day 3- Biceps</a>
-            <a href="{% url 'workouts_by_day' 5 %}" class="day-button">Day 4- Triceps</a>
-            <a href="{% url 'workouts_by_day' 3 %}" class="day-button">Day 5- Shoulder</a>
-            <a href="{% url 'workouts_by_day' 2 %}" class="day-button">Day 6- Leg</a>
-        </div>
-        {% if plan %}
-    <h1>Workouts for {{ plan.plan_name }}</h1>
-    <p>{{ plan.description }}</p>
-
-    <div class="workout-list">
-        {% for workout in workouts %}
-            <div class="workout-item">
-                <h2>{{ workout.workout_name }}</h2>
-                <p>{{ workout.description }}</p>
-                <p><strong>Body Part:</strong> {{ workout.body_part }}</p>
-                <p><strong>Duration:</strong> {{ workout.duration }} minutes 3*12 sets</p>
-                <a href="{% url 'view_workout_img' workout.workout_id %}">View Image</a> {{ workout.workout_name }}
+    {% if plan %}
+        <div class="container">
+            <div class="button-container">
+                <a href="{% url 'workouts_by_day' 1 %}" class="day-button">Day 1- Chest</a>
+                <a href="{% url 'workouts_by_day' 6 %}" class="day-button">Day 2- Back</a>
+                <a href="{% url 'workouts_by_day' 4 %}" class="day-button">Day 3- Biceps</a>
+                <a href="{% url 'workouts_by_day' 5 %}" class="day-button">Day 4- Triceps</a>
+                <a href="{% url 'workouts_by_day' 3 %}" class="day-button">Day 5- Shoulder</a>
+                <a href="{% url 'workouts_by_day' 2 %}" class="day-button">Day 6- Leg</a>
             </div>
-        {% empty %}
-            <p>Please Select the Day.</p>
-        {% endfor %}
-    </div>
-    <div class="plan-buttons">
-        {% if plan.plan_name == 'Premium Plan' %}
-            <a href="{% url 'personal_workout' %}" class="day-button">Workout Guidance</a>
-        {% elif plan.plan_name == 'Standard Plan' %}
-            <a href="{% url 'personal_workout' %}" class="day-button">Workout Guidance</a>
-        
-        {% endif %}
-    </div>
-{% else %}
-    <p>{{ error }}</p>
-{% endif %}
 
-    </div>
+            <h1>Workouts for {{ plan.plan_name }}</h1>
+            <p>{{ plan.description }}</p>
+
+            <div class="workout-list">
+                {% for workout in workouts %}
+                    <div class="workout-item">
+                        <h2>{{ workout.workout_name }}</h2>
+                        <p>{{ workout.description }}</p>
+                        <p><strong>Body Part:</strong> {{ workout.body_part }}</p>
+                        <p><strong>Duration:</strong> {{ workout.duration }} minutes 3*12 sets</p>
+                        <a href="{% url 'view_workout_img' workout.workout_id %}">View Image</a> {{ workout.workout_name }}
+                    </div>
+                {% empty %}
+                    <p>Please Select the Day.</p>
+                {% endfor %}
+            </div>
+
+            <div class="plan-buttons">
+                {% if plan.plan_name == 'Premium Plan' %}
+                    <a href="{% url 'personal_workout' %}" class="day-button">Workout Guidance</a>
+                {% elif plan.plan_name == 'Standard Plan' %}
+                    <a href="{% url 'personal_workout' %}" class="day-button">Workout Guidance</a>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="plan-button-container">
+            <a href="{% url 'plans' %}" class="plan-button">Please Choose a valid Plan To Continue</a>
+        </div>
+    {% endif %}
 </body>
 </html>
 <footer>
     <p>&copy; {{ 2024 }} My Fitness Site. All rights reserved.</p>
-</footer> 
+</footer>
 {% endblock %}
