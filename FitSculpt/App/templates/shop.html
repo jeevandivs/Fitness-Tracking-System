@@ -1,0 +1,459 @@
+{% block content %}
+<style>
+    /* Header styling */
+    header {
+        background-color: black;
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        position: fixed;
+        
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        left: 0px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    /* Sidebar styling */
+    .sidebar {
+        width: 250px;
+        background-color: #f1f1f1;
+        color: #333;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: 100vh;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar ul li {
+        margin-bottom: 15px;
+    }
+
+    .sidebar ul li a {
+        text-decoration: none;
+        color: black;
+        font-weight: 600;
+        display: block;
+        padding: 10px 15px;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .sidebar ul li a:hover {
+        background-color: #2874f0;
+        color: white;
+    }
+
+    /* Main content area */
+    .content {
+        margin-left: 270px; /* Adjust for sidebar width */
+        margin-top: 90px; /* Adjust for header height */
+        padding: 20px;
+    }
+
+    /* Search bar */
+    .search-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .search-input {
+        width: 55%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px 0 0 20px;
+        outline: none;
+    }
+
+    .search-btn {
+        padding: 10px 20px;
+        background-color: #2874f0;
+        color: white;
+        border: none;
+        border-radius: 0 20px 20px 0;
+        cursor: pointer;
+    }
+
+    .search-btn:hover {
+        background-color: #1b62c1;
+    }
+
+    /* Search results container */
+    .search-results {
+        position: absolute;
+        top: 100%; /* Position below the search input */
+        left: 0;
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        display: none; /* Initially hidden */
+    }
+
+    .search-result-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .search-result-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .search-result-item h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .search-result-item p {
+        font-size: 12px;
+        color: #555;
+    }
+
+    .search-result-item span {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Show search results when there are suggestions */
+    .search-results.show {
+        display: block;
+    }
+
+    /* For mobile responsiveness */
+    @media (max-width: 768px) {
+        .search-input {
+            width: 70%;
+        }
+    }
+
+    /* Product listing */
+    .product-list .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .product-card {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        text-align: center;
+        flex: 1 1 calc(25% - 15px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .product-image {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        margin-bottom: 10px;
+    }
+
+    .product-card h5 {
+        font-size: 16px;
+        margin: 10px 0;
+    }
+
+    .product-card p {
+        font-size: 14px;
+        color: #555;
+        margin: 5px 0 15px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-info {
+        background-color: #ff9f00;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #ff7700;
+    }
+
+    .btn-primary {
+        background-color: #2874f0;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #1b62c1;
+    }
+
+    /* Filters */
+    .filters {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .filters h4 {
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .styled-select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-btn {
+        margin-top: 10px;
+        background-color: #2874f0;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-btn:hover {
+        background-color: #1b62c1;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Select all Add to Cart buttons
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+        // Add click event listener to each button
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id'); // Get the product ID from the button
+
+                fetch(`/add-to-cart/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'), // Add CSRF token for security
+                    },
+                    body: JSON.stringify({
+                        quantity: 1 // You can update this to fetch quantity dynamically
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message); // Show success message
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Something went wrong. Please try again.');
+                });
+            });
+        });
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Function to send a POST request for adding to wishlist
+        function addToWishlist(productId) {
+            fetch(`/wishlist/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Add CSRF token for security
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Show success or error message
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+            });
+        }
+
+        // Add click event listener to wishlist buttons
+        const wishlistButtons = document.querySelectorAll('.add-to-wishlist');
+        wishlistButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                addToWishlist(productId);
+            });
+        });
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+
+<header>
+    <h1>Fitsculpt Shop</h1>
+</header>
+
+<div class="sidebar">
+    <ul>
+        <li><a href="{% url 'shop' %}">Home</a></li>
+        <li><a href="{% url 'cart_view' %}">My Cart</a></li>
+        <li><a href="{% url 'orders' %}">Orders</a></li>
+        <li><a href="{% url 'view_wishlist' %}">Wishlist</a></li>
+        <li><a href="{% url 'user_home' %}">Return to Fitsculpt</a></li>
+
+    </ul>
+</div>
+
+<div class="content">
+    <!-- Search bar -->
+    <div class="search-bar">
+        <form method="GET" action="{% url 'search_products' %}" id="search-form">
+            <input type="text" name="query" placeholder="Search for products..." class="search-input" id="search-input" />
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+        <div id="search-results" class="search-results"></div>
+    </div>
+    
+    <script>
+    // Add an event listener to the search input field
+    document.getElementById('search-input').addEventListener('input', function() {
+        const query = this.value;
+        
+        if (query.length > 1) {
+            fetch(`{% url 'search_products' %}?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById('search-results');
+                    resultsContainer.innerHTML = '';  // Clear previous results
+                    
+                    if (data.products.length > 0) {
+                        resultsContainer.classList.add('show'); // Show the search results
+                        data.products.forEach(product => {
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('search-result-item');
+                            resultItem.innerHTML = `
+                                <h4>${product.name}</h4>
+                            `;
+                            // Add event listener to each result item
+                            resultItem.addEventListener('click', function() {
+                                document.getElementById('search-input').value = product.name;  // Fill search input with clicked suggestion
+                                document.getElementById('search-form').submit();  // Submit the form automatically
+                            });
+                            resultsContainer.appendChild(resultItem);
+                        });
+                    } else {
+                        resultsContainer.innerHTML = '<p>No products found</p>';
+                        resultsContainer.classList.add('show'); // Show even if no results
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-results').classList.remove('show'); // Hide if query is too short
+        }
+    });
+</script>
+
+    
+    <!-- Category Filters -->
+    <div class="filters">
+        <h4>Filters</h4>
+        <form method="GET" action="{% url 'filter_products' %}">
+            <label for="category">Category:</label>
+            <select name="category" id="category" class="styled-select">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="filter-btn">Apply</button>
+        </form>
+    </div>
+
+    <!-- Product Listing -->
+    <div class="product-list">
+        <div class="row">
+            {% for product in products %}
+                <div class="product-card">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    <h5>{{ product.name }}</h5>
+                    <p>Rs. {{ product.price }}</p>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-info">View Details</a>
+                    <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+    
+                    {% if product.id in wishlist_items %}
+                        <span style="font-size: 24px; color: red;">❤️</span> <!-- Heart emoji -->
+                    {% else %}
+                        <button class="btn btn-secondary add-to-wishlist" data-product-id="{{ product.id }}">Add to Wishlist</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

@@ -41,6 +41,18 @@ urlpatterns = [
     path('progress/', views.progress, name='progress'),
     path('get_bmi_data/<str:selected_date>/', get_bmi_data, name='get_bmi_data'),
     path('goal_progress/', goal_progress, name='goal_progress'),
+    path('shop', views.shop_home, name='shop'),
+    path('product/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('search/', views.search_products, name='search_products'),
+    path('filter/', views.filter_products, name='filter_products'),
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/', views.cart_view, name='cart_view'),
+    path('remove-from-cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('orders/', views.order_view, name='orders'),
+    path('wishlist/', views.view_wishlist, name='view_wishlist'),
+    path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/<int:wishlist_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
 
 
 
@@ -107,6 +119,18 @@ urlpatterns = [
     path('admin_delete_plan/<int:plan_id>/', views.admin_delete_plan, name='admin_delete_plan'),
     path('view_sessions/', views.view_sessions_view, name='view_sessions'),
     path('view_feedbacks/', views.view_feedbacks, name='view_feedbacks'),
+    path('admin_shop/', views.admin_shop, name='admin_shop'),
+    path('admin_shop_add/', views.add_product, name='add_product'),
+    path('admin_shop_edit/<int:product_id>/', views.edit_product, name='edit_product'),
+    path('admin_shop_delete/<int:product_id>/', views.delete_product, name='delete_product'),
+    path('admin_shop_orders/', views.manage_orders, name='manage_orders'),
+    path('stock-management/', views.stock_management, name='stock_management'),
+    path('initiate-payment/', views.initiate_payment, name='initiate_payment'),
+    path('address-confirmation/', views.address_confirmation, name='address_confirmation'),
+    path('verify-payment/', views.verify_payment, name='verify_payment'),
+    path('payment-success/', views.payment_success, name='payment_success'),
+    path('payment-failed/', views.payment_failed, name='payment_failed'),
+
 
 
 

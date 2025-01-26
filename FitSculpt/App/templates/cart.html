@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <style>
+        /* Include header and sidebar styling from previous pages */
+        header {
+            background-color: black;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            left: 0px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f1f1f1;
+            color: #333;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            font-weight: 600;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #2874f0;
+            color: white;
+        }
+
+        .content {
+            margin-left: 270px; /* Adjust for sidebar width */
+            margin-top: 90px; /* Adjust for header height */
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #2874f0;
+            color: white;
+        }
+
+        input[type="number"] {
+            padding: 5px;
+            width: 60px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background-color: #2874f0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .btn-primary:hover {
+            background-color: #1b62c1;
+        }
+        .quantity-btn {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #2874f0;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+
+        .quantity-btn:hover {
+            background-color: #1b62c1;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            font-size: 18px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Fitsculpt Shop</h1>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul>
+            <li><a href="{% url 'shop' %}">Home</a></li>
+            <li><a href="{% url 'cart_view' %}">My Cart</a></li>
+            <li><a href="{% url 'orders' %}">Orders</a></li>
+            <li><a href="{% url 'view_wishlist' %}">Wishlist</a></li>
+
+        </ul>
+    </div>
+
+    <!-- Content Section for Cart -->
+    <div class="content">
+        <h1>Your Cart</h1>
+
+        {% if cart_items %}
+            <form method="post">
+                {% csrf_token %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>
+                                    <button type="button" class="quantity-btn" onclick="updateQuantity({{ item.id }}, 'minus')">-</button>
+                                    <input type="number" name="quantity_{{ item.id }}" class="quantity-input" value="{{ item.quantity }}" min="1" readonly>
+                                    <button type="button" class="quantity-btn" onclick="updateQuantity({{ item.id }}, 'plus')">+</button>
+                                </td>
+                                <td>{{ item.product.price }}</td>
+                                <td>{{ item.total_price }}</td>
+                                <td>
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="btn-primary" style="background-color: red;">Remove from Cart</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h2>Total: Rs. {{ total_price }}</h2>
+                <button type="submit" class="btn-primary">Update Cart</button>
+            </form>
+            <a href="{% url 'address_confirmation' %}" class="btn btn-primary">Proceed to Checkout</a>
+            {% else %}
+            <p>Your cart is empty!</p>
+            <a href="{% url 'shop' %}" class="btn-primary">Continue Shopping</a>
+        {% endif %}
+    </div>
+
+    <script>
+        // JavaScript to handle the plus and minus buttons
+        function updateQuantity(itemId, action) {
+            const quantityInput = document.querySelector(`input[name="quantity_${itemId}"]`);
+            let quantity = parseInt(quantityInput.value);
+
+            if (action === 'plus') {
+                quantity++;
+            } else if (action === 'minus' && quantity > 1) {
+                quantity--;
+            }
+
+            quantityInput.value = quantity;
+
+            // Optionally, you can trigger the form submission here to update the database
+            // e.g., automatically submit the form to update cart quantities
+        }
+    </script>
+
+</body>
+</html>

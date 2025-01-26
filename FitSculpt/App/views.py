@@ -2992,6 +2992,555 @@ def fm_header(request):
     })
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from .models import Product, Order
+
+# Admin views for managing the shop
+from django.db.models import Q
+
+from django.db import connection
+@admin_custom_login_required
+def admin_shop(request):
+    query = request.GET.get('search', '')  # Get the search query from the request
+    selected_category = request.GET.get('category', '')  # Get the selected category ID
+    
+    # Fetch all categories from the database
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, name FROM app_category")
+        categories = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+    
+    # Filter products based on search query and selected category
+    products = Product.objects.all()
+    if query:
+        products = products.filter(name__icontains=query)
+    if selected_category:
+        products = products.filter(category_id=selected_category)
+    
+    # Map category IDs to category names
+    category_map = {category['id']: category['name'] for category in categories}
+    for product in products:
+        product.category_name = category_map.get(product.category_id, "Unknown")
+    
+    return render(request, 'admin_shop.html', {
+        'products': products,
+        'query': query,
+        'categories': categories,
+        'selected_category': selected_category
+    })
+from django.db import connection
+from django.shortcuts import render
+from .models import Product
+@admin_custom_login_required
+def stock_management(request):
+    query = request.GET.get('search', '').strip()
+    selected_category = request.GET.get('category', '').strip()
+
+    # Get all categories for the dropdown
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, name FROM app_category")
+        categories = [{"id": row[0], "name": row[1]} for row in cursor.fetchall()]
+
+    # Filter products based on search and category
+    products = Product.objects.all()
+    if query:
+        products = products.filter(name__icontains=query)
+    if selected_category:
+        products = products.filter(category_id=selected_category)
+
+    # Find products with stock 2 or less
+    low_stock_products = products.filter(stock__lte=2)
+
+    # Map category names to products
+    category_map = {category['id']: category['name'] for category in categories}
+    for product in products:
+        product.category_name = category_map.get(product.category_id, "Unknown")
+
+    return render(request, 'stock_management.html', {
+        'products': products,
+        'categories': categories,
+        'query': query,
+        'selected_category': selected_category,
+        'low_stock_products': low_stock_products,
+    })
+
+
+
+
+from django.db import connection
+@admin_custom_login_required
+def add_product(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        description = request.POST['description']
+        price = request.POST['price']
+        stock = request.POST['stock']
+        category_id = request.POST['category']
+        image = request.FILES.get('image')
+
+        # Save the product with the selected category ID
+        product = Product(
+            name=name,
+            description=description,
+            price=price,
+            stock=stock,
+            category_id=category_id,
+            image=image
+        )
+        product.save()
+
+        return redirect('admin_shop')
+
+    # Fetch all categories for the dropdown
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, name FROM app_category")
+        categories = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+
+    return render(request, 'add_product.html', {'categories': categories})
+
+
+from django.db import connection
+@admin_custom_login_required
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    # Fetch all categories for display
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, name FROM app_category")
+        categories = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+
+    if request.method == "POST":
+        product.name = request.POST['name']
+        product.description = request.POST['description']
+        product.price = request.POST['price']
+        product.stock = request.POST['stock']
+        if 'image' in request.FILES:
+            product.image = request.FILES['image']
+        product.save()
+        return redirect('admin_shop')
+
+    return render(request, 'edit_product.html', {'product': product, 'categories': categories})
+
+@admin_custom_login_required
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.delete()
+    return redirect('admin_shop')
+@admin_custom_login_required
+def manage_orders(request):
+    orders = Order.objects.select_related('product').all()
+    return render(request, 'manage_orders.html', {'orders': orders})
+
+# views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Product, Category
+from django.db.models import Q
+
+
+@custom_login_required
+def shop_home(request):
+    user_id = request.session.get('user_id')
+    print(user_id)
+    
+    # Fetch categories and products
+    categories = Category.objects.all()
+    products = Product.objects.all()
+
+    # Search functionality
+    query = request.GET.get('query', '')
+    if query:
+        products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
+
+    # Filter by category
+    category_id = request.GET.get('category', '')
+    if category_id:
+        products = products.filter(category_id=category_id)
+
+    # Fetch wishlist items for the user
+    wishlist_items = Wishlist.objects.filter(user_id=user_id).values_list('product_id', flat=True)
+
+    context = {
+        'categories': categories,
+        'products': products,
+        'wishlist_items': wishlist_items,  # Pass wishlist product IDs to the template
+    }
+    return render(request, 'shop.html', context)
+
+
+# Product details page
+@custom_login_required
+def product_detail(request, product_id):
+    user_id = request.session.get('user_id')
+    print(user_id)
+    product = get_object_or_404(Product, id=product_id)
+    wishlist_items = Wishlist.objects.filter(user_id=user_id).values_list('product_id', flat=True)
+
+    return render(request, 'product_detail.html', {'product': product,'wishlist_items': wishlist_items})
+
+
+from django.http import JsonResponse
+from transformers import pipeline
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+from django.db.models import Q
+
+# Load the pre-trained NLP model for feature extraction
+nlp_model = pipeline("feature-extraction", model="sentence-transformers/all-MiniLM-L6-v2")
+
+BODY_PART_SYNONYMS = {
+    "hand": ["wrist", "arm", "fingers", "grip"],
+    "leg": ["thigh", "calf", "foot", "ankle"],
+    "shoulder": ["arm", "neck", "upper body"],
+    "back": ["spine", "posture", "lower back", "pull up bar"],
+    "chest": ["pecs", "pectorals", "upper body", "push up"],
+    "weight loss": ["fat burn", "slimming", "cardio"],
+    "muscle gain": ["bodybuilding", "strength training", "mass gain"],
+    # Add more terms as needed
+}
+
+def expand_query(query):
+    """Expand the query using synonyms if found."""
+    expanded_terms = BODY_PART_SYNONYMS.get(query.lower(), [])
+    return [query] + expanded_terms
+
+@custom_login_required
+def search_products(request):
+    query = request.GET.get('query', '').strip()
+    if not query:
+        return JsonResponse({'products': []})
+
+    # Expand the query using synonyms
+    expanded_queries = expand_query(query)
+    
+    # Fetch all products using substring search
+    substring_matches = Product.objects.filter(
+        Q(name__icontains=query) | Q(description__icontains=query)
+    )[:10]  # Limit the results for performance
+
+    # Fetch all products for semantic similarity search
+    products = Product.objects.all()
+    product_descriptions = [product.description for product in products]
+
+    # Encode the query and product descriptions into vectors
+    query_vectors = [np.mean(nlp_model(q), axis=1) for q in expanded_queries]
+    product_vectors = [np.mean(nlp_model(desc), axis=1) for desc in product_descriptions if desc]
+
+    # Compute cosine similarity between each query vector and product vectors
+    similarities = [
+        max(cosine_similarity(query_vector, pv)[0][0] for query_vector in query_vectors)
+        for pv in product_vectors
+    ]
+
+    # Rank products by similarity score
+    ranked_products = sorted(
+        zip(products, similarities), 
+        key=lambda x: x[1], 
+        reverse=True
+    )
+
+    # Filter products with a similarity score above a threshold
+    semantic_matches = [prod for prod, score in ranked_products if score > 0.5][:10]  # Limit to top 10
+
+    # Combine substring matches and semantic matches, ensuring no duplicates
+    combined_results = list(set(substring_matches) | set(semantic_matches))
+
+    # Prepare the data to send back
+    results = [{
+        'id': product.id,
+        'name': product.name,
+        'description': product.description,
+        'price': str(product.price),  # Convert Decimal to string for JSON
+        'image': product.image.url if product.image else None,
+    } for product in combined_results]
+
+    return JsonResponse({'products': results})
+
+
+# Filter products by category
+@custom_login_required
+def filter_products(request):
+    user_id = request.session.get('user_id')
+    print(user_id)
+    category_id = request.GET.get('category')  # Get the category_id from the request
+    if category_id:
+        products = Product.objects.filter(category_id=category_id)  # Filter products by category_id
+    else:
+        products = Product.objects.all()  # If no category is provided, show all products
+
+    # Fetching the category details to display on the page (optional)
+    category = Category.objects.filter(id=category_id).first() if category_id else None
+    
+    return render(request, 'shop.html', {'products': products, 'category': category})
+
+from django.views.decorators.csrf import csrf_exempt  # Required for AJAX requests if CSRF token is missing
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Cart
+
+@csrf_exempt  # Remove this if you handle CSRF tokens in the frontend
+@custom_login_required
+def add_to_cart(request, product_id):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)  # Parse JSON body
+        quantity = data.get('quantity', 1)  # Default quantity is 1
+        user_id = request.session.get('user_id')  # Assuming user_id is stored in session
+        
+        # Check if the item is already in the cart
+        cart_item, created = Cart.objects.get_or_create(user_id=user_id, product_id=product_id)
+        if not created:
+            # If the item is already in the cart, update the quantity
+            # cart_item.quantity += quantity
+            # cart_item.save()
+            message = 'Item already in the cart.Please check your cart.'
+        else:
+            cart_item.quantity = quantity
+            cart_item.save()
+            message = 'Item added to cart successfully!'
+        
+        return JsonResponse({'message': message})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+from django.shortcuts import render, redirect
+from .models import Cart
+
+@custom_login_required
+def cart_view(request):
+    user_id = request.session.get('user_id')  # Assuming user_id is stored in session
+    cart_items = Cart.objects.filter(user_id=user_id,status=0)
+    # Handle the POST request to update cart quantities
+    if request.method == 'POST':
+        for item in cart_items:
+            # Get the new quantity from the form
+            new_quantity = request.POST.get(f'quantity_{item.id}')
+            if new_quantity:
+                new_quantity = int(new_quantity)  # Convert to integer
+                if new_quantity != item.quantity:
+                    item.quantity = new_quantity  # Update quantity
+                    item.save()  # Save the updated item to the database
+
+        # Redirect to the same cart page after updating
+        return redirect('cart_view')
+
+    # Calculate total cart value (reflecting updated quantities)
+    total_price = sum(item.quantity * item.product.price for item in cart_items)
+
+    return render(request, 'cart.html', {'cart_items': cart_items, 'total_price': total_price})
+
+
+@custom_login_required
+def remove_from_cart(request, item_id):
+    cart_item = Cart.objects.get(id=item_id)
+    cart_item.delete()  # Delete the item from the cart
+
+    return redirect('cart_view')
+
+
+from django.shortcuts import render
+from .models import Order, Address  # Replace `myapp` with your actual app name
+
+@custom_login_required
+def order_view(request):
+    user_id = request.session.get('user_id')  # Assuming session contains user ID
+    orders = Order.objects.filter(user_id=user_id, status='Paid').select_related('address', 'product').order_by('-order_date')
+    return render(request, 'order.html', {'orders': orders})
+
+
+
+import razorpay
+from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from .models import Order, Payment
+
+# Razorpay client initialization    
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+@custom_login_required
+def initiate_payment(request):
+    user_id = request.session.get('user_id')  # Adjust as per your authentication system
+    cart_items = Cart.objects.filter(user_id=user_id, status=0)  # Cart items for the user
+
+    if not cart_items:
+        return redirect('cart')  # Redirect if no items in cart
+
+    # Calculate total amount
+    total_amount = sum(item.total_price for item in cart_items)
+
+    # Create an order
+    razorpay_order = razorpay_client.order.create({
+        "amount": int(total_amount * 100),  # Razorpay works with paise
+        "currency": "INR",
+        "payment_capture": "1"
+    })
+
+    # Save the order
+    order = Order.objects.create(
+        user_id=user_id,
+        product=cart_items[0].product,  # Assuming one product per order for simplicity
+        quantity=cart_items[0].quantity,
+        total_price=total_amount,
+    )
+
+    payment = Shop_Payment.objects.create(
+        user_id=user_id,
+        order=order,
+        razorpay_order_id=razorpay_order['id'],
+        amount=total_amount,
+    )
+
+    # Update cart status and product stock after payment
+    if razorpay_order:  # Ensure the order was created successfully
+        for cart_item in cart_items:
+            # Update the stock of the associated product
+            product = cart_item.product
+            if product.stock >= cart_item.quantity:
+                product.stock -= cart_item.quantity
+                product.save()
+            else:
+                # Handle insufficient stock scenario if needed
+                return redirect('cart')  # Redirect back to cart
+
+            # Update the cart status to 1 (delivered/processed)
+            cart_item.status = 1
+            cart_item.save()
+
+    # Pass Razorpay details to template
+    context = {
+        "order": order,
+        "payment": payment,
+        "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+        "razorpay_order_id": razorpay_order['id'],
+        "amount": total_amount,
+        "currency": "INR",
+    }
+    return render(request, 'payment.html', context)
+
+
+from django.shortcuts import render, redirect
+from .models import Address, Cart
+
+@custom_login_required
+def address_confirmation(request):
+    user_id = request.session.get('user_id')
+    
+    # Check if the user already has an address
+    address = Address.objects.filter(user_id=user_id).first()
+    
+    if request.method == "POST":
+        if address:
+            # Update the existing address
+            address.address_line1 = request.POST.get("address_line1")
+            address.city = request.POST.get("city")
+            address.state = request.POST.get("state")
+            address.zip_code = request.POST.get("zip_code")
+            address.contact_number = request.POST.get("contact_number")
+            address.save()
+        else:
+            # Create a new address
+            address = Address.objects.create(
+                user_id=user_id,
+                address_line1=request.POST.get("address_line1"),
+                city=request.POST.get("city"),
+                state=request.POST.get("state"),
+                zip_code=request.POST.get("zip_code"),
+                contact_number=request.POST.get("contact_number"),
+            )
+        
+        request.session['address_id'] = address.id
+        return redirect('initiate_payment')
+
+    # Retrieve cart items and calculate total price
+    cart_items = Cart.objects.filter(user_id=user_id)
+    total_price = sum(item.total_price for item in cart_items)
+    
+    # Pass the address (if exists) to the template
+    return render(
+        request, 
+        'address_confirmation.html', 
+        {'cart_items': cart_items, 'total_price': total_price, 'address': address}
+    )
+
+
+
+
+@csrf_exempt
+def verify_payment(request):
+    if request.method == "POST":
+        data = request.POST
+        razorpay_order_id = data.get('razorpay_order_id')
+        razorpay_payment_id = data.get('razorpay_payment_id')
+        razorpay_signature = data.get('razorpay_signature')
+
+        payment = get_object_or_404(Shop_Payment, razorpay_order_id=razorpay_order_id)
+
+        try:
+            # Verify the payment signature
+            razorpay_client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+            # Update payment details and status
+            payment.razorpay_payment_id = razorpay_payment_id
+            payment.razorpay_signature = razorpay_signature
+            payment.status = 'Completed'
+            payment.save()
+
+            # Update the order status
+            payment.order.status = 'Paid'
+            payment.order.save()
+
+            return redirect('payment_success')
+        except razorpay.errors.SignatureVerificationError:
+            print("Razorpay Order ID:", razorpay_order_id)
+            print("Razorpay Payment ID:", razorpay_payment_id)
+            print("Razorpay Signature:", razorpay_signature)
+            print("Payment verification failed.")
+
+            payment.status = 'Failed'
+            payment.save()
+            return redirect('payment_failed')
+
+def payment_success(request):
+    return render(request, 'Shop_payment_success.html')
+def payment_failed(request):
+    return render(request, 'shop_payment_failed.html')
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from .models import Product, Wishlist
+@custom_login_required
+def add_to_wishlist(request, product_id):
+    if request.method == "POST":
+        user_id = request.session.get('user_id')  # Assuming you have user authentication
+        product = get_object_or_404(Product, id=product_id)
+
+        # Check if the item is already in the wishlist
+        existing_item = Wishlist.objects.filter(user_id=user_id, product=product).first()
+        if existing_item:
+            return JsonResponse({"message": "Item already in wishlist"}, status=400)
+
+        # Add item to wishlist
+        Wishlist.objects.create(user_id=user_id, product=product)
+        return JsonResponse({"message": "Item added to wishlist successfully"}, status=200)
+
+    return JsonResponse({"message": "Invalid request method"}, status=405)
+@custom_login_required
+def view_wishlist(request):
+    user_id = request.session.get('user_id')  # Assuming user authentication
+    wishlist_items = Wishlist.objects.filter(user_id=user_id).select_related('product')
+    context = {
+        'wishlist_items': wishlist_items
+    }
+    return render(request, 'wishlist.html', context)
+@custom_login_required
+def remove_from_wishlist(request, wishlist_id):
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_id, user_id = request.session.get('user_id'))
+    wishlist_item.delete()
+    return redirect('view_wishlist')  # Replace with the name of your wishlist URL
 
 
 

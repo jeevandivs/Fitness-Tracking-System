@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Confirmation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        /* Header styling */
+        header {
+            background-color: black;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            background-color: #f1f1f1;
+            color: #333;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            font-weight: 600;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .sidebar ul li a:hover {
+            background-color: #2874f0;
+            color: white;
+        }
+
+        /* Content styling */
+        .content {
+            margin-left: 270px;
+            margin-top: 90px;
+            padding: 20px;
+        }
+        .form-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .form-control {
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-success {
+            background-color: #2874f0;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn-success:hover {
+            background-color: #1b62c1;
+        }
+        h4 {
+            color: #2874f0;
+            margin-top: 20px;
+        }
+        .order-summary {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Address Confirmation</h1>
+    </header>
+    <div class="sidebar">
+        <ul>
+            <li><a href="{% url 'shop' %}">Home</a></li>
+            <li><a href="{% url 'cart_view' %}">My Cart</a></li>
+            <li><a href="{% url 'orders' %}">Orders</a></li>
+            <li><a href="{% url 'view_wishlist' %}">Wishlist</a></li>
+
+        </ul>
+    </div>
+    <div class="content">
+        <div class="row">
+            <!-- Address Form -->
+            <div class="col-lg-7 col-md-8">
+                <h2>Confirm Your Address</h2>
+                <form method="post" action="{% url 'address_confirmation' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="address_line1" class="form-label">Address Line</label>
+                        <input type="text" name="address_line1" id="address_line1" class="form-control" 
+                               value="{{ address.address_line1 }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" name="city" id="city" class="form-control" 
+                               value="{{ address.city }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" name="state" id="state" class="form-control" 
+                               value="{{ address.state }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="zip_code" class="form-label">ZIP Code</label>
+                        <input type="text" name="zip_code" id="zip_code" class="form-control" 
+                               value="{{ address.zip_code }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_number" class="form-label">Contact Number</label>
+                        <input type="text" name="contact_number" id="contact_number" class="form-control" 
+                               value="{{ address.contact_number }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Confirm and Proceed to Payment</button>
+                </form>
+                
+            </div>
+            <!-- Order Summary -->
+            <div class="col-lg-5 col-md-4">
+                <div class="order-summary">
+                    <h4>Order Summary</h4>
+                    <ul>
+                        {% for item in cart_items %}
+                            <li>{{ item.product.name }} (x{{ item.quantity }}) - ₹{{ item.total_price }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>Total Price:</strong> ₹{{ total_price }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -117,6 +117,15 @@
     {% endif %}
 
     <b><h1>Welcome To Admin Dashboard</h1></b>
+    <div class="button-container">
+        <!-- Shop Management Button -->
+        <div class="btn-image">
+            <a href="{% url 'admin_shop' %}">
+                <img src="{% static 'assets/images/fitness shop.jpg' %}" alt="Shop Management">
+                <div class="btn-text">Shop Management</div>
+            </a>
+        </div>
+    </div>
 </div>
 
 <footer>

@@ -1,0 +1,167 @@
+<!-- update_quantity.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Quantity</title>
+    <style>
+        /* Header styling */
+        header {
+            background-color: black;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            left: 0px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            background-color: #f1f1f1;
+            color: #333;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            font-weight: 600;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #2874f0;
+            color: white;
+        }
+
+        /* Main content area */
+        .content {
+            margin-left: 270px;
+            margin-top: 90px;
+            padding: 20px;
+        }
+
+        .content h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Form styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+        }
+
+        form div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #2874f0;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: #1b62c1;
+        }
+
+        /* Back to Cart button */
+        .btn-back {
+            margin-top: 20px;
+            display: inline-block;
+            background-color: #ff9f00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background-color: #ff7700;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fitsculpt Shop</h1>
+    </header>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="{% url 'shop' %}">Home</a></li>
+            <li><a href="{% url 'cart_view' %}">My Cart</a></li>
+            <li><a href="{% url 'orders' %}">Orders</a></li>
+            <li><a href="{% url 'view_wishlist' %}">Wishlist</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h1>Update Quantity for {{ cart_item.product_id }}</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" value="{{ cart_item.quantity }}" min="1">
+            </div>
+            <button type="submit" class="btn-primary">Update Quantity</button>
+        </form>
+        
+        <a href="{% url 'cart_view' %}" class="btn-back">Back to Cart</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<form action="{% url 'verify_payment' %}" method="POST">
+    {% csrf_token %}
+    <script 
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="{{ razorpay_key_id }}"
+        data-amount="{{ amount|floatformat:2|add:'0'|add:'00' }}"
+        data-currency="{{ currency }}"
+        data-order_id="{{ razorpay_order_id }}"
+        data-buttontext="Pay with Razorpay"
+        data-name="Your Store Name"
+        data-description="Order Payment"
+        data-theme.color="#F37254">
+    </script>
+    <input type="hidden" name="razorpay_order_id" value="{{ razorpay_order_id }}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+<style>
+    form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+    }
+    .razorpay-payment-button {
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: blue !important; /* Custom button color */
+        color: white !important;
+        border: none;
+        cursor: pointer;
+        justify-content: center;
+    }
+
+    .razorpay-payment-button:hover {
+        background-color: blue !important; /* Hover effect */
+    }
+</style>
+
