@@ -21,7 +21,7 @@ from .decorators import *
 from django.utils.html import strip_tags
 from datetime import datetime,date
 
-
+ 
 def index_view(request):
     return render(request, 'index.html')
 
@@ -3205,7 +3205,9 @@ def expand_query(query):
 
 @custom_login_required
 def search_products(request):
+    
     query = request.GET.get('query', '').strip()
+    
     if not query:
         return JsonResponse({'products': []})
 
@@ -3542,5 +3544,119 @@ def remove_from_wishlist(request, wishlist_id):
     wishlist_item.delete()
     return redirect('view_wishlist')  # Replace with the name of your wishlist URL
 
+from django.shortcuts import render
+from .utils.mind_body_synergy import multi_output_model, encoder_dict, scaler
+import pandas as pd
 
+def predict_fitness(request):
+    if request.method == 'POST':
+        # Extract user inputs from the form
+        user_data = {
+            'Physical_Fitness_Level': request.POST.get('physical_fitness_level'),
+            'Exercise_Hours_Per_Week': float(request.POST.get('exercise_hours_per_week')),
+            'Sleep_Hours_Per_Night': float(request.POST.get('sleep_hours_per_night')),
+            'Diet_Quality': request.POST.get('diet_quality'),
+        }
 
+        # Convert to DataFrame
+        input_data = pd.DataFrame([user_data])
+
+        # Encode categorical columns
+        for col in ["Physical_Fitness_Level", "Diet_Quality"]:
+            encoder = encoder_dict.get(col)
+            if encoder:
+                input_data[col] = input_data[col].apply(
+                    lambda x: encoder.transform([x])[0] if x in encoder.classes_ else -1
+                )
+
+        # Scale the data
+        input_data_scaled = scaler.transform(input_data)
+
+        # Predict outcomes
+        predictions = multi_output_model.predict(input_data_scaled)
+
+        # Decode categorical predictions where applicable
+        predictions_df = pd.DataFrame(predictions, columns=[
+            "Mental_Fitness_Level", "Stress_Level", "Social_Engagement_Score",
+            "Depression_Score", "Anxiety_Score", "Confidence_Level", "Cleverness_Score", "Focus_Level"
+        ])
+
+        def decode_column(col, value):
+            encoder = encoder_dict.get(col)
+            return encoder.inverse_transform([int(round(value))])[0] if encoder else value
+
+        for col in ["Mental_Fitness_Level", "Stress_Level", "Confidence_Level", "Focus_Level"]:
+            predictions_df[col] = predictions_df[col].apply(lambda x: decode_column(col, x))
+
+        # Render results
+        return render(request, 'predict_results.html', {
+            'predictions': predictions_df.iloc[0].to_dict(),
+        })
+
+    return render(request, 'predict_form.html')
+    
+from django.shortcuts import render
+from .models import Client
+from .utils.injury_predictor import predict_injury
+from .decorators import custom_login_required
+
+@custom_login_required
+def injury_prediction_view(request):
+    user_id = request.session.get("user_id")
+
+    try:
+        client = Client.objects.get(user_id=user_id)
+        player_age = client.age
+        player_weight = client.weight
+        player_height = client.height
+        gender = client.gender
+    except Client.DoesNotExist:
+        return render(request, "injury_prediction.html", {"message": "Client not found."})
+
+    # Initialize default values for context
+    is_pregnant = 0
+    previous_injuries = 0
+    disease_status = 0
+    diseases = []
+    injury_type = "Other"
+
+    if request.method == "POST":
+        # Extract form data
+        previous_injuries = int(request.POST["previous_injuries"])
+        is_pregnant = int(request.POST.get("is_pregnant", 0)) if gender.lower() == "female" else 0
+        disease_status = int(request.POST["disease_status"])
+        diseases = request.POST.get("disease_details", "").split(",") if disease_status == 1 else []
+        injury_type = request.POST["injury_type"]
+
+        # Prepare input for model
+        input_data = [
+            player_age, player_weight, player_height, previous_injuries,
+            gender, is_pregnant, disease_status, len(diseases), injury_type
+        ]
+
+        # Predict outcomes
+        prediction = predict_injury(input_data)
+        training_intensity, likelihood_of_injury, recovery_time = prediction
+
+        context = {
+            "training_intensity": training_intensity,
+            "likelihood_of_injury": likelihood_of_injury,
+            "recovery_time": recovery_time,
+            "form_data": input_data,
+            "injury_type": injury_type
+        }
+        return render(request, "injury_result.html", context)
+
+    # Default context for GET request
+    context = {
+        "player_age": player_age,
+        "player_weight": player_weight,
+        "player_height": player_height,
+        "gender": gender,
+        "is_pregnant": is_pregnant,
+        "previous_injuries": previous_injuries,
+        "disease_status": disease_status,
+        "diseases": diseases,
+        "injury_type": injury_type,
+    }
+    return render(request, "injury_prediction.html", context)

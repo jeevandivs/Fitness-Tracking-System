@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Injury Prediction Result</title>
+</head>
+<body>
+    <h1>Injury Prediction Results</h1>
+    <p>Injury Type: {{ injury_type }}</p>
+    <p>Training Intensity: {{ training_intensity }}</p>
+    <p>Likelihood of Injury: {{ likelihood_of_injury }}</p>
+    <p>Recovery Time: {{ recovery_time }}</p>
+    <a href="{% url 'injury_prediction' %}">Go back to the form</a>
+</body>
+</html>

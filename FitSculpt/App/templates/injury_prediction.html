@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extended Injury Prediction Form</title>
+    <script>
+        function togglePregnancyField() {
+            const gender = document.getElementById("gender").value.toLowerCase();
+            const isPregnant = document.getElementById("is_pregnant").value;
+            const pregnancyMonthsField = document.getElementById("pregnancy_months");
+            
+            // Show pregnancy months field if gender is female and pregnant
+            if (gender === "female" && isPregnant === "1") {
+                pregnancyMonthsField.style.display = "block";
+            } else {
+                pregnancyMonthsField.style.display = "none";
+            }
+        }
+
+        function toggleInjuryDetails() {
+            const hasInjury = document.getElementById("previous_injuries").value;
+            const injuryDetailsField = document.getElementById("injury_details");
+            
+            // Show injury details field if previous injuries exist
+            if (hasInjury === "1") {
+                injuryDetailsField.style.display = "block";
+            } else {
+                injuryDetailsField.style.display = "none";
+            }
+        }
+
+        function toggleDiseaseDetails() {
+            const hasDisease = document.getElementById("disease_status").value;
+            const diseaseDetailsField = document.getElementById("disease_details");
+            
+            // Show disease details field if diseases exist
+            if (hasDisease === "1") {
+                diseaseDetailsField.style.display = "block";
+            } else {
+                diseaseDetailsField.style.display = "none";
+            }
+        }
+
+        // Initialize form fields on page load
+        window.onload = function () {
+            togglePregnancyField();
+            toggleInjuryDetails();
+            toggleDiseaseDetails();
+        };
+    </script>
+</head>
+<body>
+    <h1>Extended Injury Prediction Form</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="player_age">Player Age:</label>
+        <input type="number" id="player_age" name="player_age" value="{{ player_age }}" readonly><br><br>
+
+        <label for="player_weight">Player Weight (kg):</label>
+        <input type="number" step="0.01" id="player_weight" name="player_weight" value="{{ player_weight }}" readonly><br><br>
+
+        <label for="player_height">Player Height (cm):</label>
+        <input type="number" step="0.01" id="player_height" name="player_height" value="{{ player_height }}" readonly><br><br>
+
+        <label for="gender">Gender:</label>
+        <input type="text" id="gender" name="gender" value="{{ gender }}" readonly><br><br>
+
+        <div id="pregnancy_status" style="display: {% if gender == 'female' %}block{% else %}none{% endif %};">
+            <label for="is_pregnant">Pregnant:</label>
+            <select id="is_pregnant" name="is_pregnant" onchange="togglePregnancyField()">
+                <option value="0" {% if is_pregnant == 0 %}selected{% endif %}>No</option>
+                <option value="1" {% if is_pregnant == 1 %}selected{% endif %}>Yes</option>
+            </select><br><br>
+            
+            <div id="pregnancy_months" style="display:none;">
+                <label for="pregnancy_months">How many months pregnant?</label>
+                <input type="number" id="pregnancy_months" name="pregnancy_months" min="1" max="9" value="{{ pregnancy_months }}"><br><br>
+            </div>
+        </div>
+
+        <label for="previous_injuries">Previous Injuries:</label>
+        <select id="previous_injuries" name="previous_injuries" onchange="toggleInjuryDetails()">
+            <option value="0" {% if previous_injuries == 0 %}selected{% endif %}>No</option>
+            <option value="1" {% if previous_injuries == 1 %}selected{% endif %}>Yes</option>
+        </select><br><br>
+
+        <div id="injury_details" style="display:none;">
+            <label for="injury_details">Specify Injury Details:</label><br>
+            <textarea id="injury_details" name="injury_details" rows="3">{{ injury_details }}</textarea><br><br>
+        </div>
+
+        <label for="disease_status">Any Diseases:</label>
+        <select id="disease_status" name="disease_status" onchange="toggleDiseaseDetails()">
+            <option value="0" {% if disease_status == 0 %}selected{% endif %}>No</option>
+            <option value="1" {% if disease_status == 1 %}selected{% endif %}>Yes</option>
+        </select><br><br>
+
+        <div id="disease_details" style="display:none;">
+            <label for="disease_details">Specify Disease Details:</label><br>
+            <textarea id="disease_details" name="disease_details" rows="3">{{ disease_details }}</textarea><br><br>
+        </div>
+
+        <label for="injury_type">Type of Injuries:</label>
+        <select id="injury_type" name="injury_type">
+            <option value="Fracture" {% if injury_type == "Fracture" %}selected{% endif %}>Fracture</option>
+            <option value="Sprain" {% if injury_type == "Sprain" %}selected{% endif %}>Sprain</option>
+            <option value="Dislocation" {% if injury_type == "Dislocation" %}selected{% endif %}>Dislocation</option>
+            <option value="Other" {% if injury_type == "Other" %}selected{% endif %}>Other</option>
+        </select><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+</body>
+</html>

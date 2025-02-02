@@ -100,45 +100,70 @@
     /* Search results container */
     .search-results {
         position: absolute;
-        top: 100%; /* Position below the search input */
-        left: 0;
-        width: 100%;
-        max-height: 300px;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        max-height: 400px;
         overflow-y: auto;
         background-color: white;
-        border: 1px solid #ccc;
-        border-top: none;
-        border-radius: 0 0 5px 5px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        z-index: 9999;
-        display: none; /* Initially hidden */
+        border: 1px solid #ddd;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 1000;
+        display: none;
     }
 
     .search-result-item {
-        padding: 10px;
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
         border-bottom: 1px solid #eee;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: background-color 0.2s;
     }
 
     .search-result-item:hover {
-        background-color: #f0f0f0;
+        background-color: #f8f9fa;
     }
 
-    .search-result-item h4 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: bold;
+    .search-result-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-right: 15px;
     }
 
-    .search-result-item p {
-        font-size: 12px;
-        color: #555;
+    .search-result-details {
+        flex: 1;
     }
 
-    .search-result-item span {
-        font-size: 14px;
-        font-weight: bold;
+    .search-result-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+    .search-result-description {
+        font-size: 0.85em;
+        color: #666;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .search-result-price {
+        font-weight: 600;
+        color: #2874f0;
+    }
+
+    .no-results {
+        padding: 15px;
+        text-align: center;
+        color: #666;
     }
 
     /* Show search results when there are suggestions */
@@ -155,32 +180,34 @@
 
     /* Product listing */
     .product-list .row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
     }
 
     .product-card {
-        background-color: white;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 15px;
-        text-align: center;
-        flex: 1 1 calc(25% - 15px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 15px;
     }
 
     .product-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .product-image {
         width: 100%;
-        height: auto;
-        max-height: 200px;
-        margin-bottom: 10px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 15px;
     }
 
     .product-card h5 {
@@ -221,37 +248,48 @@
     }
 
     /* Filters */
-    .filters {
+    .filters-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
         margin-bottom: 20px;
-        padding: 15px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .filters h4 {
+    .filters-section h4 {
         margin-bottom: 15px;
-        font-size: 18px;
+        color: #333;
     }
 
-    .styled-select {
+    .filter-group {
+        margin-bottom: 15px;
+    }
+
+    .filter-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+    .filter-select {
         width: 100%;
         padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
     }
 
-    .filter-btn {
-        margin-top: 10px;
+    .apply-filters {
         background-color: #2874f0;
         color: white;
-        padding: 8px 15px;
         border: none;
-        border-radius: 5px;
+        padding: 10px 20px;
+        border-radius: 4px;
         cursor: pointer;
+        transition: background-color 0.3s;
     }
 
-    .filter-btn:hover {
+    .apply-filters:hover {
         background-color: #1b62c1;
     }
 </style>
@@ -369,91 +407,288 @@
 </div>
 
 <div class="content">
-    <!-- Search bar -->
+    <!-- Search bar with recommendations -->
     <div class="search-bar">
-        <form method="GET" action="{% url 'search_products' %}" id="search-form">
-            <input type="text" name="query" placeholder="Search for products..." class="search-input" id="search-input" />
-            <button type="submit" class="search-btn">Search</button>
-        </form>
+        <input type="text" placeholder="Search for products..." class="search-input" id="search-input" />
+        <button class="search-btn" id="search-button">Search</button>
         <div id="search-results" class="search-results"></div>
     </div>
-    
-    <script>
-    // Add an event listener to the search input field
-    document.getElementById('search-input').addEventListener('input', function() {
-        const query = this.value;
-        
-        if (query.length > 1) {
-            fetch(`{% url 'search_products' %}?query=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    const resultsContainer = document.getElementById('search-results');
-                    resultsContainer.innerHTML = '';  // Clear previous results
-                    
-                    if (data.products.length > 0) {
-                        resultsContainer.classList.add('show'); // Show the search results
-                        data.products.forEach(product => {
-                            const resultItem = document.createElement('div');
-                            resultItem.classList.add('search-result-item');
-                            resultItem.innerHTML = `
-                                <h4>${product.name}</h4>
-                            `;
-                            // Add event listener to each result item
-                            resultItem.addEventListener('click', function() {
-                                document.getElementById('search-input').value = product.name;  // Fill search input with clicked suggestion
-                                document.getElementById('search-form').submit();  // Submit the form automatically
-                            });
-                            resultsContainer.appendChild(resultItem);
-                        });
-                    } else {
-                        resultsContainer.innerHTML = '<p>No products found</p>';
-                        resultsContainer.classList.add('show'); // Show even if no results
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        } else {
-            document.getElementById('search-results').innerHTML = '';
-            document.getElementById('search-results').classList.remove('show'); // Hide if query is too short
-        }
-    });
-</script>
 
-    
-    <!-- Category Filters -->
-    <div class="filters">
+    <!-- Filters Section -->
+    <div class="filters-section">
         <h4>Filters</h4>
-        <form method="GET" action="{% url 'filter_products' %}">
+        <form id="filter-form" class="filter-group">
             <label for="category">Category:</label>
-            <select name="category" id="category" class="styled-select">
+            <select name="category" id="category" class="filter-select">
                 <option value="">All Categories</option>
                 {% for category in categories %}
                     <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="filter-btn">Apply</button>
+            <button type="submit" class="apply-filters">Apply Filters</button>
         </form>
     </div>
 
     <!-- Product Listing -->
     <div class="product-list">
-        <div class="row">
+        <div class="row" id="product-container">
             {% for product in products %}
                 <div class="product-card">
                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
                     <h5>{{ product.name }}</h5>
                     <p>Rs. {{ product.price }}</p>
-                    <a href="{% url 'product_detail' product.id %}" class="btn btn-info">View Details</a>
-                    <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
-    
-                    {% if product.id in wishlist_items %}
-                        <span style="font-size: 24px; color: red;">❤️</span> <!-- Heart emoji -->
-                    {% else %}
-                        <button class="btn btn-secondary add-to-wishlist" data-product-id="{{ product.id }}">Add to Wishlist</button>
-                    {% endif %}
+                    <div class="product-actions">
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-info">View Details</a>
+                        <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+                        {% if product.id in wishlist_items %}
+                            <span style="font-size: 24px; color: red;">❤️</span>
+                        {% else %}
+                            <button class="btn btn-secondary add-to-wishlist" data-product-id="{{ product.id }}">Add to Wishlist</button>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         </div>
     </div>
-    
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const searchResults = document.getElementById('search-results');
+        const productContainer = document.getElementById('product-container');
+        const filterForm = document.getElementById('filter-form');
+        let searchTimeout;
+        let originalContent = productContainer.innerHTML;
+
+        // Function to perform search
+        function performSearch(query) {
+            if (!query.trim()) {
+                searchResults.style.display = 'none';
+                productContainer.innerHTML = originalContent;
+                return;
+            }
+
+            fetch(`{% url 'search_products' %}?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.products && data.products.length > 0) {
+                        // Update the main product container with search results
+                        productContainer.innerHTML = data.products.map(product => `
+                            <div class="product-card">
+                                ${product.image ? 
+                                    `<img src="${product.image}" alt="${product.name}" class="product-image">` :
+                                    '<div class="product-image" style="background: #eee;"></div>'
+                                }
+                                <h5>${product.name}</h5>
+                                <p>Rs. ${product.price}</p>
+                                <div class="product-actions">
+                                    <a href="/product/${product.id}" class="btn btn-info">View Details</a>
+                                    <button class="btn btn-primary add-to-cart" data-product-id="${product.id}">Add to Cart</button>
+                                    <button class="btn btn-secondary add-to-wishlist" data-product-id="${product.id}">Add to Wishlist</button>
+                                </div>
+                            </div>
+                        `).join('');
+                        
+                        // Hide search results dropdown
+                        searchResults.style.display = 'none';
+                        
+                        // Reattach event listeners
+                        attachEventListeners();
+                    } else {
+                        productContainer.innerHTML = `
+                            <div class="no-results" style="text-align: center; padding: 20px;">
+                                No products found for "${query}"
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    productContainer.innerHTML = `
+                        <div class="no-results" style="text-align: center; padding: 20px;">
+                            An error occurred while searching. Please try again.
+                        </div>
+                    `;
+                });
+        }
+
+        // Add click event listener to search button
+        searchButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const query = searchInput.value;
+            performSearch(query);
+        });
+
+        // Add enter key press event on search input
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = searchInput.value;
+                performSearch(query);
+            }
+        });
+
+        // Keep existing input event for live search suggestions
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            clearTimeout(searchTimeout);
+
+            if (!query) {
+                searchResults.classList.remove('show');
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`{% url 'search_products' %}?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.products && data.products.length > 0) {
+                            // Show search recommendations dropdown
+                            searchResults.innerHTML = data.products.map(product => `
+                                <div class="search-result-item" data-product-id="${product.id}">
+                                    <img src="${product.image || '/static/placeholder.jpg'}" class="search-result-image">
+                                    <div class="search-result-details">
+                                        <div class="search-result-name">${product.name}</div>
+                                        <div class="search-result-description">${product.description}</div>
+                                        <div class="search-result-price">Rs. ${product.price}</div>
+                                    </div>
+                                </div>
+                            `).join('');
+                            searchResults.style.display = 'block';
+
+                            // Add click handlers for search results
+                            document.querySelectorAll('.search-result-item').forEach(item => {
+                                item.addEventListener('click', function() {
+                                    window.location.href = `/product/${this.dataset.productId}`;
+                                });
+                            });
+                        } else {
+                            searchResults.innerHTML = `
+                                <div class="no-results">
+                                    No products found for "${query}"
+                                </div>
+                            `;
+                            searchResults.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        searchResults.innerHTML = `
+                            <div class="no-results">
+                                An error occurred while searching. Please try again.
+                            </div>
+                        `;
+                        searchResults.style.display = 'block';
+                    });
+            }, 300);
+        });
+
+        // Handle filter form submission
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const category = document.getElementById('category').value;
+            
+            fetch(`{% url 'filter_products' %}?category=${category}`)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newProducts = doc.getElementById('product-container');
+                    if (newProducts) {
+                        productContainer.innerHTML = newProducts.innerHTML;
+                        attachEventListeners();
+                    }
+                })
+                .catch(error => {
+                    console.error('Filter error:', error);
+                    alert('Error applying filters. Please try again.');
+                });
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Function to attach event listeners to dynamic elements
+        function attachEventListeners() {
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    addToCart(productId);
+                });
+            });
+
+            document.querySelectorAll('.add-to-wishlist').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    addToWishlist(productId);
+                });
+            });
+        }
+
+        // Initial attachment of event listeners
+        attachEventListeners();
+    });
+
+    // Cart and Wishlist functions remain the same
+    function addToCart(productId) {
+        fetch(`/add-to-cart/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ quantity: 1 }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong. Please try again.');
+        });
+    }
+
+    function addToWishlist(productId) {
+        fetch(`/wishlist/add/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong. Please try again.');
+        });
+    }
+
+    // CSRF token helper function
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock %}
